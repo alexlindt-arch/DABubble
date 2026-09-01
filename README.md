@@ -84,9 +84,9 @@ public/
 
 | Name | GitHub |
 | --- | --- |
-| Alexander Lindt | [@alexlindt-arch](https://github.com/alexlindt-arch) |
 | Julia Schäffer | [@edda14](https://github.com/edda14) |
 | Joannis Ballos | [@ball82](https://github.com/ball82) |
+| Alexander Lindt | [@alexlindt-arch](https://github.com/alexlindt-arch) |
 
 ## Lizenz
 
