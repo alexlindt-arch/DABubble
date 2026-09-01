@@ -67,20 +67,17 @@ firebase deploy
 ```
 src/
 ├─ app/
-│  ├─ components/       # Feature-Komponenten
-│  │  ├─ auth/          # login, register, choose-avatar, forgot-password, reset-password
-│  │  └─ main/          # main-layout, sidebar, chat, thread, new-message
-│  ├─ shared/           # wiederverwendbare Komponenten (message-item, message-input, emoji-picker)
-│  ├─ services/         # auth, user, channel, message
-│  ├─ models/           # Interfaces für User, Channel, Message
-│  ├─ guards/           # Routen-Schutz
-│  ├─ pipes/            # eigene Pipes
-│  └─ firebase.ts       # Firebase-Initialisierung
+│  ├─ components/       # login, register, choose-avatar, forgot-password, reset-password,
+│  │                    # main-layout, sidebar, chat, thread, new-message
+│  ├─ shared/           # wiederverwendbare Komponenten + Pipes
+│  ├─ services/         # auth, user, channel, message + auth.guard
+│  ├─ models.ts         # Interfaces für User, Channel, Message
+│  ├─ firebase.ts       # Firebase-Initialisierung
+│  └─ app.ts / app.html / app.routes.ts
 ├─ environments/        # Firebase-Konfiguration
 └─ index.html
 public/
-├─ img/                 # Bilder
-└─ icons/               # Icons
+└─ img/                 # Bilder und Icons
 ```
 
 ## Team
