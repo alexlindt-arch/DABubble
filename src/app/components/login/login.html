@@ -1,0 +1,98 @@
+<div class="login-page">
+  <header class="login-page__header">
+    <img class="login-page__logo" src="/assets/img/Logo.svg" alt="DABubble Logo" />
+
+    <div class="signup-hint">
+      <span>Neu bei DABubble?</span>
+      <a class="signup-hint__link" routerLink="/register">Konto erstellen</a>
+    </div>
+  </header>
+
+  <section class="login-card">
+    <h1 class="login-card__title">Anmeldung</h1>
+    <p class="login-card__subtitle">
+      Wir empfehlen dir, die E-Mail-Adresse zu nutzen, die du bei der Arbeit verwendest.
+    </p>
+
+    <form class="login-form" [formGroup]="loginForm" (ngSubmit)="submitLogin()" novalidate>
+      <div class="form-field">
+        <label class="input-group">
+          <img class="input-group__icon" src="/assets/img/icons/mail-default.svg" alt="" />
+          <input
+            class="input-group__input"
+            type="email"
+            formControlName="email"
+            placeholder="beispielname@email.com"
+            autocomplete="email"
+            aria-label="E-Mail-Adresse"
+          />
+        </label>
+        @if (emailErrorMessage && loginForm.controls.email.touched) {
+          <span class="form-field__error">{{ emailErrorMessage }}</span>
+        }
+      </div>
+
+      <div class="form-field">
+        <label class="input-group">
+          <img class="input-group__icon" src="/assets/img/icons/lock-default.svg" alt="" />
+          <input
+            class="input-group__input"
+            type="password"
+            formControlName="password"
+            placeholder="Passwort"
+            autocomplete="current-password"
+            aria-label="Passwort"
+          />
+        </label>
+        @if (passwordErrorMessage && loginForm.controls.password.touched) {
+          <span class="form-field__error">{{ passwordErrorMessage }}</span>
+        }
+      </div>
+
+      <a class="forgot-password-link" routerLink="/forgot-password">Passwort vergessen?</a>
+
+      <div class="divider">
+        <span class="divider__line"></span>
+        <span class="divider__label">ODER</span>
+        <span class="divider__line"></span>
+      </div>
+
+      <button
+        type="button"
+        class="google-button"
+        [disabled]="isSubmitting"
+        (click)="loginWithGoogle()"
+      >
+        <img class="google-button__icon" src="/assets/img/icons/google.svg" alt="" />
+        <span>Anmelden mit Google</span>
+      </button>
+
+      @if (loginError) {
+        <p class="login-form__error" role="alert">{{ loginError }}</p>
+      }
+
+      <div class="login-form__actions">
+        <button
+          type="submit"
+          class="btn btn--primary"
+          [disabled]="loginForm.invalid || isSubmitting"
+        >
+          Anmelden
+        </button>
+        <button
+          type="button"
+          class="btn btn--secondary"
+          [disabled]="isSubmitting"
+          (click)="loginAsGuest()"
+        >
+          Gäste-Login
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <footer class="login-page__footer">
+    <span class="login-page__footer-link">Impressum</span>
+    <span class="login-page__footer-link">Datenschutz</span>
+  </footer>
+</div>
