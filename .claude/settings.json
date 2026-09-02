@@ -9,7 +9,20 @@
       "Bash(git remote *)",
       "Bash(git fetch *)",
       "Bash(git checkout *)",
-      "Bash(git -C /Users/Programming/Documents/DABubble log --oneline)"
+      "Bash(git -C /Users/Programming/Documents/DABubble log --oneline)",
+      "Bash(npx ng *)",
+      "Bash(command -v nvm)",
+      "Bash([ -s \"$HOME/.nvm/nvm.sh\" ])",
+      "Bash(command -v fnm)",
+      "Bash(command -v n)",
+      "Bash(command -v brew)",
+      "Read(//Users/Programming/**)",
+      "Read(//usr/local/bin/**)",
+      "Bash(brew list *)",
+      "Bash(brew info *)",
+      "Bash(npm start *)",
+      "Bash(curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh)",
+      "Bash(bash)"
     ]
   }
 }
