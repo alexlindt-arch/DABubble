@@ -10,4 +10,14 @@ import { NewMessage } from '../new-message/new-message';
   templateUrl: './main-layout.html',
   styleUrl: './main-layout.scss',
 })
-export class MainLayout {}
+export class MainLayout {
+  profileMenuOpen = false;
+
+toggleProfileMenu() {
+  this.profileMenuOpen = !this.profileMenuOpen;
+}
+
+closeProfileMenu() {
+  this.profileMenuOpen = false;
+}
+}

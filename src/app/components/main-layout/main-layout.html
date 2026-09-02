@@ -10,7 +10,7 @@
             </div>
 
         </div>
-        <div class="profile-wrapper">
+        <div class="profile-wrapper" (click)="toggleProfileMenu()">
             <p>Frederik Beck</p>
             <div class="profile-picture-div">
                 <img class="profile-picture" src="./assets/img/avatar/Property 1=Elias Neumann.png" alt="Profilbild">
@@ -23,5 +23,15 @@
                 <img class="icon-hover" src="./assets/img/icons/arrow-hover.svg" alt="">
             </div>
         </div>
+        @if (profileMenuOpen) {
+  <div class="overlay" (click)="closeProfileMenu()">
+
+    <div class="profile-menu" (click)="$event.stopPropagation()">
+      <button>Profil</button>
+      <button>Log out</button>
+    </div>
+
+  </div>
+}
     </header>
 </main>
