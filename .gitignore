@@ -53,7 +53,7 @@ Thumbs.db
 firebase-debug.log
 firestore-debug.log
 ui-debug.log
-/enviroments/enviroment.ts
+/src/environments/environment.ts
 
 
 
