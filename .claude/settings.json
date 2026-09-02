@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /Users/Programming/Documents/DABubble status)",
+      "Bash(git -C /Users/Programming/Documents/DABubble remote -v)",
+      "Bash(gh auth *)",
+      "Bash(git ls-remote *)",
+      "Bash(git init *)",
+      "Bash(git remote *)",
+      "Bash(git fetch *)",
+      "Bash(git checkout *)",
+      "Bash(git -C /Users/Programming/Documents/DABubble log --oneline)"
+    ]
+  }
+}
