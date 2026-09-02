@@ -54,6 +54,5 @@ firebase-debug.log
 firestore-debug.log
 ui-debug.log
 
-# Environment config (contains Firebase credentials)
-/src/environments
+
 

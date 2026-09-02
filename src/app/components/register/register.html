@@ -1,0 +1,119 @@
+<div class="register-page">
+  <header class="register-page__header">
+    <img class="register-page__logo" src="/assets/img/Home-Workspaces.svg" alt="DABubble Logo" />
+  </header>
+
+  <section class="register-card">
+    <div class="register-card__top">
+      <button
+        type="button"
+        class="back-button"
+        aria-label="Zurück zur Anmeldung"
+        (click)="goBack()"
+      >
+        <img src="/assets/img/icons/arrow_back.svg" alt="" />
+      </button>
+      <h1 class="register-card__title">Konto erstellen</h1>
+    </div>
+
+    <p class="register-card__subtitle">
+      Mit deinem Namen und deiner E-Mail-Adresse hast du dein neues DABubble-Konto.
+    </p>
+
+    <form
+      class="register-form"
+      [formGroup]="registerForm"
+      (ngSubmit)="submitRegister()"
+      novalidate
+    >
+      <div class="form-field">
+        <label class="input-group">
+          <img class="input-group__icon" src="/assets/img/icons/account_circle.svg" alt="" />
+          <input
+            class="input-group__input"
+            type="text"
+            formControlName="name"
+            placeholder="Name und Nachname"
+            autocomplete="name"
+            aria-label="Name und Nachname"
+          />
+        </label>
+        @if (nameErrorMessage && registerForm.controls.name.touched) {
+          <span class="form-field__error">{{ nameErrorMessage }}</span>
+        }
+      </div>
+
+      <div class="form-field">
+        <label class="input-group">
+          <img class="input-group__icon" src="/assets/img/icons/mail-default.svg" alt="" />
+          <input
+            class="input-group__input"
+            type="email"
+            formControlName="email"
+            placeholder="beispielname@email.com"
+            autocomplete="email"
+            aria-label="E-Mail-Adresse"
+          />
+        </label>
+        @if (emailErrorMessage && registerForm.controls.email.touched) {
+          <span class="form-field__error">{{ emailErrorMessage }}</span>
+        }
+      </div>
+
+      <div class="form-field">
+        <label class="input-group">
+          <img class="input-group__icon" src="/assets/img/icons/lock-default.svg" alt="" />
+          <input
+            class="input-group__input"
+            type="password"
+            formControlName="password"
+            placeholder="Passwort"
+            autocomplete="new-password"
+            aria-label="Passwort"
+          />
+        </label>
+        @if (passwordErrorMessage && registerForm.controls.password.touched) {
+          <span class="form-field__error">{{ passwordErrorMessage }}</span>
+        }
+      </div>
+
+      <div class="form-field">
+        <label class="checkbox-group">
+          <input
+            class="checkbox-group__input"
+            type="checkbox"
+            formControlName="acceptPrivacy"
+          />
+          <span class="checkbox-group__box"></span>
+          <span class="checkbox-group__text">
+            Ich stimme der
+            <span class="checkbox-group__link">Datenschutzerklärung</span>
+            zu.
+          </span>
+        </label>
+        @if (privacyErrorMessage && registerForm.controls.acceptPrivacy.touched) {
+          <span class="form-field__error">{{ privacyErrorMessage }}</span>
+        }
+      </div>
+
+      @if (registerError) {
+        <p class="register-form__error" role="alert">{{ registerError }}</p>
+      }
+
+      <div class="register-form__actions">
+        <button
+          type="submit"
+          class="btn btn--primary"
+          [disabled]="registerForm.invalid || isSubmitting"
+        >
+          Weiter
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <footer class="register-page__footer">
+    <span class="register-page__footer-link">Impressum</span>
+    <span class="register-page__footer-link">Datenschutz</span>
+  </footer>
+</div>
