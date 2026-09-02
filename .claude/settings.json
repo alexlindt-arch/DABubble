@@ -26,7 +26,8 @@
       "Bash(mkdir -p /tmp/pw-verify)",
       "Read(//tmp/**)",
       "Bash(export PLAYWRIGHT_BROWSERS_PATH=/tmp/pw-verify/browsers)",
-      "Bash(npx --yes playwright@1.62.1 install chromium --with-deps)"
+      "Bash(npx --yes playwright@1.62.1 install chromium --with-deps)",
+      "Bash(pip3 show *)"
     ]
   }
 }
