@@ -4,6 +4,10 @@
     font-family: 'Nunito';
 }
 
+input:focus {
+  outline: none;
+}
+
 @font-face {
   font-family: 'Nunito';
   src: url('/assets/font/Nunito/static/Nunito-ExtraLight.ttf') format('truetype');
