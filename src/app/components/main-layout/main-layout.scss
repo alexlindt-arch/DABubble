@@ -1,0 +1,26 @@
+main {
+    padding: 25px 20px;
+    header {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        img {
+            height: 70px;
+            width: 242px;
+            margin-left: 25px;
+        }
+        .input-wrapper {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            margin-left: 113px;
+            width: 100%;
+            img {
+                width: 35px;
+                height: 35px;
+
+            }
+        }
+    }
+}
