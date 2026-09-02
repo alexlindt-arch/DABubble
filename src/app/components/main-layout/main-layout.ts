@@ -1,9 +1,13 @@
 import { Component } from '@angular/core';
+import { Sidebar } from '../sidebar/sidebar';
+import { Chat } from '../chat/chat';
+import { Thread } from '../thread/thread';
+import { NewMessage } from '../new-message/new-message';
 
 @Component({
-  imports: [],
   selector: 'app-main-layout',
-  styleUrl: './main-layout.scss',
+  imports: [Sidebar, Chat, Thread, NewMessage],
   templateUrl: './main-layout.html',
+  styleUrl: './main-layout.scss',
 })
 export class MainLayout {}
