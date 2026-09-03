@@ -1,1 +1,66 @@
-<p>send-mail works!</p>
+<div class="send-mail-page">
+  <header class="send-mail-page__header">
+    <img class="send-mail-page__logo" src="/assets/img/Home-Workspaces.svg" alt="DABubble Logo" />
+  </header>
+
+  <section class="send-mail-card">
+    <div class="send-mail-card__top">
+      <button
+        type="button"
+        class="back-button"
+        aria-label="Zurück zur Anmeldung"
+        (click)="goBack()"
+      >
+        <img src="/assets/img/icons/arrow_back.svg" alt="" />
+      </button>
+      <h1 class="send-mail-card__title">Passwort zurücksetzen</h1>
+    </div>
+
+    <p class="send-mail-card__subtitle">Bitte gib deine E-Mail-Adresse ein.</p>
+
+    <form
+      class="send-mail-form"
+      [formGroup]="sendMailForm"
+      (ngSubmit)="submitSendMail()"
+      novalidate
+    >
+      <div class="form-field">
+        <label class="input-group">
+          <img class="input-group__icon" src="/assets/img/icons/mail-default.svg" alt="" />
+          <input
+            class="input-group__input"
+            type="email"
+            formControlName="email"
+            placeholder="beispielname@email.com"
+            autocomplete="email"
+            aria-label="E-Mail-Adresse"
+          />
+        </label>
+        @if (emailErrorMessage && sendMailForm.controls.email.touched) {
+          <span class="form-field__error">{{ emailErrorMessage }}</span>
+        }
+      </div>
+
+      <p class="send-mail-form__hint">
+        Wir senden dir eine E-Mail, über die du dein Passwort ändern kannst.
+      </p>
+
+      @if (mailSent) {
+        <p class="send-mail-form__success" role="status">
+          Die E-Mail ist unterwegs. Schau in dein Postfach.
+        </p>
+      }
+
+      <div class="send-mail-form__actions">
+        <button type="submit" class="btn btn--primary" [disabled]="sendMailForm.invalid">
+          E-Mail senden
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <footer class="send-mail-page__footer">
+    <span class="send-mail-page__footer-link">Impressum</span>
+    <span class="send-mail-page__footer-link">Datenschutz</span>
+  </footer>
+</div>
