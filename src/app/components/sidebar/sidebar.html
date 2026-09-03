@@ -1,0 +1,83 @@
+<section class="sidebar-content">
+    <div class="sidebar-header">
+        <img class="logo" src="./assets/img/Workspace-logo.svg" alt="workspace">
+        <p>Devspace</p>
+        <button type="button" class="toggle-icon" aria-label="Neue Nachricht">
+            <img class="toggle-header-icon" src="./assets/img/icons/edit_square.svg" alt="">
+            <img class="toggle-header-icon-hover" src="./assets/img/icons/edit_square-hover.svg" alt="">
+        </button>
+    </div>
+    <nav class="sidebar-navigation" aria-label="Channels und Direktnachrichten">
+        <section class="navigation-group">
+            <div class="group-heading">
+                <button type="button" class="group-toggle" (click)="toggleChannels()"
+                    [attr.aria-expanded]="channelsOpen" aria-controls="sidebar-channels">
+                    <span class="nav-icon dropdown-icon" [class.collapsed]="!channelsOpen" aria-hidden="true"></span>
+                    <span class="nav-icon channels-icon" aria-hidden="true"></span>
+                    <span class="group-title">Channels</span>
+                </button>
+                <button type="button" class="add-channel-button" aria-label="Channel hinzufügen"
+                    (click)="channelCreateRequested.emit()">
+                    <span class="nav-icon plus-icon" aria-hidden="true"></span>
+                </button>
+            </div>
+            <div id="sidebar-channels" class="collapsible-list" [class.collapsed]="!channelsOpen"
+                [attr.inert]="channelsOpen ? null : ''" [attr.aria-hidden]="!channelsOpen">
+                <div class="list-clip">
+                    <ul class="channel-list">
+                        @for (channel of channels; track channel) {
+                        <li>
+                            <button type="button" class="conversation channel-row" [title]="channel"
+                                [class.selected]="selectedConversation === 'channel:' + channel"
+                                [attr.aria-pressed]="selectedConversation === 'channel:' + channel"
+                                (click)="selectConversation('channel', channel)">
+                                <span class="nav-icon tag-icon" aria-hidden="true"></span>
+                                <span class="row-label">{{ channel }}</span>
+                            </button>
+                        </li>
+                        }
+                        <li class="add-channel-row">
+                            <button type="button" class="conversation" (click)="channelCreateRequested.emit()">
+                                <span class="nav-icon add-circle-icon" aria-hidden="true"></span>
+                                <span class="row-label">Channel hinzufügen</span>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="navigation-group">
+            <div class="group-heading">
+                <button type="button" class="group-toggle" (click)="toggleDirectMessages()"
+                    [attr.aria-expanded]="directMessagesOpen" aria-controls="sidebar-direct-messages">
+                    <span class="nav-icon dropdown-icon" [class.collapsed]="!directMessagesOpen" aria-hidden="true"></span>
+                    <span class="nav-icon account-icon" aria-hidden="true"></span>
+                    <span class="group-title">Direktnachrichten</span>
+                </button>
+            </div>
+            <div id="sidebar-direct-messages" class="collapsible-list" [class.collapsed]="!directMessagesOpen"
+                [attr.inert]="directMessagesOpen ? null : ''" [attr.aria-hidden]="!directMessagesOpen">
+                <div class="list-clip">
+                    <ul class="direct-message-list">
+                        @for (user of users; track user.name) {
+                        <li>
+                            <button type="button" class="conversation user-row" [title]="user.name"
+                                [class.selected]="selectedConversation === 'direct:' + user.name"
+                                [attr.aria-pressed]="selectedConversation === 'direct:' + user.name"
+                                (click)="selectConversation('direct', user.name)">
+                                <span class="avatar-wrapper">
+                                    <img [src]="'/assets/img/avatar/Property 1=' + user.name + '.png'" alt="">
+                                    <span class="status-dot" [class.offline]="!user.online"
+                                        role="img" [attr.aria-label]="user.online ? 'Online' : 'Offline'"></span>
+                                </span>
+                                <span class="row-label">{{ user.name }}{{ user.isSelf ? ' (Du)' : '' }}</span>
+                            </button>
+                        </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </nav>
+</section>

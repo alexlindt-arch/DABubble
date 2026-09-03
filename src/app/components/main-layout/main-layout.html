@@ -24,14 +24,56 @@
             </div>
         </div>
         @if (profileMenuOpen) {
-  <div class="overlay" (click)="closeProfileMenu()">
+        <div class="overlay" (click)="closeProfileMenu()">
 
-    <div class="profile-menu" (click)="$event.stopPropagation()">
-      <button>Profil</button>
-      <button>Log out</button>
-    </div>
-
-  </div>
-}
+            <div class="profile-menu" (click)="$event.stopPropagation()">
+                <button>Profil</button>
+                <button>Log out</button>
+            </div>
+        </div>
+        }
     </header>
+    <section class="content" [class.sidebar-closed]="!sidebarOpen">
+    <app-sidebar
+      id="workspace-sidebar"
+      [class.closed]="!sidebarOpen"
+      [attr.inert]="sidebarOpen ? null : ''"
+      [attr.aria-hidden]="!sidebarOpen"
+    ></app-sidebar>
+
+  <app-chat></app-chat>
+  <app-thread></app-thread>
+</section>
+
+<button
+  type="button"
+  class="sidebar-toggle"
+  [class.is-closed]="!sidebarOpen"
+  [style.height.px]="sidebarOpen ? closeLabelHeight() : openLabelHeight()"
+  (click)="toggleSidebar()"
+  [attr.aria-expanded]="sidebarOpen"
+  [attr.aria-label]="sidebarOpen ? 'Workspace-Menü schließen' : 'Workspace-Menü öffnen'"
+  aria-controls="workspace-sidebar"
+>
+  <span class="toggle-label" aria-hidden="true">
+    <span class="toggle-text" [class.is-visible]="sidebarOpen">Workspace-Menü schließen</span>
+    <span class="toggle-text" [class.is-visible]="!sidebarOpen">Workspace-Menü öffnen</span>
+    <span #closeLabel class="toggle-text toggle-measure">Workspace-Menü schließen</span>
+    <span #openLabel class="toggle-text toggle-measure">Workspace-Menü öffnen</span>
+  </span>
+
+  <span class="toggle-icon" aria-hidden="true">
+    <img
+      class="toggle-icon-default"
+      [src]="sidebarOpen ? '/assets/img/icons/hide-navigation.svg' : '/assets/img/icons/show-navigation.svg'"
+      alt=""
+    >
+    <img
+      class="toggle-icon-hover"
+      [src]="sidebarOpen ? '/assets/img/icons/hide-navigation_hover.svg' : '/assets/img/icons/show-navigation-hover.svg'"
+      alt=""
+    >
+  </span>
+</button>
+
 </main>

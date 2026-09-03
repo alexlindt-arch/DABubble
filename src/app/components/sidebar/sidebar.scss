@@ -1,0 +1,288 @@
+.sidebar-content {
+    width: calc((100cqw - 40px) * 0.2);
+    height: auto;
+    background-color: rgba(255, 255, 255, 1);
+    border-radius: 30px;
+    padding: 32px 30px;
+    flex: 0 0 auto;
+    min-width: 0;
+    min-height: 0;
+    box-sizing: border-box;
+    overflow: auto;
+    transform: translateX(0);
+    transition: transform 0.3s ease;
+}
+
+:host(.closed) .sidebar-content {
+    transform: translateX(-100%);
+}
+
+.sidebar-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+
+    p {
+        min-width: 0;
+        margin: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 24px;
+        font-weight: 700;
+        color: rgba(0, 0, 0, 1);
+    }
+    .logo {
+        width: 60px;
+        height: 60px;
+        flex-shrink: 0;
+        margin-left: 2px;
+    }
+
+    .toggle-icon {
+        flex-shrink: 0;
+        margin-left: auto;
+    }
+
+}
+
+.toggle-icon {
+    position: relative;
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    border: none;
+    padding: 0;
+    background: transparent;
+
+    img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        transition: opacity 0.3s ease;
+    }
+
+    .toggle-header-icon {
+        opacity: 1;
+    }
+
+    .toggle-header-icon-hover {
+        opacity: 0;
+    }
+
+    &:hover {
+        .toggle-header-icon {
+            opacity: 0;
+        }
+
+        .toggle-header-icon-hover {
+            opacity: 1;
+        }
+    }
+}
+
+
+.sidebar-navigation {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    margin-top: 25px;
+
+    button {
+        font-family: inherit;
+        color: #000;
+        background: transparent;
+        border: 0;
+        cursor: pointer;
+        transition: color 0.3s ease, background-color 0.3s ease;
+
+        &:focus-visible {
+            outline: 2px solid #535af1;
+            outline-offset: 2px;
+        }
+    }
+
+    .nav-icon {
+        display: inline-block;
+        flex: 0 0 24px;
+        width: 24px;
+        height: 24px;
+        background-color: currentColor;
+        mask: var(--icon) center / contain no-repeat;
+    }
+
+    .dropdown-icon {
+        --icon: url('/assets/img/icons/arrow_drop_down.svg');
+        flex-basis: 20px;
+        width: 20px;
+        transition: transform 0.3s ease;
+
+        &.collapsed {
+            transform: rotate(-90deg);
+        }
+    }
+
+    .channels-icon { --icon: url('/assets/img/icons/workspaces.svg'); }
+    .account-icon { --icon: url('/assets/img/icons/account_circle.svg'); }
+    .plus-icon { --icon: url('/assets/img/icons/add.svg'); }
+    .tag-icon { --icon: url('/assets/img/icons/tag.svg'); }
+    .add-circle-icon { --icon: url('/assets/img/icons/add_circle.svg'); }
+
+    .group-heading {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        min-height: 32px;
+    }
+
+    .group-toggle {
+        display: flex;
+        flex: 1;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        min-height: 32px;
+        padding: 0;
+        text-align: left;
+        font-size: 18px;
+        font-weight: 700;
+
+        &:hover, &:focus-visible {
+            color: rgba(83, 90, 241, 1);
+            background-color: transparent;
+        }
+    }
+
+    .group-title, .row-label {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .add-channel-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 30px;
+        height: 30px;
+        margin-left: auto;
+        padding: 3px;
+        border-radius: 50%;
+
+        &:hover, &:focus-visible {
+            color: #535af1;
+            background-color: #eceefe;
+        }
+    }
+
+    // Keep the list mounted so its height can animate in both directions.
+    .collapsible-list {
+        display: grid;
+        grid-template-rows: 1fr;
+        opacity: 1;
+        transition: grid-template-rows 0.3s ease, opacity 0.3s ease;
+
+        &.collapsed {
+            grid-template-rows: 0fr;
+            opacity: 0;
+        }
+    }
+
+    .list-clip {
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    ul {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        list-style: none;
+        margin: 0;
+        padding: 20px 0 0 28px;
+    }
+
+    .conversation {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        min-width: 0;
+        padding: 6px 8px;
+        box-sizing: border-box;
+        border-radius: 24px;
+        font-size: 18px;
+        text-align: left;
+
+        &:hover, &:focus-visible { background-color: #eceefe; }
+
+        &.selected {
+            background-color: #eceefe;
+            color: #535af1;
+            font-weight: 700;
+        }
+    }
+
+    .channel-row {
+        width: fit-content;
+        max-width: 100%;
+
+        .tag-icon { color: #000; }
+    }
+
+    .user-row {
+        border-radius: 0;
+    }
+
+    .add-channel-row {
+        margin-top: 12px;
+
+        .conversation:hover, .conversation:focus-visible {
+            color: rgba(83, 90, 241, 1);
+            background-color: transparent;
+        }
+    }
+
+    .direct-message-list { gap: 10px; }
+
+    .avatar-wrapper {
+        position: relative;
+        flex: 0 0 50px;
+        width: 50px;
+        height: 50px;
+
+        img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+    }
+
+    .status-dot {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        width: 14px;
+        height: 14px;
+        border: 2px solid white;
+        border-radius: 50%;
+        box-sizing: border-box;
+        background-color: #92c83e;
+
+        &.offline { background-color: #686868; }
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sidebar-navigation *,
+    .sidebar-content {
+        transition: none;
+    }
+}
