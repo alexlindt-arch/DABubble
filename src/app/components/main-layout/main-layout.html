@@ -39,10 +39,13 @@
       [class.closed]="!sidebarOpen"
       [attr.inert]="sidebarOpen ? null : ''"
       [attr.aria-hidden]="!sidebarOpen"
+      (conversationSelected)="selectConversation($event)"
     ></app-sidebar>
 
-  <app-chat></app-chat>
+  <app-chat [isSelfChat]="selfChatOpen"></app-chat>
+  @if (!selfChatOpen) {
   <app-thread></app-thread>
+  }
 </section>
 
 <button

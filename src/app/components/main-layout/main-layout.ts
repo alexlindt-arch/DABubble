@@ -13,6 +13,7 @@ import { NewMessage } from '../new-message/new-message';
 export class MainLayout {
   profileMenuOpen = false;
   sidebarOpen = true;
+  selfChatOpen = false;
   closeLabelHeight = signal(310);
   openLabelHeight = signal(280);
   private closeLabel = viewChild.required<ElementRef<HTMLElement>>('closeLabel');
@@ -46,4 +47,8 @@ closeProfileMenu() {
 toggleSidebar(): void {
   this.sidebarOpen = !this.sidebarOpen;
 }
+
+  selectConversation(conversation: { type: 'channel' | 'direct'; id: string }): void {
+    this.selfChatOpen = conversation.type === 'direct' && conversation.id === 'Frederik Beck';
+  }
 }

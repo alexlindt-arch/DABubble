@@ -10,3 +10,198 @@
     border-radius: 30px;
     padding: 32px 30px;
 }
+
+.chat-content.self-chat {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+}
+
+.chat-header {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 15px;
+    min-height: 110px;
+    padding: 20px 45px;
+    box-sizing: border-box;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    z-index: 1;
+
+    h1 { margin: 0; font-size: 24px; font-weight: 700; }
+}
+
+.header-avatar {
+    position: relative;
+    flex: 0 0 50px;
+    width: 50px;
+    height: 50px;
+
+    img { width: 100%; height: 100%; border-radius: 50%; }
+
+    .online-dot {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 14px;
+        height: 14px;
+        border: 2px solid white;
+        border-radius: 50%;
+        background: #92c83e;
+    }
+}
+
+.chat-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    gap: 25px;
+    padding: 30px 40px 40px;
+}
+
+.chat-history {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #adb0d9 transparent;
+}
+
+.self-introduction {
+    margin-top: auto;
+
+    .introduction-profile {
+        display: flex;
+        align-items: flex-end;
+        gap: 25px;
+        margin-bottom: 20px;
+    }
+
+    img { width: 100px; height: 100px; border-radius: 50%; }
+    h2 { margin: 0; font-size: 24px; font-weight: 700; }
+    p { margin: 0; color: #686868; font-size: 18px; line-height: 1.5; }
+}
+
+.message-composer {
+    position: relative;
+    flex-shrink: 0;
+    min-width: 0;
+    padding: 16px 20px;
+    border: 1px solid #adb0d9;
+    border-radius: 20px;
+    transition: border-color 0.3s ease;
+
+    &:focus-within { border-color: #535af1; }
+
+    textarea {
+        display: block;
+        width: 100%;
+        height: 65px;
+        padding: 0;
+        box-sizing: border-box;
+        border: none;
+        outline: none;
+        resize: none;
+        background: transparent;
+        font: inherit;
+        font-size: 18px;
+        color: #000;
+
+        &::placeholder { color: #686868; opacity: 1; }
+    }
+}
+
+.composer-actions { display: flex; align-items: center; gap: 8px; }
+
+.composer-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 4px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: #686868;
+    cursor: pointer;
+    transition: color 0.3s ease, background-color 0.3s ease;
+
+    &:hover:not(:disabled), &:focus-visible { background: #eceefe; color: #535af1; }
+    &:focus-visible { outline: 2px solid #535af1; outline-offset: 2px; }
+    &:disabled { cursor: default; opacity: 0.5; }
+}
+
+.composer-icon {
+    display: block;
+    width: 24px;
+    height: 24px;
+    background: currentColor;
+    mask: var(--icon) center / contain no-repeat;
+}
+
+.emoji-icon { --icon: url('/assets/img/icons/sentiment_satisfied.svg'); }
+.mention-icon { --icon: url('/assets/img/icons/alternate_email.svg'); }
+.send-icon { --icon: url('/assets/img/icons/send.svg'); }
+.send-button { margin-left: auto; color: #444df2; }
+
+.emoji-picker {
+    position: absolute;
+    bottom: 58px;
+    left: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    max-width: calc(100% - 30px);
+    padding: 8px;
+    border-radius: 16px;
+    background: white;
+    box-shadow: 0 3px 12px #0002;
+
+    button {
+        padding: 6px;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        font-size: 24px;
+        cursor: pointer;
+
+        &:hover, &:focus-visible { background: #eceefe; }
+    }
+}
+
+.own-message {
+    align-self: flex-end;
+    max-width: 85%;
+    margin: 12px 0;
+    text-align: right;
+
+    span { font-size: 16px; font-weight: 700; }
+    p {
+        margin: 8px 0 0;
+        padding: 15px 20px;
+        border-radius: 24px 0 24px 24px;
+        background: #797ef3;
+        color: white;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        text-align: left;
+    }
+}
+
+@media (max-width: 700px) {
+    .chat-header { min-height: 80px; padding: 15px; }
+    .chat-header h1, .self-introduction h2 { font-size: 18px; }
+    .chat-body { padding: 20px 15px; gap: 16px; }
+    .self-introduction img { width: 70px; height: 70px; }
+    .self-introduction .introduction-profile { gap: 12px; }
+    .self-introduction p { font-size: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .message-composer, .composer-button { transition: none; }
+}
