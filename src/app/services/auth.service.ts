@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import {
   Auth,
   createUserWithEmailAndPassword,
-  deleteUser,
   getAuth,
   GoogleAuthProvider,
   signInAnonymously,
@@ -30,23 +29,18 @@ export class AuthService {
     return signInAnonymously(this.auth);
   }
 
-  async register(email: string, password: string, name: string): Promise<UserCredential> {
-    const credential = await createUserWithEmailAndPassword(this.auth, email, password);
-    try {
-      await this.createUserDocument(credential.user.uid, name, email);
-      return credential;
-    } catch (error) {
-      await this.rollbackRegistration(credential);
-      throw error;
-    }
+  register(email: string, password: string): Promise<UserCredential> {
+    return createUserWithEmailAndPassword(this.auth, email, password);
   }
 
-  private createUserDocument(uid: string, name: string, email: string): Promise<void> {
+  get currentUserId(): string | null {
+    return this.auth.currentUser?.uid ?? null;
+  }
+
+  saveUserProfile(name: string, email: string, avatar: string): Promise<void> {
+    const uid = this.currentUserId;
+    if (!uid) return Promise.reject(new Error('Kein angemeldeter Benutzer.'));
     const userRef = doc(this.firestore, 'users', uid);
-    return setDoc(userRef, { name, email, avatar: '', status: 'online' });
-  }
-
-  private async rollbackRegistration(credential: UserCredential): Promise<void> {
-    await deleteUser(credential.user).catch(() => undefined);
+    return setDoc(userRef, { name, email, avatar, status: 'online' });
   }
 }

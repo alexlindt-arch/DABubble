@@ -43,11 +43,15 @@
       </div>
     </div>
 
+    @if (avatarError) {
+      <p class="avatar-card__error" role="alert">{{ avatarError }}</p>
+    }
+
     <div class="avatar-card__actions">
       <button
         type="button"
         class="btn btn--primary"
-        [disabled]="!hasSelection"
+        [disabled]="!hasSelection || isSubmitting"
         (click)="continueToMain()"
       >
         Weiter

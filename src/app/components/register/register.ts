@@ -69,10 +69,14 @@ export class Register {
     this.isSubmitting = true;
     this.registerError = '';
     this.authService
-      .register(email ?? '', password ?? '', name ?? '')
-      .then(() => this.router.navigateByUrl('/choose-avatar'))
+      .register(email ?? '', password ?? '')
+      .then(() => this.goToAvatarSelection(name ?? '', email ?? ''))
       .catch((error: unknown) => (this.registerError = this.mapRegisterError(error)))
       .finally(() => (this.isSubmitting = false));
+  }
+
+  private goToAvatarSelection(name: string, email: string): void {
+    this.router.navigate(['/choose-avatar'], { state: { name, email } });
   }
 
   private mapRegisterError(error: unknown): string {

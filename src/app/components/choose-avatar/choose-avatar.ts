@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 const PLACEHOLDER_AVATAR = '/assets/img/Profile.svg';
 
@@ -20,6 +21,9 @@ const AVATAR_FILES = [
 })
 export class ChooseAvatar {
   private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
+
+  private readonly userEmail: string = history.state?.email ?? '';
 
   readonly avatars = AVATAR_FILES.map((file) => ({
     label: file.replace('Property 1=', '').replace('.png', ''),
@@ -29,6 +33,8 @@ export class ChooseAvatar {
   readonly userName: string = history.state?.name ?? 'Gast';
 
   selectedIndex: number | null = null;
+  isSubmitting = false;
+  avatarError = '';
 
   get previewUrl(): string {
     if (this.selectedIndex === null) return PLACEHOLDER_AVATAR;
@@ -48,7 +54,19 @@ export class ChooseAvatar {
   }
 
   continueToMain(): void {
-    if (!this.hasSelection) return;
-    this.router.navigateByUrl('/main');
+    if (!this.hasSelection || this.isSubmitting) return;
+    this.saveProfileAndContinue();
+  }
+
+  private saveProfileAndContinue(): void {
+    if (this.selectedIndex === null) return;
+    const avatar = AVATAR_FILES[this.selectedIndex];
+    this.isSubmitting = true;
+    this.avatarError = '';
+    this.authService
+      .saveUserProfile(this.userName, this.userEmail, avatar)
+      .then(() => this.router.navigateByUrl('/main'))
+      .catch(() => (this.avatarError = 'Profil konnte nicht gespeichert werden. Bitte versuche es erneut.'))
+      .finally(() => (this.isSubmitting = false));
   }
 }

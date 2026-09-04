@@ -188,6 +188,17 @@ $color-input-bg: rgba(236, 238, 254, 1);
 }
 
 
+.avatar-card__error {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  top: 546px;
+  margin: 0;
+  font-size: 14px;
+  text-align: center;
+  color: rgba(224, 34, 34, 1);
+}
+
 .avatar-card__actions {
   position: absolute;
   left: 446px;
@@ -313,6 +324,11 @@ $color-input-bg: rgba(236, 238, 254, 1);
     width: auto;
     height: auto;
     align-self: stretch;
+  }
+
+  .avatar-card__error {
+    position: static;
+    margin-top: 16px;
   }
 
   .avatar-card__actions {
