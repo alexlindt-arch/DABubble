@@ -1,6 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { FirebaseError } from 'firebase/app';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   imports: [ReactiveFormsModule],
@@ -10,6 +12,7 @@ import { Router } from '@angular/router';
 })
 export class Register {
   private readonly formBuilder = inject(FormBuilder);
+  private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
   readonly registerForm = this.formBuilder.group({
@@ -58,11 +61,25 @@ export class Register {
       this.registerForm.markAllAsTouched();
       return;
     }
-    this.goToAvatarSelection();
+    this.performRegister();
   }
 
-  private goToAvatarSelection(): void {
+  private performRegister(): void {
     const { name, email, password } = this.registerForm.getRawValue();
-    this.router.navigate(['/choose-avatar'], { state: { name, email, password } });
+    this.isSubmitting = true;
+    this.registerError = '';
+    this.authService
+      .register(email ?? '', password ?? '', name ?? '')
+      .then(() => this.router.navigateByUrl('/choose-avatar'))
+      .catch((error: unknown) => (this.registerError = this.mapRegisterError(error)))
+      .finally(() => (this.isSubmitting = false));
+  }
+
+  private mapRegisterError(error: unknown): string {
+    const code = error instanceof FirebaseError ? error.code : '';
+    if (code === 'auth/email-already-in-use') return 'Diese E-Mail-Adresse wird bereits verwendet.';
+    if (code === 'auth/invalid-email') return 'Bitte gib eine gültige E-Mail-Adresse ein.';
+    if (code === 'auth/weak-password') return 'Das Passwort ist zu schwach.';
+    return 'Die Registrierung ist fehlgeschlagen. Bitte versuche es erneut.';
   }
 }
