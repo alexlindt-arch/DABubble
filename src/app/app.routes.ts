@@ -6,6 +6,7 @@ import { ForgotPassword } from './components/forgot-password/forgot-password';
 import { ResetPassword } from './components/reset-password/reset-password';
 import { SendMail } from './components/send-mail/send-mail';
 import { MainLayout } from './components/main-layout/main-layout';
+import { authGuard } from './services/auth.guard';
 
 export const routes: Routes = [
   {
@@ -40,6 +41,7 @@ export const routes: Routes = [
   {
     path: 'main',
     component: MainLayout,
+    canActivate: [authGuard],
   },
   {
     path: '**',

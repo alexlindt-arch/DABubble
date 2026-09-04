@@ -1,6 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { FirebaseError } from 'firebase/app';
+import { AppUser } from '../../models';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -48,7 +50,7 @@ export class Login {
     this.loginError = '';
     this.authService
       .loginWithGoogle()
-      .then(() => this.router.navigateByUrl('/main'))
+      .then((user) => this.goToMain(user))
       .catch(() => (this.loginError = 'Die Google-Anmeldung ist fehlgeschlagen.'))
       .finally(() => (this.isSubmitting = false));
   }
@@ -58,7 +60,7 @@ export class Login {
     this.loginError = '';
     this.authService
       .loginAsGuest()
-      .then(() => this.router.navigateByUrl('/main'))
+      .then((user) => this.goToMain(user))
       .catch(() => (this.loginError = 'Die Gäste-Anmeldung ist fehlgeschlagen.'))
       .finally(() => (this.isSubmitting = false));
   }
@@ -69,8 +71,23 @@ export class Login {
     this.loginError = '';
     this.authService
       .login(email ?? '', password ?? '')
-      .then(() => this.router.navigateByUrl('/main'))
-      .catch(() => (this.loginError = 'E-Mail-Adresse oder Passwort ist falsch.'))
+      .then((user) => this.goToMain(user))
+      .catch((error: unknown) => (this.loginError = this.mapLoginError(error)))
       .finally(() => (this.isSubmitting = false));
+  }
+
+  private goToMain(user: AppUser | null): void {
+    if (user && !user.avatar) return void this.router.navigate(['/choose-avatar'], { state: user });
+    this.router.navigateByUrl('/main');
+  }
+
+  private mapLoginError(error: unknown): string {
+    const code = error instanceof FirebaseError ? error.code : '';
+    if (code === 'auth/invalid-email') return 'Bitte gib eine gültige E-Mail-Adresse ein.';
+    if (code === 'auth/too-many-requests') return 'Zu viele Versuche. Bitte warte einen Moment.';
+    if (code === 'auth/network-request-failed') return 'Keine Verbindung zum Server.';
+    if (code.startsWith('auth/')) return 'E-Mail-Adresse oder Passwort ist falsch.';
+    console.error('Login fehlgeschlagen:', error);
+    return 'Die Anmeldung ist fehlgeschlagen. Bitte versuche es erneut.';
   }
 }

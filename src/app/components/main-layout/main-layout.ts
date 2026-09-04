@@ -1,8 +1,19 @@
-import { afterNextRender, Component, DestroyRef, ElementRef, inject, signal, viewChild } from '@angular/core';
+import {
+  afterNextRender,
+  Component,
+  DestroyRef,
+  ElementRef,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
+import { Router } from '@angular/router';
 import { Sidebar } from '../sidebar/sidebar';
 import { Chat } from '../chat/chat';
 import { Thread } from '../thread/thread';
 import { NewMessage } from '../new-message/new-message';
+import { AuthService } from '../../services/auth.service';
+import { avatarUrl } from '../../shared/avatar-url';
 
 @Component({
   selector: 'app-main-layout',
@@ -11,6 +22,11 @@ import { NewMessage } from '../new-message/new-message';
   styleUrl: './main-layout.scss',
 })
 export class MainLayout {
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+
+  readonly currentUser = this.authService.currentUser;
+
   profileMenuOpen = false;
   sidebarOpen = true;
   selfChatOpen = false;
@@ -36,17 +52,34 @@ export class MainLayout {
     this.openLabelHeight.set(this.openLabel().nativeElement.offsetHeight + 76);
   }
 
-toggleProfileMenu() {
-  this.profileMenuOpen = !this.profileMenuOpen;
-}
+  get userName(): string {
+    return this.currentUser()?.name ?? 'Gast';
+  }
 
-closeProfileMenu() {
-  this.profileMenuOpen = false;
-}
+  get userAvatarUrl(): string {
+    return avatarUrl(this.currentUser()?.avatar);
+  }
 
-toggleSidebar(): void {
-  this.sidebarOpen = !this.sidebarOpen;
-}
+  get isOnline(): boolean {
+    return this.currentUser()?.status === 'online';
+  }
+
+  logout(): void {
+    this.closeProfileMenu();
+    this.authService.logout().finally(() => this.router.navigateByUrl('/login'));
+  }
+
+  toggleProfileMenu() {
+    this.profileMenuOpen = !this.profileMenuOpen;
+  }
+
+  closeProfileMenu() {
+    this.profileMenuOpen = false;
+  }
+
+  toggleSidebar(): void {
+    this.sidebarOpen = !this.sidebarOpen;
+  }
 
   selectConversation(conversation: { type: 'channel' | 'direct'; id: string }): void {
     this.selfChatOpen = conversation.type === 'direct' && conversation.id === 'Frederik Beck';

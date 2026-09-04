@@ -11,10 +11,12 @@
 
         </div>
         <div class="profile-wrapper" (click)="toggleProfileMenu()">
-            <p>Frederik Beck</p>
+            <p>{{ userName }}</p>
             <div class="profile-picture-div">
-                <img class="profile-picture" src="./assets/img/avatar/Property 1=Elias Neumann.png" alt="Profilbild">
-                <img class="online-dot" src="./assets/img/icons/Online.svg" alt="Online dot">
+                <img class="profile-picture" [src]="userAvatarUrl" alt="Profilbild">
+                @if (isOnline) {
+                <img class="online-dot" src="./assets/img/icons/Online.svg" alt="Online">
+                }
             </div>
 
             <div class="arrow-icon">
@@ -27,8 +29,8 @@
         <div class="overlay" (click)="closeProfileMenu()">
 
             <div class="profile-menu" (click)="$event.stopPropagation()">
-                <button>Profil</button>
-                <button>Log out</button>
+                <button type="button">Profil</button>
+                <button type="button" (click)="logout()">Log out</button>
             </div>
         </div>
         }
