@@ -3,6 +3,7 @@ import {
   Component,
   DestroyRef,
   ElementRef,
+  HostListener,
   inject,
   signal,
   viewChild,
@@ -28,6 +29,7 @@ export class MainLayout {
   readonly currentUser = this.authService.currentUser;
 
   profileMenuOpen = false;
+  profilePopupOpen = false;
   sidebarOpen = true;
   selfChatOpen = false;
   closeLabelHeight = signal(310);
@@ -64,6 +66,10 @@ export class MainLayout {
     return this.currentUser()?.status === 'online';
   }
 
+  get userEmail(): string {
+    return this.currentUser()?.email ?? '';
+  }
+
   logout(): void {
     this.closeProfileMenu();
     this.authService.logout().finally(() => this.router.navigateByUrl('/login'));
@@ -75,6 +81,21 @@ export class MainLayout {
 
   closeProfileMenu() {
     this.profileMenuOpen = false;
+  }
+
+  openProfilePopup(): void {
+    this.closeProfileMenu();
+    this.profilePopupOpen = true;
+  }
+
+  closeProfilePopup(): void {
+    this.profilePopupOpen = false;
+  }
+
+  @HostListener('document:keydown.escape')
+  closeDialogsWithEscape(): void {
+    this.closeProfileMenu();
+    this.closeProfilePopup();
   }
 
   toggleSidebar(): void {

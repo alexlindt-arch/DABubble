@@ -29,9 +29,48 @@
         <div class="overlay" (click)="closeProfileMenu()">
 
             <div class="profile-menu" (click)="$event.stopPropagation()">
-                <button type="button">Profil</button>
+                <button type="button" (click)="openProfilePopup()">Profil</button>
                 <button type="button" (click)="logout()">Log out</button>
             </div>
+        </div>
+        }
+        @if (profilePopupOpen) {
+        <div class="profile-dialog-backdrop" (click)="closeProfilePopup()">
+            <section class="profile-dialog" role="dialog" aria-modal="true" aria-labelledby="profile-dialog-title"
+                (click)="$event.stopPropagation()">
+                <header class="profile-dialog-header">
+                    <h2 id="profile-dialog-title">Profil</h2>
+                    <button type="button" class="close-profile-button" aria-label="Profil schließen"
+                        (click)="closeProfilePopup()">
+                        <span class="dialog-icon close-icon" aria-hidden="true"></span>
+                    </button>
+                </header>
+
+                <img class="profile-dialog-avatar" [src]="userAvatarUrl" alt="Profilbild von {{ userName }}">
+
+                <div class="profile-name-row">
+                    <h3>{{ userName }}</h3>
+                    <button type="button" class="edit-profile-button" disabled
+                        title="Die Profilbearbeitung wird noch angeschlossen">Bearbeiten</button>
+                </div>
+
+                <p class="profile-status" [class.offline]="!isOnline">
+                    <span aria-hidden="true"></span>
+                    {{ isOnline ? 'Aktive' : 'Offline' }}
+                </p>
+
+                <div class="profile-email">
+                    <span class="dialog-icon mail-icon" aria-hidden="true"></span>
+                    <div>
+                        <h4>E-Mail-Adresse</h4>
+                        @if (userEmail) {
+                        <a [href]="'mailto:' + userEmail">{{ userEmail }}</a>
+                        } @else {
+                        <p>Keine E-Mail-Adresse hinterlegt</p>
+                        }
+                    </div>
+                </div>
+            </section>
         </div>
         }
     </header>
