@@ -1,0 +1,119 @@
+.imprint-page {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 100dvh;
+    padding: 120px 24px 40px;
+    box-sizing: border-box;
+    background: #eceefe;
+}
+
+.imprint-logo {
+    position: absolute;
+    top: 40px;
+    left: 60px;
+    display: block;
+    width: auto;
+    height: 60px;
+}
+
+.imprint-card {
+    width: min(600px, 100%);
+    max-height: min(620px, calc(100dvh - 160px));
+    box-sizing: border-box;
+    overflow: hidden;
+    border-radius: 30px;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.imprint-scroll {
+    max-height: inherit;
+    padding: 40px 34px 40px 40px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior-y: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #c4c6eb transparent;
+
+    &:hover { scrollbar-color: #adb0d9 transparent; }
+
+    &::-webkit-scrollbar { width: 6px; }
+    &::-webkit-scrollbar-track { background: transparent; }
+    &::-webkit-scrollbar-thumb { background: #c4c6eb; border-radius: 10px; }
+    &::-webkit-scrollbar-thumb:hover { background: #adb0d9; }
+}
+
+.back-button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    margin: -8px 0 10px -8px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: black;
+    font: inherit;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    img {
+        position: absolute;
+        inset: 8px;
+        width: 24px;
+        height: 24px;
+        transition: opacity 0.3s ease;
+    }
+
+    .back-icon-default { opacity: 1; }
+    .back-icon-hover { opacity: 0; }
+
+    &:hover, &:focus-visible {
+        color: #535af1;
+        background: #eceefe;
+
+        .back-icon-default { opacity: 0; }
+        .back-icon-hover { opacity: 1; }
+    }
+
+    &:focus-visible { outline: 2px solid #535af1; outline-offset: 2px; }
+}
+
+h1 {
+    margin: 0 0 20px;
+    color: #444df2;
+    font-size: 46px;
+    line-height: 1.2;
+}
+
+.imprint-content {
+    color: black;
+    font-size: 18px;
+    line-height: 1.5;
+
+    section + section { margin-top: 28px; }
+    p { margin: 0 0 18px; }
+    h2 { margin: 0 0 10px; color: #444df2; font-size: 24px; }
+    a { color: #1381ff; text-decoration: none; overflow-wrap: anywhere; }
+    a:hover, a:focus-visible { text-decoration: underline; }
+}
+
+@media (max-width: 700px) {
+    .imprint-page { align-items: flex-start; padding: 110px 16px 24px; }
+    .imprint-logo { top: 24px; left: 24px; width: auto; height: 55px; }
+    .imprint-card { max-height: calc(100dvh - 134px); border-radius: 24px; }
+    .imprint-scroll { padding: 28px 22px; }
+    h1 { font-size: 34px; }
+    .imprint-content { font-size: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .back-button { transition: none; }
+}

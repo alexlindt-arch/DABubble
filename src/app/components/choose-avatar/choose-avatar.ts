@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { RouterLink } from '@angular/router';
 
 const PLACEHOLDER_AVATAR = '/assets/img/Profile.svg';
 
@@ -14,7 +15,7 @@ const AVATAR_FILES = [
 ];
 
 @Component({
-  imports: [],
+  imports: [ RouterLink ],
   selector: 'app-choose-avatar',
   styleUrl: './choose-avatar.scss',
   templateUrl: './choose-avatar.html',

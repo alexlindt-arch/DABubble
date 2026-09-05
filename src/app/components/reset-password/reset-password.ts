@@ -6,7 +6,7 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink} from '@angular/router';
 
 function passwordsMatch(group: AbstractControl): ValidationErrors | null {
   const password = group.get('password')?.value;
@@ -15,7 +15,7 @@ function passwordsMatch(group: AbstractControl): ValidationErrors | null {
 }
 
 @Component({
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterLink],
   selector: 'app-reset-password',
   styleUrl: './reset-password.scss',
   templateUrl: './reset-password.html',
