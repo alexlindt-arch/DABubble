@@ -1,0 +1,28 @@
+<section class="new-message-content">
+    <header class="new-message-header">
+        <h2>Neue Nachricht</h2>
+        <label class="recipient-field">
+            <span class="visually-hidden">Empfänger</span>
+            <input #recipientInput type="text"
+                placeholder="An: #channel, oder @jemand oder E-Mail Adresse"
+                autocomplete="off">
+        </label>
+    </header>
+
+    <div class="new-message-body">
+        <form class="message-composer" (submit)="$event.preventDefault()">
+            <textarea aria-label="Neue Nachricht" placeholder="Starte eine neue Nachricht"></textarea>
+            <div class="composer-actions">
+                <button type="button" class="composer-button" aria-label="Emoji auswählen">
+                    <span class="composer-icon emoji-icon" aria-hidden="true"></span>
+                </button>
+                <button type="button" class="composer-button" aria-label="Person erwähnen">
+                    <span class="composer-icon mention-icon" aria-hidden="true"></span>
+                </button>
+                <button type="submit" class="composer-button send-button" aria-label="Nachricht senden">
+                    <span class="composer-icon send-icon" aria-hidden="true"></span>
+                </button>
+            </div>
+        </form>
+    </div>
+</section>

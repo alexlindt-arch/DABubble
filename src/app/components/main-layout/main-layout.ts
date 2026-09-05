@@ -12,13 +12,15 @@ import { Router } from '@angular/router';
 import { Sidebar } from '../sidebar/sidebar';
 import { Chat } from '../chat/chat';
 import { Thread } from '../thread/thread';
-import { NewMessage } from '../new-message/new-message';
 import { AuthService } from '../../services/auth.service';
 import { avatarUrl } from '../../shared/avatar-url';
+import { CreateChannelDialog, NewChannel } from '../create-channel-dialog/create-channel-dialog';
+import { NewMessage } from '../new-message/new-message';
+import { AppUser } from '../../models';
 
 @Component({
   selector: 'app-main-layout',
-  imports: [Sidebar, Chat, Thread, NewMessage],
+  imports: [Sidebar, Chat, Thread, CreateChannelDialog, NewMessage],
   templateUrl: './main-layout.html',
   styleUrl: './main-layout.scss',
 })
@@ -30,13 +32,17 @@ export class MainLayout {
 
   profileMenuOpen = false;
   profilePopupOpen = false;
+  createChannelDialogOpen = false;
   sidebarOpen = true;
   selfChatOpen = false;
+  newMessageOpen = false;
+  selectedDirectUser: AppUser | null = null;
   closeLabelHeight = signal(310);
   openLabelHeight = signal(280);
   private closeLabel = viewChild.required<ElementRef<HTMLElement>>('closeLabel');
   private openLabel = viewChild.required<ElementRef<HTMLElement>>('openLabel');
   private destroyRef = inject(DestroyRef);
+  private sidebar = viewChild(Sidebar);
 
   constructor() {
     afterNextRender(() => {
@@ -92,17 +98,43 @@ export class MainLayout {
     this.profilePopupOpen = false;
   }
 
+  openCreateChannelDialog(): void {
+    this.createChannelDialogOpen = true;
+  }
+
+  closeCreateChannelDialog(): void {
+    this.createChannelDialogOpen = false;
+  }
+
+  createChannel(channel: NewChannel): void {
+    this.sidebar()?.addChannel(channel.name);
+    this.closeCreateChannelDialog();
+  }
+
+  get channelNames(): string[] {
+    return this.sidebar()?.channels ?? [];
+  }
+
   @HostListener('document:keydown.escape')
   closeDialogsWithEscape(): void {
     this.closeProfileMenu();
     this.closeProfilePopup();
+    this.closeCreateChannelDialog();
   }
 
   toggleSidebar(): void {
     this.sidebarOpen = !this.sidebarOpen;
   }
 
-  selectConversation(conversation: { type: 'channel' | 'direct'; id: string }): void {
-    this.selfChatOpen = conversation.type === 'direct' && conversation.id === 'Frederik Beck';
+  selectConversation(conversation: { type: 'channel' | 'direct'; id: string; user?: AppUser }): void {
+    this.newMessageOpen = false;
+    this.selfChatOpen = conversation.type === 'direct' && conversation.id === this.currentUser()?.uid;
+    this.selectedDirectUser = conversation.type === 'direct' && !this.selfChatOpen ? conversation.user ?? null : null;
+  }
+
+  openNewMessage(): void {
+    this.selfChatOpen = false;
+    this.selectedDirectUser = null;
+    this.newMessageOpen = true;
   }
 }

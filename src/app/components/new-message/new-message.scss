@@ -1,0 +1,142 @@
+:host {
+    display: flex;
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 0;
+}
+
+.new-message-content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    border-radius: 30px;
+    background: white;
+}
+
+.new-message-header {
+    flex-shrink: 0;
+    padding: 30px 40px 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+
+    h2 {
+        margin: 0 0 20px;
+        font-size: 24px;
+        line-height: 1.2;
+    }
+}
+
+.recipient-field {
+    display: block;
+
+    input {
+        width: 100%;
+        height: 48px;
+        padding: 0 20px;
+        box-sizing: border-box;
+        border: 1px solid #adb0d9;
+        border-radius: 30px;
+        outline: none;
+        background: white;
+        color: black;
+        font: inherit;
+        font-size: 18px;
+        transition: border-color 0.3s ease;
+
+        &::placeholder { color: #686868; opacity: 1; }
+        &:hover, &:focus { border-color: #535af1; }
+    }
+}
+
+.new-message-body {
+    display: flex;
+    flex: 1;
+    align-items: flex-end;
+    min-height: 0;
+    padding: 30px 40px 40px;
+}
+
+.message-composer {
+    width: 100%;
+    padding: 16px 20px;
+    box-sizing: border-box;
+    border: 1px solid #adb0d9;
+    border-radius: 20px;
+    transition: border-color 0.3s ease;
+
+    &:focus-within { border-color: #535af1; }
+
+    textarea {
+        display: block;
+        width: 100%;
+        height: 65px;
+        padding: 0;
+        border: none;
+        outline: none;
+        resize: none;
+        background: transparent;
+        color: black;
+        font: inherit;
+        font-size: 18px;
+
+        &::placeholder { color: #686868; opacity: 1; }
+    }
+}
+
+.composer-actions { display: flex; align-items: center; gap: 8px; }
+
+.composer-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 4px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: #686868;
+    cursor: pointer;
+    transition: color 0.3s ease, background-color 0.3s ease;
+
+    &:hover, &:focus-visible { color: #535af1; background: #eceefe; }
+    &:focus-visible { outline: 2px solid #535af1; outline-offset: 2px; }
+}
+
+.composer-icon {
+    display: block;
+    width: 24px;
+    height: 24px;
+    background: currentColor;
+    mask: var(--icon) center / contain no-repeat;
+}
+
+.emoji-icon { --icon: url('/assets/img/icons/sentiment_satisfied.svg'); }
+.mention-icon { --icon: url('/assets/img/icons/alternate_email.svg'); }
+.send-icon { --icon: url('/assets/img/icons/send.svg'); }
+.send-button { margin-left: auto; color: #444df2; }
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+@media (max-width: 700px) {
+    .new-message-header { padding: 20px 15px; }
+    .new-message-body { padding: 20px 15px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .recipient-field input,
+    .message-composer,
+    .composer-button { transition: none; }
+}

@@ -81,10 +81,18 @@
       [attr.inert]="sidebarOpen ? null : ''"
       [attr.aria-hidden]="!sidebarOpen"
       (conversationSelected)="selectConversation($event)"
+      (channelCreateRequested)="openCreateChannelDialog()"
+      (newMessageRequested)="openNewMessage()"
     ></app-sidebar>
 
-  <app-chat [isSelfChat]="selfChatOpen"></app-chat>
-  @if (!selfChatOpen) {
+  @if (newMessageOpen) {
+  <app-new-message></app-new-message>
+  } @else {
+  <app-chat [isSelfChat]="selfChatOpen" [userName]="userName" [userAvatarUrl]="userAvatarUrl"
+    [directUser]="selectedDirectUser"
+    (profileRequested)="openProfilePopup()"></app-chat>
+  }
+  @if (!selfChatOpen && !newMessageOpen) {
   <app-thread></app-thread>
   }
 </section>
@@ -119,5 +127,13 @@
     >
   </span>
 </button>
+
+@if (createChannelDialogOpen) {
+  <app-create-channel-dialog
+    [existingChannels]="channelNames"
+    (closed)="closeCreateChannelDialog()"
+    (created)="createChannel($event)"
+  />
+}
 
 </main>

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import {
+  collection,
   doc,
   DocumentReference,
   Firestore,
@@ -42,6 +43,13 @@ export class UserService {
     return onSnapshot(this.userRef(uid), (snapshot) => {
       if (!snapshot.exists()) return onChange(null);
       onChange({ uid, ...(snapshot.data() as UserProfile) });
+    });
+  }
+
+  watchUsers(onChange: (users: AppUser[]) => void): Unsubscribe {
+    return onSnapshot(collection(this.firestore, 'users'), (snapshot) => {
+      const users = snapshot.docs.map(user => ({ uid: user.id, ...(user.data() as UserProfile) }));
+      onChange(users);
     });
   }
 

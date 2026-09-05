@@ -3,7 +3,8 @@
     <div class="sidebar-header">
         <img class="logo" src="./assets/img/Workspace-logo.svg" alt="workspace">
         <p>Devspace</p>
-        <button type="button" class="toggle-icon" aria-label="Neue Nachricht">
+        <button type="button" class="toggle-icon" aria-label="Neue Nachricht"
+            (click)="newMessageRequested.emit()">
             <img class="toggle-header-icon" src="./assets/img/icons/edit_square.svg" alt="">
             <img class="toggle-header-icon-hover" src="./assets/img/icons/edit_square-hover.svg" alt="">
         </button>
@@ -61,18 +62,18 @@
                 [attr.inert]="directMessagesOpen ? null : ''" [attr.aria-hidden]="!directMessagesOpen">
                 <div class="list-clip">
                     <ul class="direct-message-list">
-                        @for (user of users; track user.name) {
+                        @for (user of users(); track user.uid) {
                         <li>
                             <button type="button" class="conversation user-row" [title]="user.name"
-                                [class.selected]="selectedConversation === 'direct:' + user.name"
-                                [attr.aria-pressed]="selectedConversation === 'direct:' + user.name"
-                                (click)="selectConversation('direct', user.name)">
+                                [class.selected]="selectedConversation === 'direct:' + user.uid"
+                                [attr.aria-pressed]="selectedConversation === 'direct:' + user.uid"
+                                (click)="selectConversation('direct', user.uid)">
                                 <span class="avatar-wrapper">
-                                    <img [src]="'/assets/img/avatar/Property 1=' + user.name + '.png'" alt="">
-                                    <span class="status-dot" [class.offline]="!user.online"
-                                        role="img" [attr.aria-label]="user.online ? 'Online' : 'Offline'"></span>
+                                    <img [src]="avatar(user)" alt="">
+                                    <span class="status-dot" [class.offline]="user.status !== 'online'"
+                                        role="img" [attr.aria-label]="user.status === 'online' ? 'Online' : 'Offline'"></span>
                                 </span>
-                                <span class="row-label">{{ user.name }}{{ user.isSelf ? ' (Du)' : '' }}</span>
+                                <span class="row-label">{{ user.name }}{{ isSelf(user) ? ' (Du)' : '' }}</span>
                             </button>
                         </li>
                         }

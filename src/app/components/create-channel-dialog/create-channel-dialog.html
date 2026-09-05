@@ -1,0 +1,33 @@
+<div class="dialog-backdrop" (click)="closeOnBackdrop($event)">
+  <section class="channel-dialog" role="dialog" aria-modal="true" aria-labelledby="channel-dialog-title">
+    <header>
+      <h2 id="channel-dialog-title">Channel erstellen</h2>
+      <button type="button" class="close-button" aria-label="Dialog schließen" (click)="closed.emit()">
+        <span class="icon close-icon" aria-hidden="true"></span>
+      </button>
+    </header>
+
+    <p>Channels dienen deinem Team zur Kommunikation. Am besten sollten sie themenbezogen sein<br>
+      #marketing zum Beispiel.</p>
+
+    <form (submit)="submit($event)" novalidate>
+      <label for="channel-name">Channel-Name</label>
+      <div class="input-wrapper" [class.invalid]="submitted() && (!name().trim() || duplicateName)">
+        <span aria-hidden="true">#</span>
+        <input #nameInput id="channel-name" type="text" autocomplete="off"
+          placeholder="z.B. Kooperationsprojekte" [value]="name()" (input)="name.set(nameInput.value)">
+      </div>
+      @if (submitted() && !name().trim()) {
+      <p class="error-message">Bitte gib einen Channel-Namen ein.</p>
+      } @else if (duplicateName) {
+      <p class="error-message">Dieser Channel-Name ist bereits vergeben.</p>
+      }
+
+      <label for="channel-description">Beschreibung <span>(optional)</span></label>
+      <input #descriptionInput id="channel-description" type="text" placeholder="Dein Text hier"
+        [value]="description()" (input)="description.set(descriptionInput.value)">
+
+      <button type="submit" class="create-button" [disabled]="!formValid">Erstellen</button>
+    </form>
+  </section>
+</div>

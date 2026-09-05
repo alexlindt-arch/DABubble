@@ -1,28 +1,30 @@
 <section class="chat-content" [class.self-chat]="isSelfChat()">
     @if (isSelfChat()) {
     <header class="chat-header">
-        <span class="header-avatar">
-            <img src="/assets/img/avatar/Property 1=Frederik Beck.png" alt="">
-            <span class="online-dot" role="img" aria-label="Online"></span>
-        </span>
-        <h1>Frederik Beck (Du)</h1>
+        <button type="button" class="self-profile-button" (click)="profileRequested.emit()">
+            <span class="header-avatar">
+                <img [src]="userAvatarUrl()" alt="">
+                <span class="online-dot" role="img" aria-label="Online"></span>
+            </span>
+            <span class="self-profile-name">{{ userName() }} (Du)</span>
+        </button>
     </header>
 
     <div class="chat-body">
         <div #history class="chat-history" role="log" aria-label="Deine lokalen Notizen" aria-live="polite">
             @if (notes().length === 0) {
             <div class="self-introduction">
-                <div class="introduction-profile">
-                    <img src="/assets/img/avatar/Property 1=Frederik Beck.png" alt="">
-                    <h2>Frederik Beck (Du)</h2>
-                </div>
+                <button type="button" class="introduction-profile" (click)="profileRequested.emit()">
+                    <img [src]="userAvatarUrl()" alt="">
+                    <h2>{{ userName() }} (Du)</h2>
+                </button>
                 <p><strong>Dieser Raum ist nur für dich da.</strong> Mache dir Notizen, liste deine To-dos auf oder
                     bewahre Links und Dateien griffbereit auf. Du kannst hier auch gerne Dinge mit dir selbst besprechen.</p>
             </div>
             } @else {
                 @for (note of notes(); track $index) {
                 <article class="own-message">
-                    <span>Frederik Beck (Du)</span>
+                    <span>{{ userName() }} (Du)</span>
                     <p>{{ note }}</p>
                 </article>
                 }
@@ -30,7 +32,7 @@
         </div>
 
         <form class="message-composer" (submit)="sendNote($event)">
-            <textarea #editor aria-label="Nachricht an dich selbst" placeholder="Nachricht an Frederik Beck (Du)"
+            <textarea #editor aria-label="Nachricht an dich selbst" [placeholder]="'Nachricht an ' + userName() + ' (Du)'"
                 [value]="draft()" (input)="draft.set(editor.value)"
                 (keydown)="onEditorKeydown($event)"></textarea>
             <div class="composer-actions">
@@ -55,5 +57,54 @@
             }
         </form>
     </div>
+    } @else if (directUser(); as user) {
+    <header class="chat-header direct-chat-header">
+        <button type="button" class="direct-profile-button" (click)="openDirectProfile()">
+            <span class="header-avatar"><img [src]="directUserAvatar()" alt=""><span class="online-dot"
+                [class.offline]="user.status !== 'online'" aria-hidden="true"></span></span>
+            <span class="direct-profile-name">{{ user.name }}</span>
+        </button>
+    </header>
+
+    <div class="chat-body direct-chat-body">
+        <div class="direct-introduction">
+            <button type="button" class="introduction-profile" (click)="openDirectProfile()">
+                <img [src]="directUserAvatar()" alt=""><h2>{{ user.name }}</h2>
+            </button>
+            <p>Diese Unterhaltung findet nur zwischen <button type="button" class="inline-profile-button"
+                (click)="openDirectProfile()">@{{ user.name }}</button> und dir statt.</p>
+        </div>
+        <form class="message-composer" (submit)="sendNote($event)">
+            <textarea #editor [attr.aria-label]="'Nachricht an ' + user.name" [placeholder]="'Nachricht an ' + user.name"
+                [value]="draft()" (input)="draft.set(editor.value)" (keydown)="onEditorKeydown($event)"></textarea>
+            <div class="composer-actions">
+                <button type="button" class="composer-button" aria-label="Emoji auswählen"
+                    [attr.aria-expanded]="emojiPickerOpen()" aria-controls="direct-chat-emojis"
+                    (click)="emojiPickerOpen.set(!emojiPickerOpen())"><span class="composer-icon emoji-icon"></span></button>
+                <button type="button" class="composer-button" aria-label="At-Zeichen einfügen" (click)="insertText('@')"><span class="composer-icon mention-icon"></span></button>
+                <button type="submit" class="composer-button send-button" aria-label="Nachricht senden" [disabled]="!draft().trim()"><span class="composer-icon send-icon"></span></button>
+            </div>
+            @if (emojiPickerOpen()) {
+            <div id="direct-chat-emojis" class="emoji-picker" role="group" aria-label="Emojis">
+                @for (emoji of emojis; track emoji) {
+                <button type="button" (click)="insertText(emoji)">{{ emoji }}</button>
+                }
+            </div>
+            }
+        </form>
+    </div>
+
+    @if (profileDialogOpen()) {
+    <div class="direct-profile-backdrop" (click)="closeDirectProfile()">
+        <section class="direct-profile-dialog" role="dialog" aria-modal="true" aria-labelledby="direct-profile-title" (click)="$event.stopPropagation()">
+            <header><h2 id="direct-profile-title">Profil</h2><button type="button" class="dialog-close" aria-label="Profil schließen" (click)="closeDirectProfile()">×</button></header>
+            <img class="dialog-avatar" [src]="directUserAvatar()" alt="Profilbild von {{ user.name }}">
+            <h3>{{ user.name }}</h3>
+            <p class="dialog-status" [class.offline]="user.status !== 'online'"><span></span>{{ user.status === 'online' ? 'Aktiv' : 'Offline' }}</p>
+            <div class="dialog-email"><span class="mail-symbol"></span><div><h4>E-Mail-Adresse</h4><a [href]="'mailto:' + user.email">{{ user.email }}</a></div></div>
+            <button type="button" class="dialog-message-button" (click)="closeDirectProfile()">▢&nbsp; Nachricht</button>
+        </section>
+    </div>
+    }
     }
 </section>

@@ -18,6 +18,8 @@
     overflow: hidden;
 }
 
+.chat-content:has(.direct-chat-header) { display: flex; flex-direction: column; padding: 0; overflow: hidden; }
+
 .chat-header {
     display: flex;
     align-items: center;
@@ -29,8 +31,41 @@
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
     z-index: 1;
 
-    h1 { margin: 0; font-size: 24px; font-weight: 700; }
 }
+
+.self-profile-button {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 30px;
+    background: transparent;
+    color: black;
+    font-family: inherit;
+    cursor: pointer;
+    transition: color 0.3s ease, background-color 0.3s ease;
+
+    &:hover, &:focus-visible {
+        color: #535af1;
+        background: #eceefe;
+    }
+
+    &:focus-visible { outline: 2px solid #535af1; outline-offset: 2px; }
+}
+
+.direct-profile-button {
+    display: flex; align-items: center; gap: 15px; padding: 5px 10px; border: 0;
+    border-radius: 30px; background: transparent; color: black; font-family: inherit; cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover, &:focus-visible { background: #eceefe; }
+    &:focus-visible { outline: 2px solid #535af1; outline-offset: 2px; }
+}
+
+.direct-profile-name { font-size: 24px; font-weight: 700; transition: color 0.3s ease; }
+
+.self-profile-name { font-size: 24px; font-weight: 700; }
 
 .header-avatar {
     position: relative;
@@ -49,7 +84,64 @@
         border: 2px solid white;
         border-radius: 50%;
         background: #92c83e;
+        &.offline { background: #686868; }
     }
+}
+
+.direct-chat-body { justify-content: flex-end; }
+
+.direct-introduction {
+    .introduction-profile {
+        display: flex; align-items: flex-end; gap: 25px; padding: 8px; border: 0;
+        background: transparent; color: black; font-family: inherit; cursor: pointer;
+        &:hover h2, &:focus-visible h2 { color: #535af1; }
+        &:focus-visible { outline: 2px solid #535af1; outline-offset: 2px; }
+    }
+    img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; }
+    h2 { margin: 0; font-size: 24px; transition: color 0.3s ease; }
+    p { margin: 0; color: #686868; font-size: 18px; }
+}
+
+.inline-profile-button { padding: 0; border: 0; background: transparent; color: #535af1; font: inherit; cursor: pointer; }
+
+.direct-profile-backdrop {
+    position: fixed; inset: 0; z-index: 1200; display: flex; align-items: center; justify-content: center;
+    padding: 24px; box-sizing: border-box; background: rgba(0, 0, 0, 0.6);
+}
+
+.direct-profile-dialog {
+    display: flex; flex-direction: column; width: min(500px, 100%); max-height: calc(100dvh - 48px);
+    padding: 40px; box-sizing: border-box; overflow-y: auto; border-radius: 30px; background: white;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+    header { display: flex; align-items: center; justify-content: space-between; }
+    header h2 { margin: 0; font-size: 24px; }
+    h3 { margin: 35px 0 12px; font-size: 32px; }
+}
+
+.dialog-close {
+    display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 0;
+    border-radius: 50%; background: transparent; font-size: 30px; cursor: pointer;
+    transition: color 0.3s ease, background-color 0.3s ease;
+    &:hover, &:focus-visible { color: #535af1; background: #eceefe; }
+}
+
+.dialog-avatar { align-self: center; width: 200px; height: 200px; margin-top: 40px; border-radius: 50%; object-fit: cover; }
+.dialog-status {
+    display: flex; align-items: center; gap: 15px; margin: 0 0 35px; color: #92c83e; font-size: 20px;
+    span { width: 16px; height: 16px; border-radius: 50%; background: currentColor; }
+    &.offline { color: #686868; }
+}
+.dialog-email {
+    display: flex; align-items: flex-start; gap: 20px;
+    h4 { margin: 0 0 16px; font-size: 20px; }
+    a { color: #1381ff; font-size: 18px; text-decoration: none; overflow-wrap: anywhere; }
+}
+.mail-symbol { width: 28px; height: 28px; background: black; mask: url('/assets/img/icons/mail.svg') center / contain no-repeat; }
+.dialog-message-button {
+    align-self: center; margin-top: 45px; padding: 12px 24px; border: 0; border-radius: 25px;
+    background: #444df2; color: white; font: inherit; font-size: 18px; font-weight: 700; cursor: pointer;
+    transition: background-color 0.3s ease;
+    &:hover, &:focus-visible { background: #797ef3; }
 }
 
 .chat-body {
@@ -80,10 +172,23 @@
         align-items: flex-end;
         gap: 25px;
         margin-bottom: 20px;
+        padding: 8px;
+        border: none;
+        background: transparent;
+        color: black;
+        font-family: inherit;
+        cursor: pointer;
+        transition: color 0.3s ease;
+
+        &:hover, &:focus-visible {
+            color: #535af1;
+        }
+
+        &:focus-visible { outline: 2px solid #535af1; outline-offset: 2px; }
     }
 
     img { width: 100px; height: 100px; border-radius: 50%; }
-    h2 { margin: 0; font-size: 24px; font-weight: 700; }
+    h2 { margin: 0; color: inherit; font-size: 24px; font-weight: 700; }
     p { margin: 0; color: #686868; font-size: 18px; line-height: 1.5; }
 }
 
@@ -195,7 +300,7 @@
 
 @media (max-width: 700px) {
     .chat-header { min-height: 80px; padding: 15px; }
-    .chat-header h1, .self-introduction h2 { font-size: 18px; }
+    .self-profile-name, .self-introduction h2 { font-size: 18px; }
     .chat-body { padding: 20px 15px; gap: 16px; }
     .self-introduction img { width: 70px; height: 70px; }
     .self-introduction .introduction-profile { gap: 12px; }

@@ -171,6 +171,7 @@ main header {
 
   > app-sidebar,
   > app-chat,
+  > app-new-message,
   > app-thread {
     display: flex;
     min-width: 0;
@@ -184,7 +185,8 @@ main header {
     transition: flex-basis 0.3s ease, margin-right 0.3s ease;
   }
 
-  > app-chat {
+  > app-chat,
+  > app-new-message {
     flex: 1 1 0;
   }
 
@@ -257,7 +259,6 @@ main header {
   margin-top: -110px;
   box-sizing: border-box;
   background: rgba(0, 0, 0, 0.6);
-  animation: fade-in 0.2s ease;
 }
 
 .profile-dialog {
@@ -365,10 +366,6 @@ main header {
   a { color: #1381ff; font-size: 18px; text-decoration: none; overflow-wrap: anywhere; }
   a:hover, a:focus-visible { text-decoration: underline; }
   p { margin: 0; color: #686868; }
-}
-
-@keyframes fade-in {
-  from { opacity: 0; }
 }
 
 @media (max-width: 700px) {

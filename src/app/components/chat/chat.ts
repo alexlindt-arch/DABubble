@@ -1,4 +1,6 @@
-import { afterRenderEffect, Component, ElementRef, input, signal, viewChild } from '@angular/core';
+import { afterRenderEffect, Component, ElementRef, HostListener, input, output, signal, viewChild } from '@angular/core';
+import { AppUser } from '../../models';
+import { avatarUrl } from '../../shared/avatar-url';
 
 @Component({
   imports: [],
@@ -8,10 +10,20 @@ import { afterRenderEffect, Component, ElementRef, input, signal, viewChild } fr
 })
 export class Chat {
   isSelfChat = input(false);
+  userName = input('Gast');
+  userAvatarUrl = input('/assets/img/avatar/Property 1=Frederik Beck.png');
+  directUser = input<AppUser | null>(null);
+  profileRequested = output<void>();
+  profileDialogOpen = signal(false);
   draft = signal('');
   notes = signal<string[]>([]);
   emojiPickerOpen = signal(false);
-  emojis = ['😀', '😊', '👍', '❤️', '🎉', '✅'];
+  emojis = [
+    '😂', '❤️', '🤣', '👍', '😭',
+    '💀', '🔥', '🥰', '😊', '🙏',
+    '✨', '🎉', '🫡', '🤔', '👀',
+    '✅', '😍', '😅', '💯', '😎',
+  ];
   private editor = viewChild<ElementRef<HTMLTextAreaElement>>('editor');
   private history = viewChild<ElementRef<HTMLElement>>('history');
 
@@ -53,4 +65,11 @@ export class Chat {
     editor.setSelectionRange(start + text.length, start + text.length);
     this.emojiPickerOpen.set(false);
   }
+
+  directUserAvatar(): string { return avatarUrl(this.directUser()?.avatar); }
+  openDirectProfile(): void { if (this.directUser()) this.profileDialogOpen.set(true); }
+  closeDirectProfile(): void { this.profileDialogOpen.set(false); }
+
+  @HostListener('document:keydown.escape')
+  closeProfileWithEscape(): void { this.closeDirectProfile(); }
 }
