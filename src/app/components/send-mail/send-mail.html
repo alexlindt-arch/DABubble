@@ -45,12 +45,6 @@
         Wir senden dir eine E-Mail, über die du dein Passwort ändern kannst.
       </p>
 
-      @if (mailSent) {
-        <p class="send-mail-form__success" role="status">
-          Die E-Mail ist unterwegs. Schau in dein Postfach.
-        </p>
-      }
-
       <div class="send-mail-form__actions">
         <button type="submit" class="btn btn--primary" [disabled]="sendMailForm.invalid">
           E-Mail senden

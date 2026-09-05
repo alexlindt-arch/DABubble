@@ -16,8 +16,6 @@ export class SendMail {
     email: ['', [Validators.required, Validators.email]],
   });
 
-  mailSent = false;
-
   get emailErrorMessage(): string {
     const email = this.sendMailForm.controls.email;
     if (email.hasError('required')) return 'Bitte gib deine E-Mail-Adresse ein.';
@@ -34,6 +32,6 @@ export class SendMail {
       this.sendMailForm.markAllAsTouched();
       return;
     }
-    this.mailSent = true;
+    this.router.navigateByUrl('/reset-password');
   }
 }

@@ -1,9 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
 
+/**
+ * The password recovery flow lives in SendMail. This route is kept because
+ * the login page still links to it, and forwards to the actual entry point.
+ */
 @Component({
   imports: [],
   selector: 'app-forgot-password',
   styleUrl: './forgot-password.scss',
   templateUrl: './forgot-password.html',
 })
-export class ForgotPassword {}
+export class ForgotPassword {
+  private readonly router = inject(Router);
+
+  constructor() {
+    this.router.navigateByUrl('/send-mail', { replaceUrl: true });
+  }
+}

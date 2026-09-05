@@ -32,8 +32,6 @@ export class ResetPassword {
     { validators: passwordsMatch },
   );
 
-  passwordChanged = false;
-
   get passwordErrorMessage(): string {
     const password = this.resetForm.controls.password;
     if (password.hasError('required')) return 'Bitte gib ein neues Passwort ein.';
@@ -57,6 +55,6 @@ export class ResetPassword {
       this.resetForm.markAllAsTouched();
       return;
     }
-    this.passwordChanged = true;
+    this.router.navigateByUrl('/login');
   }
 }
