@@ -1,8 +1,9 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { IntroAnimation } from './components/intro-animation/intro-animation';
 
 @Component({
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, IntroAnimation],
   selector: 'app-root',
   styleUrl: './app.scss',
   templateUrl: './app.html',

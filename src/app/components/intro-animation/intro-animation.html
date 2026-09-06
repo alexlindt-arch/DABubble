@@ -1,0 +1,23 @@
+@if (isVisible()) {
+  <div
+    class="intro"
+    [class.intro--running]="hasStarted()"
+    [class.intro--done]="isDone()"
+    aria-hidden="true"
+  >
+    <div class="intro__bg"></div>
+
+    <div class="intro__logo">
+      <div class="intro__word-clip">
+        <span class="intro__word"></span>
+      </div>
+      <img
+        class="intro__icon"
+        src="/assets/img/intro/logo-icon.svg"
+        alt=""
+        (load)="start()"
+        (error)="start()"
+      />
+    </div>
+  </div>
+}

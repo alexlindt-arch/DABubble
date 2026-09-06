@@ -8,6 +8,26 @@ input:focus {
   outline: none;
 }
 
+
+/* Solange das Intro-Overlay läuft: statisches Login-Logo verdeckt halten
+   (das animierte Logo landet exakt darauf) und die Login-Card einblenden. */
+body.intro-active .login-page__logo {
+  opacity: 0;
+}
+
+body.intro-active .login-card {
+  animation: introCardAppear 1100ms 1400ms ease-out both;
+}
+
+@keyframes introCardAppear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 @font-face {
   font-family: 'Nunito';
   src: url('/assets/font/Nunito/static/Nunito-ExtraLight.ttf') format('truetype');
