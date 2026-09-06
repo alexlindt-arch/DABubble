@@ -1,6 +1,5 @@
 import { Component, ElementRef, OnDestroy, computed, inject, signal } from '@angular/core';
 
-/** 'ready' wartet auf das Logo-Bild, 'removed' nimmt das Overlay aus dem DOM. */
 type IntroPhase = 'hidden' | 'ready' | 'running' | 'done' | 'removed';
 
 interface LogoBox {
@@ -9,10 +8,8 @@ interface LogoBox {
   height: number;
 }
 
-/** Breite/Höhe des kombinierten Logos (243x70) aus Home-Workspaces.svg. */
 const logoAspect = 243 / 70;
 const bodyIntroClass = 'intro-active';
-/** Modulvariable statt sessionStorage: bleibt bei SPA-Navigation, resettet bei echtem Reload. */
 let introPlayedInSession = false;
 const visiblePhases: IntroPhase[] = ['ready', 'running', 'done'];
 const safeGap = 16;
@@ -46,7 +43,6 @@ export class IntroAnimation implements OnDestroy {
     this.timers.push(window.setTimeout(() => this.start(), startFallbackDelay));
   }
 
-  /** Startet die Animation, sobald das Icon geladen ist (Timer als Rückfallebene). */
   start(): void {
     if (this.phase() !== 'ready') return;
     this.applyMetrics();
@@ -62,7 +58,6 @@ export class IntroAnimation implements OnDestroy {
     this.stopIntro();
   }
 
-  /** Animation ist durch: keine Interaktion mehr, kurz danach raus aus dem DOM. */
   private finish(): void {
     this.stopIntro();
     this.phase.set('done');
@@ -76,7 +71,6 @@ export class IntroAnimation implements OnDestroy {
     document.body.classList.remove(bodyIntroClass);
   }
 
-  /** Schreibt Zielbox und Startzustand des Logos als CSS-Variablen. */
   private applyMetrics(): void {
     const box = measureStaticLogo();
     const iconSize = fullscreenIconSize();
@@ -91,7 +85,6 @@ export class IntroAnimation implements OnDestroy {
     style.setProperty('--intro-y', `${window.innerHeight / 2 - box.top - iconSize / 2}px`);
   }
 
-  /** Nur vor Phase 3 neu vermessen, sonst würde die Landung springen. */
   private readonly onResize = (): void => {
     if (performance.now() - this.startedAt >= landDelay) return;
     this.applyMetrics();
@@ -117,7 +110,6 @@ function markIntroPlayed(): void {
   introPlayedInSession = true;
 }
 
-/** Zielbox ist das statische Login-Logo, damit die Landung exakt darauf liegt. */
 function measureStaticLogo(): LogoBox {
   const logo = document.querySelector<HTMLElement>('.login-page__logo');
   const rect = logo?.getBoundingClientRect();
@@ -130,7 +122,6 @@ function fallbackLogoBox(): LogoBox {
   return { left: isNarrow ? 20 : 60, top: isNarrow ? 24 : 40, height: 60 };
 }
 
-/** Icon-Größe in Phase 1: so groß, dass der Schriftzug rechts noch Platz hat. */
 function fullscreenIconSize(): number {
   const byWidth = (window.innerWidth / 2 - safeGap) / (logoAspect - 0.5);
   const byHeight = window.innerHeight * 0.3;
