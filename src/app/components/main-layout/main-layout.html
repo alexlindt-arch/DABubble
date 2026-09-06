@@ -92,8 +92,8 @@
     [directUser]="selectedDirectUser"
     (profileRequested)="openProfilePopup()"></app-chat>
   }
-  @if (!selfChatOpen && !newMessageOpen) {
-  <app-thread></app-thread>
+  @if (threadOpen && !selfChatOpen && !newMessageOpen) {
+  <app-thread (closed)="closeThread()"></app-thread>
   }
 </section>
 

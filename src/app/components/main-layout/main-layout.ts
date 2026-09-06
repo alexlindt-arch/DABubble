@@ -36,6 +36,7 @@ export class MainLayout {
   sidebarOpen = true;
   selfChatOpen = false;
   newMessageOpen = false;
+  threadOpen = true;
   selectedDirectUser: AppUser | null = null;
   closeLabelHeight = signal(310);
   openLabelHeight = signal(280);
@@ -128,8 +129,13 @@ export class MainLayout {
 
   selectConversation(conversation: { type: 'channel' | 'direct'; id: string; user?: AppUser }): void {
     this.newMessageOpen = false;
+    this.threadOpen = true;
     this.selfChatOpen = conversation.type === 'direct' && conversation.id === this.currentUser()?.uid;
     this.selectedDirectUser = conversation.type === 'direct' && !this.selfChatOpen ? conversation.user ?? null : null;
+  }
+
+  closeThread(): void {
+    this.threadOpen = false;
   }
 
   openNewMessage(): void {

@@ -9,3 +9,410 @@
     border-radius: 30px;
     padding: 32px 30px;
 }
+
+// Ab hier der Thread-Inhalt. Julias Kasten-Regel oben bleibt unveraendert; der Kopf
+// braucht die volle Kartenbreite fuer seinen Schatten, deshalb wandert der
+// Innenabstand aus dem Kasten in die einzelnen Bereiche.
+.thread-content {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+}
+
+
+.thread-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    flex: none;
+    gap: 5px;
+    padding: 32px 40px;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    z-index: 2;
+}
+
+.thread-title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+
+    h2 {
+        margin: 0;
+        font-size: 24px;
+        line-height: 33px;
+        font-weight: 700;
+        color: black;
+    }
+}
+
+.thread-channel {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 14px;
+    line-height: 19px;
+    color: #797ef3;
+}
+
+.thread-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: none;
+    border-radius: 20px;
+    background: transparent;
+    color: black;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover { background: #eceefe; }
+}
+
+
+.thread-icon {
+    display: block;
+    width: 24px;
+    height: 24px;
+    background: currentColor;
+    mask: var(--icon) center / contain no-repeat;
+}
+
+.tag-icon { --icon: url('/assets/img/icons/tag.svg'); width: 16px; height: 16px; }
+.close-icon { --icon: url('/assets/img/icons/close.svg'); }
+.reaction-icon { --icon: url('/assets/img/icons/add_reaction.svg'); }
+.emoji-icon { --icon: url('/assets/img/icons/sentiment_satisfied.svg'); }
+.mention-icon { --icon: url('/assets/img/icons/alternate_email.svg'); }
+.send-icon { --icon: url('/assets/img/icons/send.svg'); }
+
+
+.thread-history {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 20px 0 10px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #adb0d9 transparent;
+}
+
+
+.thread-divider {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex: none;
+    gap: 20px;
+    padding: 12px 32px 12px 33px;
+
+    span:first-child {
+        flex: none;
+        font-size: 18px;
+        line-height: 25px;
+        color: #adb0d9;
+    }
+}
+
+.thread-divider-line {
+    flex: 1 1 auto;
+    height: 1px;
+    background: #adb0d9;
+}
+
+
+.thread-message {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    flex: none;
+    gap: 20px;
+    padding: 10px 40px;
+
+    &.own {
+        flex-direction: row-reverse;
+    }
+}
+
+.thread-avatar {
+    flex: none;
+    width: 70px;
+    height: 70px;
+    border-radius: 35px;
+    background: white;
+    object-fit: cover;
+}
+
+.thread-bubble-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    min-width: 0;
+
+    .own & {
+        align-items: flex-end;
+    }
+}
+
+.thread-meta {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+
+    .own & {
+        flex-direction: row-reverse;
+    }
+}
+
+.thread-author {
+    font-size: 18px;
+    line-height: 25px;
+    font-weight: 700;
+    color: black;
+}
+
+.thread-time {
+    font-size: 14px;
+    line-height: 19px;
+    color: #686868;
+}
+
+.thread-bubble {
+    margin: 0;
+    padding: 15px;
+    background: #eceefe;
+    border-radius: 0 20px 20px 20px;
+    font-size: 18px;
+    line-height: 25px;
+    color: black;
+    text-wrap: pretty;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+
+    .own & {
+        background: #797ef3;
+        border-radius: 20px 0 20px 20px;
+        color: white;
+    }
+}
+
+
+.thread-reactions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+.thread-reaction {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    box-sizing: border-box;
+    padding: 5px 10px;
+    background: white;
+    border: 1px solid #adb0d9;
+    border-radius: 20px;
+    font-family: inherit;
+    font-size: 20px;
+    line-height: 24px;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+
+    &:hover { border-color: #444df2; }
+    &.active { border-color: #444df2; background: #eceefe; }
+}
+
+.thread-reaction-count {
+    font-size: 16px;
+    line-height: 22px;
+    color: black;
+}
+
+
+.thread-hover-bar {
+    position: absolute;
+    top: -6px;
+    right: 40px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    box-sizing: border-box;
+    gap: 5px;
+    padding: 3px 13px;
+    background: white;
+    border: 1px solid #adb0d9;
+    border-radius: 25px 25px 0 25px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+
+    .own & {
+        right: auto;
+        left: 40px;
+        border-radius: 25px 25px 25px 0;
+    }
+
+    .thread-message:hover &,
+    .thread-message:focus-within & {
+        opacity: 1;
+        pointer-events: auto;
+    }
+}
+
+.thread-hover-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: black;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover { background: #eceefe; }
+}
+
+
+.thread-reaction-picker {
+    position: absolute;
+    top: 34px;
+    right: 40px;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    width: 232px;
+    padding: 8px;
+    background: white;
+    border: 1px solid #adb0d9;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+
+    .own & {
+        right: auto;
+        left: 40px;
+    }
+
+    button {
+        padding: 4px 6px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        font-size: 20px;
+        cursor: pointer;
+
+        &:hover { background: #eceefe; }
+    }
+}
+
+
+.thread-composer {
+    position: relative;
+    flex: none;
+    box-sizing: border-box;
+    margin: 0 20px 40px;
+    padding: 20px;
+    border: 1px solid #adb0d9;
+    border-radius: 20px;
+    transition: border-color 0.3s ease;
+
+    &:focus-within { border-color: #444df2; }
+
+    textarea {
+        display: block;
+        box-sizing: border-box;
+        width: 100%;
+        border: none;
+        outline: none;
+        resize: none;
+        background: transparent;
+        font-family: inherit;
+        font-size: 18px;
+        line-height: 25px;
+        color: black;
+
+        &::placeholder { color: #686868; }
+    }
+}
+
+.thread-composer-actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+    margin-top: 20px;
+}
+
+.thread-composer-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: none;
+    border-radius: 20px;
+    background: transparent;
+    color: black;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover:not(:disabled) { background: #eceefe; }
+    &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+.thread-send {
+    margin-left: auto;
+    color: #444df2;
+}
+
+
+.thread-emoji-picker {
+    position: absolute;
+    bottom: 68px;
+    left: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    max-width: calc(100% - 30px);
+    padding: 8px;
+    background: white;
+    border: 1px solid #adb0d9;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+
+    button {
+        padding: 4px 6px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        font-size: 20px;
+        cursor: pointer;
+
+        &:hover { background: #eceefe; }
+    }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+    .thread-hover-bar,
+    .thread-composer,
+    .thread-close,
+    .thread-composer-button { transition: none; }
+}

@@ -1,3 +1,95 @@
 <section class="thread-content">
+    <header class="thread-header">
+        <div class="thread-title">
+            <h2>Thread</h2>
+            <span class="thread-channel">
+                <span class="thread-icon tag-icon" aria-hidden="true"></span>
+                {{ channelName() }}
+            </span>
+        </div>
+        <button type="button" class="thread-close" aria-label="Thread schließen" (click)="closed.emit()">
+            <span class="thread-icon close-icon" aria-hidden="true"></span>
+        </button>
+    </header>
 
+    <div #history class="thread-history" role="log" aria-label="Thread-Verlauf" aria-live="polite">
+        @for (message of messages(); track $index; let i = $index) {
+            @if (i === 1) {
+            <div class="thread-divider">
+                <span>{{ replyLabel }}</span>
+                <span class="thread-divider-line"></span>
+            </div>
+            }
+
+            <article class="thread-message" [class.own]="message.own">
+                <img class="thread-avatar" [src]="avatarSrc(message.avatar)" alt="">
+
+                <div class="thread-bubble-column">
+                    <div class="thread-meta">
+                        <span class="thread-author">{{ message.author }}</span>
+                        <span class="thread-time">{{ message.time }}</span>
+                    </div>
+
+                    <p class="thread-bubble">{{ message.text }}</p>
+
+                    @if (message.reactions.length) {
+                    <div class="thread-reactions">
+                        @for (reaction of message.reactions; track reaction.emoji) {
+                        <button type="button" class="thread-reaction" [class.active]="reaction.active"
+                            [attr.aria-pressed]="reaction.active"
+                            [attr.aria-label]="reaction.emoji + ' — ' + reaction.count"
+                            (click)="toggleReaction(message, reaction.emoji)">
+                            <span aria-hidden="true">{{ reaction.emoji }}</span>
+                            <span class="thread-reaction-count">{{ reaction.count }}</span>
+                        </button>
+                        }
+                    </div>
+                    }
+                </div>
+
+                <div class="thread-hover-bar">
+                    <button type="button" class="thread-hover-button" aria-label="Reaktion hinzufügen"
+                        [attr.aria-expanded]="reactionPickerFor() === i" (click)="toggleReactionPicker(i)">
+                        <span class="thread-icon reaction-icon" aria-hidden="true"></span>
+                    </button>
+                </div>
+
+                @if (reactionPickerFor() === i) {
+                <div class="thread-reaction-picker" role="group" aria-label="Reaktion auswählen">
+                    @for (emoji of emojis; track emoji) {
+                    <button type="button" (click)="toggleReaction(message, emoji)">{{ emoji }}</button>
+                    }
+                </div>
+                }
+            </article>
+        }
+    </div>
+
+    <form class="thread-composer" (submit)="sendReply($event)">
+        <textarea #editor rows="2" aria-label="Auf den Thread antworten" placeholder="Antworten..."
+            [value]="draft()" (input)="draft.set(editor.value)" (keydown)="onEditorKeydown($event)"></textarea>
+
+        <div class="thread-composer-actions">
+            <button type="button" class="thread-composer-button" aria-label="Emoji auswählen"
+                [attr.aria-expanded]="emojiPickerOpen()" aria-controls="thread-emojis"
+                (click)="emojiPickerOpen.set(!emojiPickerOpen())">
+                <span class="thread-icon emoji-icon" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="thread-composer-button" aria-label="Person erwähnen" (click)="insertText('@')">
+                <span class="thread-icon mention-icon" aria-hidden="true"></span>
+            </button>
+            <button type="submit" class="thread-composer-button thread-send" aria-label="Antwort senden"
+                [disabled]="!draft().trim()">
+                <span class="thread-icon send-icon" aria-hidden="true"></span>
+            </button>
+        </div>
+
+        @if (emojiPickerOpen()) {
+        <div id="thread-emojis" class="thread-emoji-picker" role="group" aria-label="Emojis">
+            @for (emoji of emojis; track emoji) {
+            <button type="button" (click)="insertText(emoji)">{{ emoji }}</button>
+            }
+        </div>
+        }
+    </form>
 </section>
