@@ -44,7 +44,6 @@ __screenshots__/
 Thumbs.db
 
 # Local notes / AI assistant docs (not pushed)
-*.md
 !README.md
 /docs
 
@@ -54,7 +53,7 @@ firebase-debug.log
 firestore-debug.log
 ui-debug.log
 /src/environments/environment.ts
-
+STATUS.md
 
 
 
