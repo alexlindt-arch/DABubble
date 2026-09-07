@@ -25,4 +25,14 @@ export interface Channel extends ChannelProfile {
   id: string;
 }
 
-export interface Message {}
+export interface MessageProfile {
+  text: string;
+  senderId: string;
+  timestamp: Timestamp;
+  reactions: Record<string, string[]>;
+  threadCount: number;
+}
+
+export interface Message extends MessageProfile {
+  id: string;
+}

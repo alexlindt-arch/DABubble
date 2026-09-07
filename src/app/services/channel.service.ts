@@ -9,6 +9,7 @@ import {
   Firestore,
   getFirestore,
   onSnapshot,
+  QueryDocumentSnapshot,
   Timestamp,
   Unsubscribe,
   updateDoc,
@@ -33,10 +34,15 @@ export class ChannelService {
   }
 
   watchChannels(onChange: (channels: Channel[]) => void): Unsubscribe {
-    return onSnapshot(this.channelsRef(), (snapshot) => {
-      const channels = snapshot.docs.map(item => ({ id: item.id, ...(item.data() as ChannelProfile) }));
-      onChange(channels);
-    });
+    return onSnapshot(
+      this.channelsRef(),
+      snapshot => onChange(snapshot.docs.map(item => this.toChannel(item))),
+      error => console.error('Channels konnten nicht geladen werden:', error),
+    );
+  }
+
+  private toChannel(document: QueryDocumentSnapshot): Channel {
+    return { id: document.id, ...(document.data() as ChannelProfile) };
   }
 
   addMembers(channelId: string, uids: string[]): Promise<void> {

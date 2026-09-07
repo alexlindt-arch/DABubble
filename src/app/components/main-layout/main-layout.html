@@ -89,11 +89,11 @@
   <app-new-message></app-new-message>
   } @else {
   <app-chat [isSelfChat]="selfChatOpen" [userName]="userName" [userAvatarUrl]="userAvatarUrl"
-    [directUser]="selectedDirectUser"
+    [directUser]="selectedDirectUser" [channel]="selectedChannel()" [users]="allUsers()"
     (profileRequested)="openProfilePopup()"></app-chat>
   }
   @if (threadOpen && !selfChatOpen && !newMessageOpen) {
-  <app-thread (closed)="closeThread()"></app-thread>
+  <app-thread [channelName]="selectedChannel()?.name ?? 'Entwicklerteam'" (closed)="closeThread()"></app-thread>
   }
 </section>
 

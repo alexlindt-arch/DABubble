@@ -106,5 +106,62 @@
         </section>
     </div>
     }
+    } @else if (channel(); as activeChannel) {
+    <header class="chat-header channel-chat-header">
+        <h2 class="channel-title"><span class="channel-hash" aria-hidden="true">#</span>{{ activeChannel.name }}</h2>
+    </header>
+
+    <div class="chat-body channel-chat-body">
+        <div #history class="chat-history" role="log" [attr.aria-label]="'Verlauf von ' + activeChannel.name"
+            aria-live="polite">
+            <div class="channel-introduction">
+                <h2><span aria-hidden="true">#</span> {{ activeChannel.name }}</h2>
+                @if (activeChannel.description) {
+                <p class="channel-description">{{ activeChannel.description }}</p>
+                }
+                <p>Das ist der Anfang des Channels <strong>#{{ activeChannel.name }}</strong>.</p>
+            </div>
+
+            @for (message of messages(); track message.id) {
+            <article class="channel-message" [class.own]="isOwnMessage(message)">
+                <img class="channel-message-avatar" [src]="authorAvatar(message)" alt="">
+                <div class="channel-message-column">
+                    <div class="channel-message-meta">
+                        <span class="channel-message-author">{{ authorName(message) }}</span>
+                        <span class="channel-message-time">{{ messageTime(message) }}</span>
+                    </div>
+                    <p class="channel-message-bubble">{{ message.text }}</p>
+                </div>
+            </article>
+            }
+        </div>
+
+        <form class="message-composer" (submit)="sendChannelMessage($event)">
+            <textarea #editor [attr.aria-label]="'Nachricht an #' + activeChannel.name"
+                [placeholder]="'Nachricht an #' + activeChannel.name"
+                [value]="draft()" (input)="draft.set(editor.value)" (keydown)="onChannelKeydown($event)"></textarea>
+            <div class="composer-actions">
+                <button type="button" class="composer-button" aria-label="Emoji auswählen"
+                    [attr.aria-expanded]="emojiPickerOpen()" aria-controls="channel-chat-emojis"
+                    (click)="emojiPickerOpen.set(!emojiPickerOpen())">
+                    <span class="composer-icon emoji-icon" aria-hidden="true"></span>
+                </button>
+                <button type="button" class="composer-button" aria-label="At-Zeichen einfügen" (click)="insertText('@')">
+                    <span class="composer-icon mention-icon" aria-hidden="true"></span>
+                </button>
+                <button type="submit" class="composer-button send-button" aria-label="Nachricht senden"
+                    [disabled]="!draft().trim()">
+                    <span class="composer-icon send-icon" aria-hidden="true"></span>
+                </button>
+            </div>
+            @if (emojiPickerOpen()) {
+            <div id="channel-chat-emojis" class="emoji-picker" role="group" aria-label="Emojis">
+                @for (emoji of emojis; track emoji) {
+                <button type="button" (click)="insertText(emoji)">{{ emoji }}</button>
+                }
+            </div>
+            }
+        </form>
+    </div>
     }
 </section>

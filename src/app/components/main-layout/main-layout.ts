@@ -44,6 +44,7 @@ export class MainLayout {
   newMessageOpen = false;
   threadOpen = true;
   selectedDirectUser: AppUser | null = null;
+  selectedChannel = signal<Channel | null>(null);
   closeLabelHeight = signal(310);
   openLabelHeight = signal(280);
   private closeLabel = viewChild.required<ElementRef<HTMLElement>>('closeLabel');
@@ -131,6 +132,7 @@ export class MainLayout {
     this.createdChannel.set(created);
     this.addPeopleDialogOpen = true;
     this.sidebar()?.selectConversation('channel', created.id);
+    this.selectedChannel.set(created);
   }
 
   closeAddPeopleDialog(): void {
@@ -147,6 +149,7 @@ export class MainLayout {
       .finally(() => this.closeAddPeopleDialog());
   }
 
+  readonly allUsers = computed(() => this.sidebar()?.users() ?? []);
   readonly invitableUsers = computed(() => this.usersWithoutMembers());
 
   private usersWithoutMembers(): AppUser[] {
@@ -170,11 +173,17 @@ export class MainLayout {
     this.sidebarOpen = !this.sidebarOpen;
   }
 
-  selectConversation(conversation: { type: 'channel' | 'direct'; id: string; user?: AppUser }): void {
+  selectConversation(conversation: {
+    type: 'channel' | 'direct';
+    id: string;
+    user?: AppUser;
+    channel?: Channel;
+  }): void {
     this.newMessageOpen = false;
     this.threadOpen = true;
     this.selfChatOpen = conversation.type === 'direct' && conversation.id === this.currentUser()?.uid;
     this.selectedDirectUser = conversation.type === 'direct' && !this.selfChatOpen ? conversation.user ?? null : null;
+    this.selectedChannel.set(conversation.channel ?? null);
   }
 
   closeThread(): void {

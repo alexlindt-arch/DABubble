@@ -23,7 +23,12 @@ export class Sidebar implements OnDestroy {
   selectedConversation = '';
   channelCreateRequested = output<void>();
   newMessageRequested = output<void>();
-  conversationSelected = output<{ type: 'channel' | 'direct'; id: string; user?: AppUser }>();
+  conversationSelected = output<{
+    type: 'channel' | 'direct';
+    id: string;
+    user?: AppUser;
+    channel?: Channel;
+  }>();
 
   readonly channels = this.firestoreChannels.asReadonly();
   readonly users = computed(() => this.sortedAccountUsers());
@@ -70,6 +75,7 @@ export class Sidebar implements OnDestroy {
   selectConversation(type: 'channel' | 'direct', id: string): void {
     this.selectedConversation = `${type}:${id}`;
     const user = type === 'direct' ? this.users().find(item => item.uid === id) : undefined;
-    this.conversationSelected.emit({ type, id, user });
+    const channel = type === 'channel' ? this.channels().find(item => item.id === id) : undefined;
+    this.conversationSelected.emit({ type, id, user, channel });
   }
 }
