@@ -1,0 +1,61 @@
+<div class="dialog-backdrop" (click)="closeOnBackdrop($event)">
+  <section class="people-dialog" role="dialog" aria-modal="true" aria-labelledby="people-dialog-title">
+    <header>
+      <h2 id="people-dialog-title">Leute hinzufügen</h2>
+      <button type="button" class="close-button" aria-label="Dialog schließen" (click)="closed.emit()">
+        <span class="icon close-icon" aria-hidden="true"></span>
+      </button>
+    </header>
+
+    <form (submit)="submit($event)" novalidate>
+      <label class="radio-option">
+        <input type="radio" name="add-mode" [checked]="mode() === 'all'" (change)="mode.set('all')">
+        <span class="radio-mark" aria-hidden="true"></span>
+        <span>Alle Mitglieder von <span class="workspace-name">{{ workspaceName() }}</span> hinzufügen</span>
+      </label>
+
+      <label class="radio-option">
+        <input type="radio" name="add-mode" [checked]="mode() === 'specific'" (change)="mode.set('specific')">
+        <span class="radio-mark" aria-hidden="true"></span>
+        <span>Bestimmte Leute hinzufügen</span>
+      </label>
+
+      @if (mode() === 'specific') {
+      <div class="people-picker">
+        <div class="input-wrapper">
+          @for (user of selected(); track user.uid) {
+          <span class="chip">
+            <img [src]="avatar(user)" alt="">
+            {{ user.name }}
+            <button type="button" [attr.aria-label]="user.name + ' entfernen'" (click)="removeUser(user)">
+              <span class="icon close-icon" aria-hidden="true"></span>
+            </button>
+          </span>
+          }
+          <input #searchInput type="text" autocomplete="off" placeholder="Name eingeben"
+            aria-label="Nach Personen suchen" [value]="search()" (input)="search.set(searchInput.value)">
+        </div>
+
+        @if (suggestions().length) {
+        <ul class="suggestions">
+          @for (user of suggestions(); track user.uid) {
+          <li>
+            <button type="button" (click)="addUser(user)">
+              <span class="avatar-wrapper">
+                <img [src]="avatar(user)" alt="">
+                <span class="status-dot" [class.offline]="user.status !== 'online'" role="img"
+                  [attr.aria-label]="user.status === 'online' ? 'Online' : 'Offline'"></span>
+              </span>
+              <span class="suggestion-name">{{ user.name }}</span>
+            </button>
+          </li>
+          }
+        </ul>
+        }
+      </div>
+      }
+
+      <button type="submit" class="create-button" [disabled]="!formValid">Erstellen</button>
+    </form>
+  </section>
+</div>

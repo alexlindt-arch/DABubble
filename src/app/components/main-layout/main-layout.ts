@@ -1,6 +1,7 @@
 import {
   afterNextRender,
   Component,
+  computed,
   DestroyRef,
   ElementRef,
   HostListener,
@@ -13,19 +14,22 @@ import { Sidebar } from '../sidebar/sidebar';
 import { Chat } from '../chat/chat';
 import { Thread } from '../thread/thread';
 import { AuthService } from '../../services/auth.service';
+import { ChannelService } from '../../services/channel.service';
 import { avatarUrl } from '../../shared/avatar-url';
+import { AddPeopleDialog } from '../add-people-dialog/add-people-dialog';
 import { CreateChannelDialog, NewChannel } from '../create-channel-dialog/create-channel-dialog';
 import { NewMessage } from '../new-message/new-message';
-import { AppUser } from '../../models';
+import { AppUser, Channel } from '../../models';
 
 @Component({
   selector: 'app-main-layout',
-  imports: [Sidebar, Chat, Thread, CreateChannelDialog, NewMessage],
+  imports: [Sidebar, Chat, Thread, CreateChannelDialog, AddPeopleDialog, NewMessage],
   templateUrl: './main-layout.html',
   styleUrl: './main-layout.scss',
 })
 export class MainLayout {
   private readonly authService = inject(AuthService);
+  private readonly channelService = inject(ChannelService);
   private readonly router = inject(Router);
 
   readonly currentUser = this.authService.currentUser;
@@ -33,6 +37,8 @@ export class MainLayout {
   profileMenuOpen = false;
   profilePopupOpen = false;
   createChannelDialogOpen = false;
+  addPeopleDialogOpen = false;
+  createdChannel = signal<Channel | null>(null);
   sidebarOpen = true;
   selfChatOpen = false;
   newMessageOpen = false;
@@ -108,12 +114,48 @@ export class MainLayout {
   }
 
   createChannel(channel: NewChannel): void {
-    this.sidebar()?.addChannel(channel.name);
-    this.closeCreateChannelDialog();
+    const uid = this.authService.currentUserId;
+    if (!uid) return this.closeCreateChannelDialog();
+    this.persistChannel(channel.name, channel.description, uid);
+  }
+
+  private persistChannel(name: string, description: string, uid: string): void {
+    this.channelService
+      .createChannel(name, description, uid)
+      .then(created => this.openAddPeopleDialog(created))
+      .catch(error => console.error('Channel konnte nicht erstellt werden:', error))
+      .finally(() => this.closeCreateChannelDialog());
+  }
+
+  private openAddPeopleDialog(created: Channel): void {
+    this.createdChannel.set(created);
+    this.addPeopleDialogOpen = true;
+    this.sidebar()?.selectConversation('channel', created.id);
+  }
+
+  closeAddPeopleDialog(): void {
+    this.addPeopleDialogOpen = false;
+    this.createdChannel.set(null);
+  }
+
+  addMembers(uids: string[]): void {
+    const channelId = this.createdChannel()?.id;
+    if (!channelId || !uids.length) return this.closeAddPeopleDialog();
+    this.channelService
+      .addMembers(channelId, uids)
+      .catch(error => console.error('Mitglieder konnten nicht hinzugefügt werden:', error))
+      .finally(() => this.closeAddPeopleDialog());
+  }
+
+  readonly invitableUsers = computed(() => this.usersWithoutMembers());
+
+  private usersWithoutMembers(): AppUser[] {
+    const members = this.createdChannel()?.members ?? [];
+    return (this.sidebar()?.users() ?? []).filter(user => !members.includes(user.uid));
   }
 
   get channelNames(): string[] {
-    return this.sidebar()?.channels ?? [];
+    return this.sidebar()?.channels().map(channel => channel.name) ?? [];
   }
 
   @HostListener('document:keydown.escape')
@@ -121,6 +163,7 @@ export class MainLayout {
     this.closeProfileMenu();
     this.closeProfilePopup();
     this.closeCreateChannelDialog();
+    this.closeAddPeopleDialog();
   }
 
   toggleSidebar(): void {

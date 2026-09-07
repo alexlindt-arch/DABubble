@@ -27,14 +27,14 @@
                 [attr.inert]="channelsOpen ? null : ''" [attr.aria-hidden]="!channelsOpen">
                 <div class="list-clip">
                     <ul class="channel-list">
-                        @for (channel of channels; track channel) {
+                        @for (channel of channels(); track channel.id) {
                         <li>
-                            <button type="button" class="conversation channel-row" [title]="channel"
-                                [class.selected]="selectedConversation === 'channel:' + channel"
-                                [attr.aria-pressed]="selectedConversation === 'channel:' + channel"
-                                (click)="selectConversation('channel', channel)">
+                            <button type="button" class="conversation channel-row" [title]="channel.name"
+                                [class.selected]="selectedConversation === 'channel:' + channel.id"
+                                [attr.aria-pressed]="selectedConversation === 'channel:' + channel.id"
+                                (click)="selectConversation('channel', channel.id)">
                                 <span class="nav-icon tag-icon" aria-hidden="true"></span>
-                                <span class="row-label">{{ channel }}</span>
+                                <span class="row-label">{{ channel.name }}</span>
                             </button>
                         </li>
                         }

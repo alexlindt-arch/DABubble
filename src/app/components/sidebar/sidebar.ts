@@ -1,8 +1,9 @@
 import { Component, computed, inject, OnDestroy, output, signal } from '@angular/core';
 import { Unsubscribe } from 'firebase/firestore';
-import { AppUser } from '../../models';
+import { AppUser, Channel } from '../../models';
 import { avatarUrl } from '../../shared/avatar-url';
 import { AuthService } from '../../services/auth.service';
+import { ChannelService } from '../../services/channel.service';
 import { UserService } from '../../services/user.service';
 
 @Component({
@@ -14,7 +15,9 @@ import { UserService } from '../../services/user.service';
 export class Sidebar implements OnDestroy {
   private readonly authService = inject(AuthService);
   private readonly firestoreUsers = signal<AppUser[]>([]);
+  private readonly firestoreChannels = signal<Channel[]>([]);
   private readonly stopWatchingUsers: Unsubscribe;
+  private readonly stopWatchingChannels: Unsubscribe;
   channelsOpen = true;
   directMessagesOpen = true;
   selectedConversation = '';
@@ -22,15 +25,17 @@ export class Sidebar implements OnDestroy {
   newMessageRequested = output<void>();
   conversationSelected = output<{ type: 'channel' | 'direct'; id: string; user?: AppUser }>();
 
-  channels = ['Entwicklerteam', 'Office-team'];
+  readonly channels = this.firestoreChannels.asReadonly();
   readonly users = computed(() => this.sortedAccountUsers());
 
-  constructor(userService: UserService) {
+  constructor(userService: UserService, channelService: ChannelService) {
     this.stopWatchingUsers = userService.watchUsers(users => this.firestoreUsers.set(users));
+    this.stopWatchingChannels = channelService.watchChannels(channels => this.firestoreChannels.set(channels));
   }
 
   ngOnDestroy(): void {
     this.stopWatchingUsers();
+    this.stopWatchingChannels();
   }
 
   avatar(user: AppUser): string {
@@ -60,13 +65,6 @@ export class Sidebar implements OnDestroy {
 
   toggleDirectMessages(): void {
     this.directMessagesOpen = !this.directMessagesOpen;
-  }
-
-  addChannel(name: string): void {
-    if (this.channels.some(channel => channel.toLocaleLowerCase() === name.toLocaleLowerCase())) return;
-    this.channels = [...this.channels, name];
-    this.channelsOpen = true;
-    this.selectConversation('channel', name);
   }
 
   selectConversation(type: 'channel' | 'direct', id: string): void {

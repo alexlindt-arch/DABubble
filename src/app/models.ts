@@ -1,3 +1,5 @@
+import { Timestamp } from 'firebase/firestore';
+
 export type UserStatus = 'online' | 'offline' | 'away';
 
 export interface UserProfile {
@@ -11,6 +13,16 @@ export interface AppUser extends UserProfile {
   uid: string;
 }
 
-export interface Channel {}
+export interface ChannelProfile {
+  name: string;
+  description: string;
+  createdBy: string;
+  members: string[];
+  createdAt: Timestamp;
+}
+
+export interface Channel extends ChannelProfile {
+  id: string;
+}
 
 export interface Message {}

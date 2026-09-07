@@ -136,4 +136,12 @@
   />
 }
 
+@if (addPeopleDialogOpen) {
+  <app-add-people-dialog
+    [users]="invitableUsers()"
+    (closed)="closeAddPeopleDialog()"
+    (confirmed)="addMembers($event)"
+  />
+}
+
 </main>
