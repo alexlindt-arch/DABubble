@@ -20,8 +20,6 @@
 
 .chat-content:has(.direct-chat-header) { display: flex; flex-direction: column; padding: 0; overflow: hidden; }
 
-.chat-content:has(.channel-chat-header) { display: flex; flex-direction: column; padding: 0; overflow: hidden; }
-
 .chat-header {
     display: flex;
     align-items: center;
@@ -91,60 +89,6 @@
 }
 
 .direct-chat-body { justify-content: flex-end; }
-
-.channel-chat-body { justify-content: flex-end; }
-
-.channel-message {
-    display: flex;
-    align-items: flex-start;
-    gap: 20px;
-
-    &.own { flex-direction: row-reverse; }
-    &.own .channel-message-meta { flex-direction: row-reverse; }
-    &.own .channel-message-bubble {
-        border-radius: 24px 0 24px 24px;
-        background: #797ef3;
-        color: white;
-    }
-}
-
-.channel-message-avatar { flex: 0 0 auto; width: 70px; height: 70px; border-radius: 50%; object-fit: cover; }
-
-.channel-message-column { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-
-.channel-message-meta { display: flex; align-items: baseline; gap: 20px; }
-
-.channel-message-author { font-size: 18px; font-weight: 700; }
-
-.channel-message-time { color: #686868; font-size: 14px; }
-
-.channel-message-bubble {
-    margin: 0;
-    padding: 15px 20px;
-    border-radius: 0 24px 24px 24px;
-    background: #eceefe;
-    font-size: 18px;
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
-}
-
-.channel-title {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin: 0;
-    font-size: 24px;
-    font-weight: 700;
-}
-
-.channel-hash { color: black; }
-
-.channel-introduction {
-    h2 { margin: 0 0 20px; font-size: 24px; }
-    p { margin: 0; color: #686868; font-size: 18px; }
-    .channel-description { margin-bottom: 10px; }
-    strong { color: #535af1; font-weight: 400; }
-}
 
 .direct-introduction {
     .introduction-profile {
@@ -361,11 +305,6 @@
     .self-introduction img { width: 70px; height: 70px; }
     .self-introduction .introduction-profile { gap: 12px; }
     .self-introduction p { font-size: 16px; }
-    .channel-title, .channel-introduction h2 { font-size: 18px; }
-    .channel-introduction p { font-size: 16px; }
-    .channel-message { gap: 12px; }
-    .channel-message-avatar { width: 50px; height: 50px; }
-    .channel-message-bubble, .channel-message-author { font-size: 16px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

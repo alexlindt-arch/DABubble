@@ -1,0 +1,244 @@
+.chat-content:has(.channel-chat-header) { display: flex; flex-direction: column; padding: 0; overflow: hidden; }
+
+.channel-chat-header { justify-content: space-between; }
+
+.channel-chat-body { justify-content: flex-end; }
+
+.channel-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.channel-hash { color: black; }
+
+.channel-header-actions { display: flex; align-items: center; gap: 20px; }
+
+.channel-members {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 30px;
+    background: transparent;
+    font: inherit;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover, &:focus-visible { background: #eceefe; outline: none; }
+}
+
+.member-avatars {
+    display: flex;
+
+    img {
+        width: 40px;
+        height: 40px;
+        border: 2px solid white;
+        border-radius: 50%;
+        object-fit: cover;
+
+        &:not(:first-child) { margin-left: -12px; }
+    }
+}
+
+.member-count { font-size: 20px; }
+
+.add-member-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: #eceefe;
+    color: black;
+    cursor: pointer;
+    transition: color 0.3s ease, background-color 0.3s ease;
+
+    &:hover, &:focus-visible { color: #535af1; background: #dce0fc; outline: none; }
+}
+
+.add-member-icon { --icon: url('/assets/img/icons/add-user.svg'); }
+
+.channel-introduction {
+    h2 { margin: 0 0 20px; font-size: 24px; }
+    p { margin: 0; color: #686868; font-size: 18px; }
+    .channel-description { margin-bottom: 10px; }
+    strong { color: #535af1; font-weight: 400; }
+}
+
+.chat-date-divider {
+    display: flex;
+    align-items: center;
+    flex: none;
+    gap: 16px;
+    padding: 10px 0;
+
+    &::before, &::after { content: ''; flex: 1 1 auto; height: 1px; background: #adb0d9; }
+
+    span {
+        flex: none;
+        padding: 5px 15px;
+        border: 1px solid #adb0d9;
+        border-radius: 30px;
+        font-size: 18px;
+        line-height: 25px;
+    }
+}
+
+.channel-message {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    flex: none;
+    gap: 20px;
+    padding: 10px 0;
+
+    &.own { flex-direction: row-reverse; }
+    &.own .channel-message-column { align-items: flex-end; }
+    &.own .channel-message-meta { flex-direction: row-reverse; }
+    &.own .channel-message-bubble {
+        border-radius: 20px 0 20px 20px;
+        background: #797ef3;
+        color: white;
+    }
+}
+
+.channel-message-avatar { flex: 0 0 auto; width: 70px; height: 70px; border-radius: 50%; object-fit: cover; }
+
+.channel-message-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    min-width: 0;
+}
+
+.channel-message-meta { display: flex; align-items: center; gap: 20px; }
+
+.channel-message-author { font-size: 18px; line-height: 25px; font-weight: 700; }
+
+.channel-message-time { color: #686868; font-size: 14px; line-height: 19px; }
+
+.channel-message-bubble {
+    margin: 0;
+    padding: 15px;
+    border-radius: 0 20px 20px 20px;
+    background: #eceefe;
+    font-size: 18px;
+    line-height: 25px;
+    text-wrap: pretty;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.channel-message-replies { margin: 0; color: #535af1; font-size: 18px; }
+
+.channel-reactions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+
+.channel-reaction {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-sizing: border-box;
+    padding: 5px 10px;
+    border: 1px solid #adb0d9;
+    border-radius: 20px;
+    background: white;
+    font-family: inherit;
+    font-size: 20px;
+    line-height: 24px;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+
+    &:hover { border-color: #444df2; }
+    &.active { border-color: #444df2; background: #eceefe; }
+}
+
+.channel-reaction-count { font-size: 16px; line-height: 22px; color: black; }
+
+.channel-hover-bar {
+    position: absolute;
+    top: -6px;
+    right: 0;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 3px 13px;
+    border: 1px solid #adb0d9;
+    border-radius: 25px 25px 0 25px;
+    background: white;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+
+    .own & { right: auto; left: 0; border-radius: 25px 25px 25px 0; }
+
+    .channel-message:hover &,
+    .channel-message:focus-within & { opacity: 1; pointer-events: auto; }
+}
+
+.channel-hover-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: black;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover { background: #eceefe; }
+}
+
+.reaction-icon { --icon: url('/assets/img/icons/add_reaction.svg'); }
+
+.channel-reaction-picker {
+    position: absolute;
+    top: 34px;
+    right: 0;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    width: 232px;
+    padding: 8px;
+    border: 1px solid #adb0d9;
+    border-radius: 16px;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+
+    .own & { right: auto; left: 0; }
+
+    button {
+        padding: 4px 6px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        font-size: 20px;
+        cursor: pointer;
+
+        &:hover { background: #eceefe; }
+    }
+}
+
+@media (max-width: 700px) {
+    .channel-title, .channel-introduction h2 { font-size: 18px; }
+    .channel-introduction p { font-size: 16px; }
+    .channel-message { gap: 12px; }
+    .channel-message-avatar { width: 50px; height: 50px; }
+    .channel-message-bubble, .channel-message-author { font-size: 16px; }
+    .channel-header-actions { gap: 10px; }
+    .member-avatars img { width: 32px; height: 32px; }
+    .member-count { font-size: 16px; }
+}

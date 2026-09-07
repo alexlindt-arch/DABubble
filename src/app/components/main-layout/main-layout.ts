@@ -38,7 +38,8 @@ export class MainLayout {
   profilePopupOpen = false;
   createChannelDialogOpen = false;
   addPeopleDialogOpen = false;
-  createdChannel = signal<Channel | null>(null);
+  memberDialogLabel = 'Erstellen';
+  memberDialogChannel = signal<Channel | null>(null);
   sidebarOpen = true;
   selfChatOpen = false;
   newMessageOpen = false;
@@ -129,19 +130,28 @@ export class MainLayout {
   }
 
   private openAddPeopleDialog(created: Channel): void {
-    this.createdChannel.set(created);
+    this.memberDialogLabel = 'Erstellen';
+    this.memberDialogChannel.set(created);
     this.addPeopleDialogOpen = true;
     this.sidebar()?.selectConversation('channel', created.id);
     this.selectedChannel.set(created);
   }
 
+  openMemberDialog(): void {
+    const channel = this.selectedChannel();
+    if (!channel) return;
+    this.memberDialogLabel = 'Hinzufügen';
+    this.memberDialogChannel.set(channel);
+    this.addPeopleDialogOpen = true;
+  }
+
   closeAddPeopleDialog(): void {
     this.addPeopleDialogOpen = false;
-    this.createdChannel.set(null);
+    this.memberDialogChannel.set(null);
   }
 
   addMembers(uids: string[]): void {
-    const channelId = this.createdChannel()?.id;
+    const channelId = this.memberDialogChannel()?.id;
     if (!channelId || !uids.length) return this.closeAddPeopleDialog();
     this.channelService
       .addMembers(channelId, uids)
@@ -153,7 +163,7 @@ export class MainLayout {
   readonly invitableUsers = computed(() => this.usersWithoutMembers());
 
   private usersWithoutMembers(): AppUser[] {
-    const members = this.createdChannel()?.members ?? [];
+    const members = this.memberDialogChannel()?.members ?? [];
     return (this.sidebar()?.users() ?? []).filter(user => !members.includes(user.uid));
   }
 

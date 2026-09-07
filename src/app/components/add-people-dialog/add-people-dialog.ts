@@ -23,6 +23,7 @@ type AddMode = 'all' | 'specific';
 export class AddPeopleDialog {
   users = input<AppUser[]>([]);
   workspaceName = input('Devspace');
+  submitLabel = input('Erstellen');
   closed = output<void>();
   confirmed = output<string[]>();
   mode = signal<AddMode>('all');

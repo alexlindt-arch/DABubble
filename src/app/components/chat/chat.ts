@@ -18,7 +18,7 @@ import { MessageService } from '../../services/message.service';
 @Component({
   imports: [],
   selector: 'app-chat',
-  styleUrl: './chat.scss',
+  styleUrls: ['./chat.scss', './chat-channel.scss'],
   templateUrl: './chat.html',
 })
 export class Chat {
@@ -29,7 +29,9 @@ export class Chat {
   channel = input<Channel | null>(null);
   users = input<AppUser[]>([]);
   profileRequested = output<void>();
+  addPeopleRequested = output<void>();
   messages = signal<Message[]>([]);
+  reactionPickerFor = signal<string | null>(null);
   profileDialogOpen = signal(false);
   draft = signal('');
   notes = signal<string[]>([]);
@@ -114,7 +116,23 @@ export class Chat {
   }
 
   authorName(message: Message): string {
-    return this.userById(message.senderId)?.name ?? 'Unbekannt';
+    return this.userById(message.senderId)?.name ?? message.senderId;
+  }
+
+  showDateDivider(index: number): boolean {
+    if (index === 0) return true;
+    return this.messageDay(this.messages()[index]) !== this.messageDay(this.messages()[index - 1]);
+  }
+
+  dateLabel(message: Message): string {
+    const date = message.timestamp?.toDate?.();
+    if (!date) return '';
+    if (date.toDateString() === new Date().toDateString()) return 'Heute';
+    return date.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
+  }
+
+  private messageDay(message: Message): string {
+    return message.timestamp?.toDate?.()?.toDateString() ?? '';
   }
 
   authorAvatar(message: Message): string {
@@ -129,6 +147,52 @@ export class Chat {
     const date = message.timestamp?.toDate?.();
     if (!date) return '';
     return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')} Uhr`;
+  }
+
+  memberAvatar(member: AppUser): string {
+    return avatarUrl(member.avatar);
+  }
+
+  memberCount(): number {
+    return this.channel()?.members.length ?? 0;
+  }
+
+  visibleMembers(): AppUser[] {
+    const members = this.channel()?.members ?? [];
+    return this.users().filter(user => members.includes(user.uid)).slice(0, 3);
+  }
+
+  reactionsOf(message: Message): { emoji: string; uids: string[] }[] {
+    return Object.entries(message.reactions ?? {})
+      .filter(([, uids]) => uids.length > 0)
+      .map(([emoji, uids]) => ({ emoji, uids }));
+  }
+
+  hasReacted(uids: string[]): boolean {
+    const uid = this.authService.currentUserId;
+    return !!uid && uids.includes(uid);
+  }
+
+  reactionTitle(uids: string[]): string {
+    return uids.map(uid => this.userById(uid)?.name ?? uid).join(', ');
+  }
+
+  toggleReaction(message: Message, emoji: string): void {
+    const channelId = this.channel()?.id;
+    const uid = this.authService.currentUserId;
+    this.reactionPickerFor.set(null);
+    if (!channelId || !uid) return;
+    this.messageService
+      .toggleReaction(channelId, message, emoji, uid)
+      .catch(error => console.error('Reaktion konnte nicht gespeichert werden:', error));
+  }
+
+  toggleReactionPicker(messageId: string): void {
+    this.reactionPickerFor.set(this.reactionPickerFor() === messageId ? null : messageId);
+  }
+
+  replyLabel(count: number): string {
+    return `${count} ${count === 1 ? 'Antwort' : 'Antworten'}`;
   }
 
   private userById(uid: string): AppUser | undefined {
