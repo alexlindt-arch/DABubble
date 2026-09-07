@@ -66,13 +66,6 @@
 
 .add-member-icon { --icon: url('/assets/img/icons/add-user.svg'); }
 
-.channel-introduction {
-    h2 { margin: 0 0 20px; font-size: 24px; }
-    p { margin: 0; color: #686868; font-size: 18px; }
-    .channel-description { margin-bottom: 10px; }
-    strong { color: #535af1; font-weight: 400; }
-}
-
 .chat-date-divider {
     display: flex;
     align-items: center;
@@ -233,8 +226,7 @@
 }
 
 @media (max-width: 700px) {
-    .channel-title, .channel-introduction h2 { font-size: 18px; }
-    .channel-introduction p { font-size: 16px; }
+    .channel-title { font-size: 18px; }
     .channel-message { gap: 12px; }
     .channel-message-avatar { width: 50px; height: 50px; }
     .channel-message-bubble, .channel-message-author { font-size: 16px; }

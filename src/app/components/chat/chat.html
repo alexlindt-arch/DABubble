@@ -130,14 +130,6 @@
     <div class="chat-body channel-chat-body">
         <div #history class="chat-history" role="log" [attr.aria-label]="'Verlauf von ' + activeChannel.name"
             aria-live="polite">
-            <div class="channel-introduction">
-                <h2><span aria-hidden="true">#</span> {{ activeChannel.name }}</h2>
-                @if (activeChannel.description) {
-                <p class="channel-description">{{ activeChannel.description }}</p>
-                }
-                <p>Das ist der Anfang des Channels <strong>#{{ activeChannel.name }}</strong>.</p>
-            </div>
-
             @for (message of messages(); track message.id; let i = $index) {
             @if (showDateDivider(i)) {
             <div class="chat-date-divider"><span>{{ dateLabel(message) }}</span></div>
