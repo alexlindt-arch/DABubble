@@ -90,7 +90,8 @@
   } @else {
   <app-chat [isSelfChat]="selfChatOpen" [userName]="userName" [userAvatarUrl]="userAvatarUrl"
     [directUser]="selectedDirectUser" [channel]="selectedChannel()" [users]="allUsers()"
-    (profileRequested)="openProfilePopup()" (addPeopleRequested)="openMemberDialog()"></app-chat>
+    (profileRequested)="openProfilePopup()" (addPeopleRequested)="openMemberDialog()"
+    (membersRequested)="openMembersDialog($event)"></app-chat>
   }
   @if (threadOpen && !selfChatOpen && !newMessageOpen) {
   <app-thread [channelName]="selectedChannel()?.name ?? 'Entwicklerteam'" (closed)="closeThread()"></app-thread>
@@ -133,6 +134,16 @@
     [existingChannels]="channelNames"
     (closed)="closeCreateChannelDialog()"
     (created)="createChannel($event)"
+  />
+}
+
+@if (membersDialogOpen) {
+  <app-members-dialog
+    [members]="channelMembers()"
+    [currentUserId]="currentUserId"
+    [anchor]="membersAnchor()"
+    (closed)="closeMembersDialog()"
+    (addRequested)="openMemberDialogFromList()"
   />
 }
 

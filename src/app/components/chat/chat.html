@@ -111,8 +111,8 @@
         <h2 class="channel-title"><span class="channel-hash" aria-hidden="true">#</span>{{ activeChannel.name }}</h2>
 
         <div class="channel-header-actions">
-            <button type="button" class="channel-members" (click)="addPeopleRequested.emit()"
-                [attr.aria-label]="'Mitglieder von ' + activeChannel.name + ' verwalten'">
+            <button type="button" class="channel-members" (click)="openMembers($event)"
+                [attr.aria-label]="'Mitglieder von ' + activeChannel.name + ' anzeigen'">
                 <span class="member-avatars">
                     @for (member of visibleMembers(); track member.uid) {
                     <img [src]="memberAvatar(member)" alt="">

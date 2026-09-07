@@ -17,13 +17,14 @@ import { AuthService } from '../../services/auth.service';
 import { ChannelService } from '../../services/channel.service';
 import { avatarUrl } from '../../shared/avatar-url';
 import { AddPeopleDialog } from '../add-people-dialog/add-people-dialog';
+import { MembersDialog } from '../members-dialog/members-dialog';
 import { CreateChannelDialog, NewChannel } from '../create-channel-dialog/create-channel-dialog';
 import { NewMessage } from '../new-message/new-message';
 import { AppUser, Channel } from '../../models';
 
 @Component({
   selector: 'app-main-layout',
-  imports: [Sidebar, Chat, Thread, CreateChannelDialog, AddPeopleDialog, NewMessage],
+  imports: [Sidebar, Chat, Thread, CreateChannelDialog, AddPeopleDialog, MembersDialog, NewMessage],
   templateUrl: './main-layout.html',
   styleUrl: './main-layout.scss',
 })
@@ -38,6 +39,8 @@ export class MainLayout {
   profilePopupOpen = false;
   createChannelDialogOpen = false;
   addPeopleDialogOpen = false;
+  membersDialogOpen = false;
+  membersAnchor = signal<DOMRect | null>(null);
   memberDialogLabel = 'Erstellen';
   memberDialogChannel = signal<Channel | null>(null);
   sidebarOpen = true;
@@ -137,6 +140,25 @@ export class MainLayout {
     this.selectedChannel.set(created);
   }
 
+  openMembersDialog(anchor: DOMRect): void {
+    if (!this.selectedChannel()) return;
+    this.membersAnchor.set(anchor);
+    this.membersDialogOpen = true;
+  }
+
+  closeMembersDialog(): void {
+    this.membersDialogOpen = false;
+  }
+
+  openMemberDialogFromList(): void {
+    this.closeMembersDialog();
+    this.openMemberDialog();
+  }
+
+  get currentUserId(): string | null {
+    return this.authService.currentUserId;
+  }
+
   openMemberDialog(): void {
     const channel = this.selectedChannel();
     if (!channel) return;
@@ -160,6 +182,13 @@ export class MainLayout {
   }
 
   readonly allUsers = computed(() => this.sidebar()?.users() ?? []);
+  readonly channelMembers = computed(() => this.membersOfSelectedChannel());
+
+  private membersOfSelectedChannel(): AppUser[] {
+    const members = this.selectedChannel()?.members ?? [];
+    return this.allUsers().filter(user => members.includes(user.uid));
+  }
+
   readonly invitableUsers = computed(() => this.usersWithoutMembers());
 
   private usersWithoutMembers(): AppUser[] {
@@ -177,6 +206,7 @@ export class MainLayout {
     this.closeProfilePopup();
     this.closeCreateChannelDialog();
     this.closeAddPeopleDialog();
+    this.closeMembersDialog();
   }
 
   toggleSidebar(): void {

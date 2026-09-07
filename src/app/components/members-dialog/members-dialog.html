@@ -1,0 +1,31 @@
+<div class="dialog-backdrop" [style.--anchor-top]="offsetTop" [style.--anchor-right]="offsetRight"
+  (click)="closeOnBackdrop($event)">
+  <section class="members-dialog" role="dialog" aria-modal="true" aria-labelledby="members-dialog-title">
+    <header>
+      <h2 id="members-dialog-title">Mitglieder</h2>
+      <button type="button" class="close-button" aria-label="Dialog schließen" (click)="closed.emit()">
+        <span class="icon close-icon" aria-hidden="true"></span>
+      </button>
+    </header>
+
+    <ul class="member-list">
+      @for (member of members(); track member.uid) {
+      <li>
+        <span class="avatar-wrapper">
+          <img [src]="avatar(member)" alt="">
+          <span class="status-dot" [class.offline]="!isOnline(member)" role="img"
+            [attr.aria-label]="isOnline(member) ? 'Online' : 'Offline'"></span>
+        </span>
+        <span class="member-name">{{ displayName(member) }}</span>
+      </li>
+      }
+    </ul>
+
+    <button type="button" class="add-member-button" (click)="addRequested.emit()">
+      <span class="add-icon-circle" aria-hidden="true">
+        <span class="icon add-user-icon"></span>
+      </span>
+      <span>Mitglieder hinzufügen</span>
+    </button>
+  </section>
+</div>

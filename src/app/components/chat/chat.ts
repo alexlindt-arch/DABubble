@@ -30,6 +30,7 @@ export class Chat {
   users = input<AppUser[]>([]);
   profileRequested = output<void>();
   addPeopleRequested = output<void>();
+  membersRequested = output<DOMRect>();
   messages = signal<Message[]>([]);
   reactionPickerFor = signal<string | null>(null);
   profileDialogOpen = signal(false);
@@ -147,6 +148,11 @@ export class Chat {
     const date = message.timestamp?.toDate?.();
     if (!date) return '';
     return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')} Uhr`;
+  }
+
+  openMembers(event: MouseEvent): void {
+    const button = event.currentTarget as HTMLElement;
+    this.membersRequested.emit(button.getBoundingClientRect());
   }
 
   memberAvatar(member: AppUser): string {
