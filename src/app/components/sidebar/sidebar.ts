@@ -1,9 +1,10 @@
-import { Component, computed, inject, OnDestroy, output, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnDestroy, output, signal } from '@angular/core';
 import { Unsubscribe } from 'firebase/firestore';
-import { AppUser, Channel } from '../../models';
+import { AppUser, Channel, DirectConversation } from '../../models';
 import { avatarUrl } from '../../shared/avatar-url';
 import { AuthService } from '../../services/auth.service';
 import { ChannelService } from '../../services/channel.service';
+import { MessageService } from '../../services/message.service';
 import { UserService } from '../../services/user.service';
 
 @Component({
@@ -16,6 +17,7 @@ export class Sidebar implements OnDestroy {
   private readonly authService = inject(AuthService);
   private readonly firestoreUsers = signal<AppUser[]>([]);
   private readonly firestoreChannels = signal<Channel[]>([]);
+  private readonly directConversations = signal<DirectConversation[]>([]);
   private readonly stopWatchingUsers: Unsubscribe;
   private readonly stopWatchingChannels: Unsubscribe;
   channelsOpen = true;
@@ -23,6 +25,7 @@ export class Sidebar implements OnDestroy {
   selectedConversation = '';
   channelCreateRequested = output<void>();
   newMessageRequested = output<void>();
+  initialChannelSelected = output<void>();
   conversationSelected = output<{
     type: 'channel' | 'direct';
     id: string;
@@ -32,10 +35,18 @@ export class Sidebar implements OnDestroy {
 
   readonly channels = this.firestoreChannels.asReadonly();
   readonly users = computed(() => this.sortedAccountUsers());
+  readonly directConversationUserIds = computed(() => this.directConversationPartners());
 
-  constructor(userService: UserService, channelService: ChannelService) {
+  constructor(userService: UserService, channelService: ChannelService, messageService: MessageService) {
     this.stopWatchingUsers = userService.watchUsers(users => this.firestoreUsers.set(users));
-    this.stopWatchingChannels = channelService.watchChannels(channels => this.firestoreChannels.set(channels));
+    this.stopWatchingChannels = channelService.watchChannels(channels => this.updateChannels(channels));
+    effect(onCleanup => {
+      const uid = this.authService.currentUser()?.uid;
+      this.directConversations.set([]);
+      if (!uid) return;
+      const stop = messageService.watchDirectConversations(uid, conversations => this.directConversations.set(conversations));
+      onCleanup(stop);
+    });
   }
 
   ngOnDestroy(): void {
@@ -61,7 +72,45 @@ export class Sidebar implements OnDestroy {
   private compareUsers(a: AppUser, b: AppUser, currentUid?: string): number {
     if (a.uid === currentUid) return -1;
     if (b.uid === currentUid) return 1;
+    const lastMessageWithA = this.lastMessageTimeWith(a.uid, currentUid);
+    const lastMessageWithB = this.lastMessageTimeWith(b.uid, currentUid);
+    if (lastMessageWithA !== lastMessageWithB) return lastMessageWithB - lastMessageWithA;
     return a.name.localeCompare(b.name, 'de');
+  }
+
+  private updateChannels(channels: Channel[]): void {
+    this.firestoreChannels.set(channels);
+    if (this.selectedConversation || !channels.length) return;
+    this.selectConversation('channel', channels[0].id);
+    this.initialChannelSelected.emit();
+  }
+
+  private lastMessageTimeWith(otherUid: string, currentUid?: string): number {
+    return this.conversationWith(otherUid, currentUid)?.lastMessageAt.toMillis() ?? 0;
+  }
+
+  hasUnreadMessages(user: AppUser): boolean {
+    const currentUid = this.authService.currentUser()?.uid;
+    const conversation = this.conversationWith(user.uid, currentUid);
+    const lastReadAt = currentUid ? conversation?.lastReadAt?.[currentUid] : undefined;
+    const activityAt = conversation?.lastActivityAt ?? conversation?.lastMessageAt;
+    const activityBy = conversation?.lastActivityBy ?? conversation?.lastSenderId;
+    return !!conversation && activityBy !== currentUid
+      && (!lastReadAt || !!activityAt && activityAt.toMillis() > lastReadAt.toMillis());
+  }
+
+  private conversationWith(otherUid: string, currentUid?: string): DirectConversation | undefined {
+    if (!currentUid || otherUid === currentUid) return undefined;
+    const conversationId = [currentUid, otherUid].sort().join('_');
+    return this.directConversations().find(conversation => conversation.id === conversationId);
+  }
+
+  private directConversationPartners(): string[] {
+    const currentUid = this.authService.currentUser()?.uid;
+    if (!currentUid) return [];
+    return this.directConversations()
+      .map(conversation => conversation.members.find(uid => uid !== currentUid))
+      .filter((uid): uid is string => !!uid);
   }
 
   toggleChannels(): void {

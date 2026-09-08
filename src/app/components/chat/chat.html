@@ -67,6 +67,9 @@
     </header>
 
     <div class="chat-body direct-chat-body">
+        <div #history class="chat-history" role="log" [attr.aria-label]="'Direktnachrichten mit ' + user.name"
+            aria-live="polite">
+        @if (directMessages().length === 0) {
         <div class="direct-introduction">
             <button type="button" class="introduction-profile" (click)="openDirectProfile()">
                 <img [src]="directUserAvatar()" alt=""><h2>{{ user.name }}</h2>
@@ -74,14 +77,70 @@
             <p>Diese Unterhaltung findet nur zwischen <button type="button" class="inline-profile-button"
                 (click)="openDirectProfile()">@{{ user.name }}</button> und dir statt.</p>
         </div>
-        <form class="message-composer" (submit)="sendNote($event)">
+        } @else {
+            @for (message of directMessages(); track message.id; let i = $index) {
+            @if (showDirectDateDivider(i)) {
+            <div class="chat-date-divider"><span>{{ dateLabel(message) }}</span></div>
+            }
+            <article class="channel-message direct-message" [class.own]="isOwnMessage(message)">
+                <img class="channel-message-avatar" [src]="authorAvatar(message)" alt="">
+                <div class="channel-message-column">
+                    <div class="channel-message-meta">
+                        <span class="channel-message-author">{{ authorName(message) }}</span>
+                        <span class="channel-message-time">{{ messageTime(message) }}</span>
+                    </div>
+                    @if (editingMessageId() === message.id) {
+                    <form class="direct-edit-form" (submit)="saveDirectMessage(message)">
+                        <textarea aria-label="Nachricht bearbeiten" [value]="editingText()"
+                            (input)="editingText.set($any($event.target).value)" (keydown.escape)="cancelEditingDirectMessage()"></textarea>
+                        <div><button type="button" (click)="cancelEditingDirectMessage()">Abbrechen</button><button type="submit" [disabled]="!editingText().trim()">Speichern</button></div>
+                    </form>
+                    } @else {
+                    <p class="channel-message-bubble">{{ message.text }}</p>
+                    @if (message.editedAt) { <span class="message-edited">bearbeitet</span> }
+                    }
+
+                    @if (reactionsOf(message).length) {
+                    <div class="channel-reactions">
+                        @for (reaction of reactionsOf(message); track reaction.emoji) {
+                        <button type="button" class="channel-reaction" [class.active]="hasReacted(reaction.uids)"
+                            [attr.aria-pressed]="hasReacted(reaction.uids)" [title]="reactionTitle(reaction.uids)"
+                            (click)="toggleDirectReaction(message, reaction.emoji)">
+                            <span aria-hidden="true">{{ reaction.emoji }}</span><span class="channel-reaction-count">{{ reaction.uids.length }}</span>
+                        </button>
+                        }
+                    </div>
+                    }
+                </div>
+
+                <div class="channel-hover-bar">
+                    @if (isLastOwnDirectMessage(message)) {
+                    <button type="button" class="channel-hover-button direct-edit-button" aria-label="Letzte Nachricht bearbeiten"
+                        (click)="startEditingDirectMessage(message)"><span aria-hidden="true">✎</span></button>
+                    }
+                    <button type="button" class="channel-hover-button" aria-label="Reaktion hinzufügen"
+                        [attr.aria-expanded]="reactionPickerFor() === message.id" (click)="toggleReactionPicker(message.id, $event)">
+                        <span class="composer-icon reaction-icon" aria-hidden="true"></span>
+                    </button>
+                </div>
+                @if (reactionPickerFor() === message.id) {
+                <div class="channel-reaction-picker" role="group" aria-label="Reaktion auswählen"
+                    [style.top.px]="reactionPickerPosition().top" [style.left.px]="reactionPickerPosition().left">
+                    @for (emoji of emojis; track emoji) { <button type="button" (click)="toggleDirectReaction(message, emoji)">{{ emoji }}</button> }
+                </div>
+                }
+            </article>
+            }
+        }
+        </div>
+
+        <form class="message-composer" (submit)="sendDirectMessage($event)">
             <textarea #editor [attr.aria-label]="'Nachricht an ' + user.name" [placeholder]="'Nachricht an ' + user.name"
-                [value]="draft()" (input)="draft.set(editor.value)" (keydown)="onEditorKeydown($event)"></textarea>
+                [value]="draft()" (input)="draft.set(editor.value)" (keydown)="onDirectKeydown($event)"></textarea>
             <div class="composer-actions">
                 <button type="button" class="composer-button" aria-label="Emoji auswählen"
                     [attr.aria-expanded]="emojiPickerOpen()" aria-controls="direct-chat-emojis"
                     (click)="emojiPickerOpen.set(!emojiPickerOpen())"><span class="composer-icon emoji-icon"></span></button>
-                <button type="button" class="composer-button" aria-label="At-Zeichen einfügen" (click)="insertText('@')"><span class="composer-icon mention-icon"></span></button>
                 <button type="submit" class="composer-button send-button" aria-label="Nachricht senden" [disabled]="!draft().trim()"><span class="composer-icon send-icon"></span></button>
             </div>
             @if (emojiPickerOpen()) {
@@ -165,13 +224,14 @@
                 <div class="channel-hover-bar">
                     <button type="button" class="channel-hover-button" aria-label="Reaktion hinzufügen"
                         [attr.aria-expanded]="reactionPickerFor() === message.id"
-                        (click)="toggleReactionPicker(message.id)">
+                        (click)="toggleReactionPicker(message.id, $event)">
                         <span class="composer-icon reaction-icon" aria-hidden="true"></span>
                     </button>
                 </div>
 
                 @if (reactionPickerFor() === message.id) {
-                <div class="channel-reaction-picker" role="group" aria-label="Reaktion auswählen">
+                <div class="channel-reaction-picker" role="group" aria-label="Reaktion auswählen"
+                    [style.top.px]="reactionPickerPosition().top" [style.left.px]="reactionPickerPosition().left">
                     @for (emoji of emojis; track emoji) {
                     <button type="button" (click)="toggleReaction(message, emoji)">{{ emoji }}</button>
                     }

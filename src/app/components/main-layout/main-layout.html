@@ -81,19 +81,21 @@
       [attr.inert]="sidebarOpen ? null : ''"
       [attr.aria-hidden]="!sidebarOpen"
       (conversationSelected)="selectConversation($event)"
+      (initialChannelSelected)="hideInitialThread()"
       (channelCreateRequested)="openCreateChannelDialog()"
       (newMessageRequested)="openNewMessage()"
     ></app-sidebar>
 
   @if (newMessageOpen) {
-  <app-new-message></app-new-message>
+  <app-new-message [users]="allUsers()" [existingConversationUserIds]="directConversationUserIds()"
+    (conversationStarted)="startDirectConversation($event)"></app-new-message>
   } @else {
   <app-chat [isSelfChat]="selfChatOpen" [userName]="userName" [userAvatarUrl]="userAvatarUrl"
     [directUser]="selectedDirectUser" [channel]="selectedChannel()" [users]="allUsers()"
     (profileRequested)="openProfilePopup()" (addPeopleRequested)="openMemberDialog()"
     (membersRequested)="openMembersDialog($event)"></app-chat>
   }
-  @if (threadOpen && !selfChatOpen && !newMessageOpen) {
+  @if (threadOpen && selectedChannel() && !selfChatOpen && !newMessageOpen) {
   <app-thread [channelName]="selectedChannel()?.name ?? 'Entwicklerteam'" (closed)="closeThread()"></app-thread>
   }
 </section>

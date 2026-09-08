@@ -32,7 +32,11 @@ export class Chat {
   addPeopleRequested = output<void>();
   membersRequested = output<DOMRect>();
   messages = signal<Message[]>([]);
+  directMessages = signal<Message[]>([]);
   reactionPickerFor = signal<string | null>(null);
+  reactionPickerPosition = signal({ top: 0, left: 0 });
+  editingMessageId = signal<string | null>(null);
+  editingText = signal('');
   profileDialogOpen = signal(false);
   draft = signal('');
   notes = signal<string[]>([]);
@@ -55,10 +59,12 @@ export class Chat {
     afterRenderEffect(() => {
       this.notes();
       this.messages();
+      this.directMessages();
       const history = this.history()?.nativeElement;
       if (history) history.scrollTop = history.scrollHeight;
     });
     effect(onCleanup => this.watchChannelMessages(onCleanup));
+    effect(onCleanup => this.watchDirectMessages(onCleanup));
   }
 
   private watchChannelMessages(onCleanup: (cleanup: () => void) => void): void {
@@ -66,6 +72,19 @@ export class Chat {
     this.messages.set([]);
     if (!channelId) return;
     const stop = this.messageService.watchMessages(channelId, messages => this.messages.set(messages));
+    onCleanup(() => stop());
+  }
+
+  private watchDirectMessages(onCleanup: (cleanup: () => void) => void): void {
+    const ownUid = this.authService.currentUserId;
+    const otherUid = this.directUser()?.uid;
+    this.directMessages.set([]);
+    this.editingMessageId.set(null);
+    if (!ownUid || !otherUid || ownUid === otherUid) return;
+    const stop = this.messageService.watchDirectMessages(ownUid, otherUid, messages => {
+      this.directMessages.set(messages);
+      if (messages.length) void this.messageService.markDirectConversationRead(ownUid, otherUid);
+    });
     onCleanup(() => stop());
   }
 
@@ -110,19 +129,46 @@ export class Chat {
     this.emojiPickerOpen.set(false);
   }
 
+  sendDirectMessage(event: Event): void {
+    event.preventDefault();
+    const text = this.draft().trim();
+    const senderId = this.authService.currentUserId;
+    const recipientId = this.directUser()?.uid;
+    if (!text || !senderId || !recipientId) return;
+    this.messageService
+      .sendDirectMessage(senderId, recipientId, text)
+      .catch(error => console.error('Direktnachricht konnte nicht gesendet werden:', error));
+    this.draft.set('');
+    this.emojiPickerOpen.set(false);
+  }
+
   onChannelKeydown(event: KeyboardEvent): void {
     if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
       this.sendChannelMessage(event);
     }
   }
 
+  onDirectKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
+      this.sendDirectMessage(event);
+    }
+  }
+
   authorName(message: Message): string {
-    return this.userById(message.senderId)?.name ?? message.senderId;
+    return this.isOwnMessage(message)
+      ? `${this.userName()} (Du)`
+      : this.userById(message.senderId)?.name ?? message.senderId;
   }
 
   showDateDivider(index: number): boolean {
     if (index === 0) return true;
     return this.messageDay(this.messages()[index]) !== this.messageDay(this.messages()[index - 1]);
+  }
+
+  showDirectDateDivider(index: number): boolean {
+    if (index === 0) return true;
+    const messages = this.directMessages();
+    return this.messageDay(messages[index]) !== this.messageDay(messages[index - 1]);
   }
 
   dateLabel(message: Message): string {
@@ -137,7 +183,9 @@ export class Chat {
   }
 
   authorAvatar(message: Message): string {
-    return avatarUrl(this.userById(message.senderId)?.avatar);
+    return this.isOwnMessage(message)
+      ? this.userAvatarUrl()
+      : avatarUrl(this.userById(message.senderId)?.avatar);
   }
 
   isOwnMessage(message: Message): boolean {
@@ -193,12 +241,60 @@ export class Chat {
       .catch(error => console.error('Reaktion konnte nicht gespeichert werden:', error));
   }
 
-  toggleReactionPicker(messageId: string): void {
-    this.reactionPickerFor.set(this.reactionPickerFor() === messageId ? null : messageId);
+  toggleDirectReaction(message: Message, emoji: string): void {
+    const ownUid = this.authService.currentUserId;
+    const otherUid = this.directUser()?.uid;
+    this.reactionPickerFor.set(null);
+    if (!ownUid || !otherUid) return;
+    this.messageService
+      .toggleDirectReaction(ownUid, otherUid, message, emoji, ownUid)
+      .catch(error => console.error('Reaktion konnte nicht gespeichert werden:', error));
+  }
+
+  toggleReactionPicker(messageId: string, event: MouseEvent): void {
+    if (this.reactionPickerFor() === messageId) return this.reactionPickerFor.set(null);
+    this.reactionPickerFor.set(messageId);
+    this.setReactionPickerPosition(event.currentTarget as HTMLElement);
+  }
+
+  private setReactionPickerPosition(button: HTMLElement): void {
+    const rect = button.getBoundingClientRect();
+    const left = Math.max(12, Math.min(rect.right - 232, window.innerWidth - 244));
+    this.reactionPickerPosition.set({ top: rect.bottom + 8, left });
   }
 
   replyLabel(count: number): string {
     return `${count} ${count === 1 ? 'Antwort' : 'Antworten'}`;
+  }
+
+  isLastOwnDirectMessage(message: Message): boolean {
+    const ownUid = this.authService.currentUserId;
+    if (!ownUid || message.senderId !== ownUid) return false;
+    const ownMessages = this.directMessages().filter(item => item.senderId === ownUid);
+    return ownMessages.at(-1)?.id === message.id;
+  }
+
+  startEditingDirectMessage(message: Message): void {
+    if (!this.isLastOwnDirectMessage(message)) return;
+    this.editingMessageId.set(message.id);
+    this.editingText.set(message.text);
+    this.reactionPickerFor.set(null);
+  }
+
+  cancelEditingDirectMessage(): void {
+    this.editingMessageId.set(null);
+    this.editingText.set('');
+  }
+
+  saveDirectMessage(message: Message): void {
+    const ownUid = this.authService.currentUserId;
+    const otherUid = this.directUser()?.uid;
+    const text = this.editingText().trim();
+    if (!ownUid || !otherUid || !text || !this.isLastOwnDirectMessage(message)) return;
+    this.messageService
+      .editDirectMessage(ownUid, otherUid, message.id, text)
+      .catch(error => console.error('Direktnachricht konnte nicht bearbeitet werden:', error));
+    this.cancelEditingDirectMessage();
   }
 
   private userById(uid: string): AppUser | undefined {
@@ -211,4 +307,13 @@ export class Chat {
 
   @HostListener('document:keydown.escape')
   closeProfileWithEscape(): void { this.closeDirectProfile(); }
+
+  @HostListener('document:click', ['$event'])
+  closeEmojiPickersOutside(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    const selector = '.emoji-picker, .channel-reaction-picker, .composer-button, .channel-hover-button';
+    if (target.closest(selector)) return;
+    this.emojiPickerOpen.set(false);
+    this.reactionPickerFor.set(null);
+  }
 }

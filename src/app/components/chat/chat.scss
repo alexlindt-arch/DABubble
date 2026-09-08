@@ -91,6 +91,10 @@
 .direct-chat-body { justify-content: flex-end; }
 
 .direct-introduction {
+    // Im leeren Direktchat steht die Einleitung direkt über dem Eingabefeld.
+    // Sobald Nachrichten existieren, wird der gesamte Block im Template ausgeblendet.
+    margin-top: auto;
+
     .introduction-profile {
         display: flex; align-items: flex-end; gap: 25px; padding: 8px; border: 0;
         background: transparent; color: black; font-family: inherit; cursor: pointer;
@@ -159,6 +163,8 @@
     flex-direction: column;
     flex: 1;
     min-height: 0;
+    padding: 20px 0 2px;
+    box-sizing: border-box;
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: #adb0d9 transparent;

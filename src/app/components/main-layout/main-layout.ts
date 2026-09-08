@@ -182,6 +182,7 @@ export class MainLayout {
   }
 
   readonly allUsers = computed(() => this.sidebar()?.users() ?? []);
+  readonly directConversationUserIds = computed(() => this.sidebar()?.directConversationUserIds() ?? []);
   readonly channelMembers = computed(() => this.membersOfSelectedChannel());
 
   private membersOfSelectedChannel(): AppUser[] {
@@ -220,7 +221,7 @@ export class MainLayout {
     channel?: Channel;
   }): void {
     this.newMessageOpen = false;
-    this.threadOpen = true;
+    this.threadOpen = false;
     this.selfChatOpen = conversation.type === 'direct' && conversation.id === this.currentUser()?.uid;
     this.selectedDirectUser = conversation.type === 'direct' && !this.selfChatOpen ? conversation.user ?? null : null;
     this.selectedChannel.set(conversation.channel ?? null);
@@ -230,9 +231,18 @@ export class MainLayout {
     this.threadOpen = false;
   }
 
+  hideInitialThread(): void {
+    this.threadOpen = false;
+  }
+
   openNewMessage(): void {
     this.selfChatOpen = false;
     this.selectedDirectUser = null;
     this.newMessageOpen = true;
+  }
+
+  startDirectConversation(user: AppUser): void {
+    this.selectConversation({ type: 'direct', id: user.uid, user });
+    this.threadOpen = false;
   }
 }

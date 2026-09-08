@@ -74,6 +74,9 @@
                                         role="img" [attr.aria-label]="user.status === 'online' ? 'Online' : 'Offline'"></span>
                                 </span>
                                 <span class="row-label">{{ user.name }}{{ isSelf(user) ? ' (Du)' : '' }}</span>
+                                @if (hasUnreadMessages(user)) {
+                                <span class="unread-dot" role="img" aria-label="Ungelesene Nachricht"></span>
+                                }
                             </button>
                         </li>
                         }

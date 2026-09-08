@@ -31,8 +31,27 @@ export interface MessageProfile {
   timestamp: Timestamp;
   reactions: Record<string, string[]>;
   threadCount: number;
+  editedAt?: Timestamp;
 }
 
 export interface Message extends MessageProfile {
+  id: string;
+}
+
+/** Metadaten eines privaten Chats. Die eigentlichen Nachrichten liegen darunter. */
+export interface DirectConversationProfile {
+  members: string[];
+  createdAt: Timestamp;
+  lastMessageAt: Timestamp;
+  lastMessage: string;
+  lastMessageId: string;
+  lastSenderId: string;
+  lastActivityAt?: Timestamp;
+  lastActivityBy?: string;
+  messageCount: number;
+  lastReadAt?: Record<string, Timestamp>;
+}
+
+export interface DirectConversation extends DirectConversationProfile {
   id: string;
 }

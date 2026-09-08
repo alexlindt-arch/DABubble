@@ -1,8 +1,70 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if request.auth != null;
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isDirectChatMember(chatId) {
+      return signedIn()
+        && request.auth.uid in get(/databases/$(database)/documents/directChats/$(chatId)).data.members;
+    }
+
+    function isDirectChatMemberAfter(chatId) {
+      return signedIn()
+        && request.auth.uid in getAfter(/databases/$(database)/documents/directChats/$(chatId)).data.members;
+    }
+
+    function isLastOwnDirectMessage(chatId, messageId) {
+      return request.auth.uid == resource.data.senderId
+        && get(/databases/$(database)/documents/directChats/$(chatId)).data.lastMessageId == messageId
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['text', 'editedAt']);
+    }
+
+    // Profile dürfen angemeldete Personen lesen, damit die Personenliste funktioniert.
+    match /users/{userId} {
+      allow read: if signedIn();
+      allow create, update: if signedIn() && request.auth.uid == userId;
+    }
+
+    // Channels bleiben für das gemeinsame Projekt lesbar. Nachrichten schreiben dürfen nur Mitglieder.
+    match /channels/{channelId} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.auth.uid == request.resource.data.createdBy
+        && request.auth.uid in request.resource.data.members;
+      allow update: if signedIn() && request.auth.uid in resource.data.members;
+
+      match /messages/{messageId} {
+        allow read: if signedIn();
+        allow create: if signedIn()
+          && request.auth.uid in get(/databases/$(database)/documents/channels/$(channelId)).data.members
+          && request.resource.data.senderId == request.auth.uid;
+        allow update: if signedIn()
+          && request.auth.uid in get(/databases/$(database)/documents/channels/$(channelId)).data.members;
+      }
+    }
+
+    // Private Chats: Nur die zwei IDs in "members" können sie lesen oder verändern.
+    match /directChats/{chatId} {
+      allow read: if signedIn() && request.auth.uid in resource.data.members;
+      allow create: if signedIn()
+        && request.auth.uid in request.resource.data.members
+        && request.resource.data.members.size() == 2;
+      allow update: if signedIn()
+        && request.auth.uid in resource.data.members
+        && request.resource.data.members == resource.data.members;
+
+      match /messages/{messageId} {
+        allow read: if isDirectChatMember(chatId);
+        allow create: if isDirectChatMemberAfter(chatId)
+          && request.resource.data.senderId == request.auth.uid;
+        allow update: if isDirectChatMember(chatId)
+          && (
+            request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reactions'])
+            || isLastOwnDirectMessage(chatId, messageId)
+          );
+      }
     }
   }
 }

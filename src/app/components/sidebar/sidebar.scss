@@ -271,6 +271,15 @@
 
     .user-row {
         border-radius: 35px;
+
+        .unread-dot {
+            flex: 0 0 10px;
+            width: 10px;
+            height: 10px;
+            margin-left: auto;
+            border-radius: 50%;
+            background: #535af1;
+        }
     }
 
     .add-channel-row {
