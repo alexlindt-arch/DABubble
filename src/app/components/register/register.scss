@@ -259,31 +259,164 @@ $color-disabled-bg: rgba(215, 216, 250, 1);
 }
 
 
+// ---------------------------------------------------------------------------
+// Mobil (Figma 02-Sign In, 430x932). Logo und Karte sitzen mittig, die
+// Fusszeile am unteren Rand - die beiden auto-Abstaende teilen den freien
+// Platz und fallen auf null, sobald der Inhalt laenger wird als der Schirm.
+// ---------------------------------------------------------------------------
 @media (max-width: 600px) {
   .register-page {
-    padding: 24px 20px;
+    justify-content: flex-start;
+    gap: 32px;
+    padding: 40px 16px 24px;
   }
 
-  .register-card {
-    padding: 32px 20px;
-  }
-
-  .register-card__title {
-    font-size: 30px;
-  }
-
-  .register-form__actions {
+  .register-page__header {
+    margin-top: auto;
     justify-content: center;
   }
 
+  .register-page__logo {
+    height: 56px;
+  }
+
+  .register-card {
+    padding: 20px;
+    border-radius: 30px;
+  }
+
+  .register-card__top {
+    margin: 0 0 15px;
+  }
+
+  .back-button {
+    left: 2px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .register-card__title {
+    padding: 0 44px;
+    font-size: 32px;
+    line-height: 120%;
+  }
+
+  .register-card__subtitle {
+    margin: 0 0 20px;
+    font-size: 17px;
+    line-height: 120%;
+  }
+
+  .register-form {
+    gap: 29px;
+  }
+
+  .input-group {
+    height: 50px;
+    padding: 13px 32px;
+    gap: 30px;
+    border-radius: 100px;
+  }
+
+  .input-group__icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .input-group__input {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 120%;
+  }
+
+  .form-field__error {
+    padding-left: 32px;
+    font-size: 14px;
+    line-height: 19px;
+    color: rgba(237, 30, 121, 1);
+  }
+
+  .checkbox-group {
+    gap: 8px;
+  }
+
+  .checkbox-group__box {
+    width: 24px;
+    height: 24px;
+  }
+
+  .checkbox-group__text {
+    font-size: 16px;
+    line-height: 120%;
+    color: rgba(66, 82, 110, 1);
+  }
+
+  .checkbox-group__link {
+    font-size: 18px;
+    line-height: 120%;
+    color: rgba(121, 126, 243, 1);
+  }
+
+  // Der Knopf steht rechts, nicht ueber die volle Breite.
+  .register-form__actions {
+    justify-content: flex-end;
+  }
+
   .btn {
-    width: 100%;
+    width: auto;
+    min-width: 107px;
+    height: 49px;
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 25px;
+  }
+
+  .register-page__footer {
+    margin-top: auto;
+    gap: 16px;
+  }
+
+  .register-page__footer-link {
+    padding: 10px 15px;
+    font-size: 18px;
+    line-height: 120%;
+    color: rgba(121, 126, 243, 1);
   }
 }
 
 
 @media (max-width: 400px) {
+  .register-page {
+    padding: 32px 16px 20px;
+  }
+
   .register-card {
-    padding: 24px 16px;
+    padding: 20px 16px;
+  }
+
+  // Der Pfeil braucht Platz - Titel bleibt eingerueckt und wird kleiner.
+  .register-card__title {
+    padding: 0 40px;
+    font-size: 22px;
+  }
+
+  .back-button {
+    left: 0;
+  }
+
+  .input-group {
+    padding: 13px 20px;
+    gap: 16px;
+  }
+
+  .form-field__error {
+    padding-left: 20px;
+  }
+
+  .checkbox-group__text,
+  .checkbox-group__link {
+    font-size: 15px;
   }
 }

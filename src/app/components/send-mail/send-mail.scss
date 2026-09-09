@@ -205,37 +205,148 @@ $color-disabled-bg: rgba(215, 216, 250, 1);
 }
 
 
+// ---------------------------------------------------------------------------
+// Mobil (Figma 04-Send email, 430x932). Karte 398 breit mit 40/20 Innenabstand,
+// Titel zweizeilig, Pfeil oben links, Knopf rechtsbuendig, Fusszeile am Rand.
+// ---------------------------------------------------------------------------
 @media (max-width: 600px) {
+  // Der Entwurf setzt den Inhalt bei 199px auf 932px Hoehe an - anteilig
+  // gerechnet, damit kurze Geraete den Knopf nicht aus dem Bild schieben.
   .send-mail-page {
-    padding: 24px 20px;
+    justify-content: flex-start;
+    gap: 32px;
+    padding: clamp(40px, 21.3vh, 199px) 16px 24px;
+  }
+
+  .send-mail-page__header {
+    justify-content: center;
+  }
+
+  .send-mail-page__logo {
+    height: 56px;
   }
 
   .send-mail-card {
-    padding: 32px 20px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 398px;
+    padding: 40px 20px;
+  }
+
+  // Der Pfeil haengt an der Karte, damit der Titel mittig bleibt.
+  .send-mail-card__top {
+    position: static;
+    margin: 0;
+  }
+
+  .back-button {
+    left: 22px;
+    top: 20px;
+    width: 40px;
+    height: 40px;
   }
 
   .send-mail-card__title {
-    font-size: 28px;
+    padding: 0 44px;
+    font-size: 32px;
+    line-height: 120%;
+  }
+
+  .send-mail-card__subtitle {
+    margin: 0;
+    font-size: 17px;
+    line-height: 120%;
+  }
+
+  // 12px Kartenabstand plus 13px ergeben die 25px des Entwurfs.
+  .send-mail-form {
+    margin-top: 13px;
+    gap: 40px;
+  }
+
+  .input-group {
+    height: 60px;
+    padding: 18px 32px;
+    gap: 30px;
+    border-radius: 100px;
+  }
+
+  .input-group__icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .input-group__input {
+    font-size: 18px;
+    font-weight: 500;
+  }
+
+  .form-field__error {
+    padding-left: 32px;
+    font-size: 14px;
+    line-height: 19px;
+  }
+
+  .send-mail-form__hint {
+    font-size: 20px;
+    line-height: 120%;
+    text-align: center;
+  }
+
+  .send-mail-form__actions {
+    justify-content: flex-end;
+  }
+
+  .btn {
+    min-width: 0;
+    width: 170px;
+    height: 49px;
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 25px;
+  }
+
+  .send-mail-page__footer {
+    margin-top: auto;
+    gap: 16px;
+  }
+
+  .send-mail-page__footer-link {
+    font-size: 18px;
+    line-height: 120%;
   }
 }
 
 
 @media (max-width: 400px) {
   .send-mail-card {
-    padding: 24px 16px;
+    padding: 32px 16px;
   }
 
   .send-mail-card__title {
-    font-size: 24px;
+    padding: 0 40px;
+    font-size: 26px;
   }
 
-  .send-mail-card__top {
-    flex-direction: column;
-    gap: 8px;
+  .send-mail-card__subtitle {
+    font-size: 15px;
   }
 
   .back-button {
-    position: static;
-    align-self: flex-start;
+    left: 14px;
+    top: 14px;
+  }
+
+  .input-group {
+    padding: 18px 20px;
+    gap: 16px;
+  }
+
+  .send-mail-form__hint {
+    font-size: 18px;
   }
 }

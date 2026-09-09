@@ -277,51 +277,79 @@ $color-input-bg: rgba(236, 238, 254, 1);
 }
 
 
-// Ab hier verlaesst die Seite die festen Figma-Masse, damit sie bis 320px nutzbar bleibt.
+// ---------------------------------------------------------------------------
+// Mobil (Figma 03-Choose avatar, 430x932). Hier gelten eigene Masse statt der
+// festen Desktop-Koordinaten: Karte 398 breit, Titel zweizeilig, Avatare in
+// einer Reihe zu 56px. Die Fusszeile haengt unten am Rand.
+// ---------------------------------------------------------------------------
 @media (max-width: 767px), (max-height: 809px) {
   .avatar-page {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    padding: 40px 60px;
+    justify-content: flex-start;
+    gap: 64px;
+    padding: 87px 16px 24px;
   }
 
   .avatar-page__header {
     position: static;
+    justify-content: center;
     height: auto;
   }
 
   .avatar-page__logo {
-    height: 60px;
+    height: 56px;
   }
 
   .avatar-card {
-    // relative bleiben, sonst verliert der Zurueck-Pfeil seinen Bezugspunkt
     position: relative;
     left: auto;
     top: auto;
     align-self: center;
     width: 100%;
-    max-width: 606px;
+    max-width: 398px;
     height: auto;
-    margin: 24px 0;
-    padding: 40px 24px;
+    padding: 26px 21px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
   }
 
+  // Pfeil links aussen, Titel mittig darueber - der Titel bricht auf zwei Zeilen.
   .avatar-card__top {
-    position: static;
+    position: relative;
+    left: auto;
+    right: auto;
+    top: auto;
     height: auto;
+    display: block;
+  }
+
+  .back-button {
+    position: absolute;
+    left: 1px;
+    top: 0;
   }
 
   .avatar-card__title {
-    font-size: 36px;
+    padding: 0 44px;
+    font-size: 32px;
+    line-height: 120%;
+    text-align: center;
+    white-space: normal;
   }
 
   .avatar-picker {
     position: static;
     width: auto;
     height: auto;
-    margin-top: 32px;
+    gap: 24px;
+  }
+
+  .avatar-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 100px;
   }
 
   .avatar-details,
@@ -329,69 +357,114 @@ $color-input-bg: rgba(236, 238, 254, 1);
     height: auto;
   }
 
-  .avatar-list {
-    flex-wrap: wrap;
-    justify-content: center;
-    width: auto;
-    height: auto;
-    align-self: stretch;
+  .avatar-details {
+    gap: 16px;
   }
 
-  .avatar-card__error {
-    position: static;
-    margin-top: 16px;
+  .avatar-details__text {
+    gap: 8px;
+  }
+
+  .avatar-card__name {
+    height: auto;
+    font-size: 32px;
+    line-height: 44px;
+  }
+
+  .avatar-card__hint {
+    height: auto;
+    font-size: 20px;
+    line-height: 27px;
+    text-align: left;
+  }
+
+  // Sechs Kacheln zu 56px mit 4px Abstand ergeben genau die 356px Innenbreite.
+  // Wird es enger, rutschen sie mittig in die naechste Zeile.
+  .avatar-list {
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-self: stretch;
+    width: auto;
+    height: auto;
+    gap: 4px;
+  }
+
+  // 6 x 56 + 5 x 4 ergibt exakt die 356px des Entwurfs - also null Spielraum.
+  // Die Kacheln teilen sich deshalb die Breite und schrumpfen mit, statt
+  // umzubrechen: eine Reihe zu sechst bis hinunter auf 320px.
+  .avatar-list__item {
+    flex: 1 1 0;
+    width: auto;
+    height: auto;
+    min-width: 0;
+    max-width: 56px;
+    aspect-ratio: 1;
+    padding: 2px;
+    border-width: 2px;
+    border-radius: 50%;
+
+    img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
   }
 
   .avatar-card__actions {
     position: static;
     justify-content: flex-end;
     width: auto;
-    margin-top: 32px;
+    margin-top: 0;
+  }
+
+  .btn {
+    width: 107px;
+    height: 49px;
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-size: 18px;
+    line-height: 25px;
   }
 
   .avatar-page__footer {
     position: static;
-    gap: 32px;
+    margin-top: auto;
+    gap: 16px;
   }
 
   .avatar-page__footer-link {
-    font-size: 14px;
-  }
-}
-
-@media (max-width: 600px) {
-  .avatar-page {
-    padding: 24px 20px;
-  }
-
-  .avatar-card {
-    padding: 32px 20px;
+    padding: 10px 15px;
+    font-size: 18px;
+    line-height: 120%;
   }
 }
 
 
 @media (max-width: 400px) {
+  .avatar-page {
+    gap: 40px;
+    padding: 48px 16px 20px;
+  }
+
   .avatar-card {
-    padding: 32px 16px;
+    padding: 20px 16px;
   }
 
   .avatar-card__title {
-    font-size: 24px;
-    white-space: normal;
+    padding: 0 40px;
+    font-size: 26px;
+  }
+
+  .back-button {
+    left: 0;
   }
 
   .avatar-card__name {
-    font-size: 24px;
-    line-height: 32px;
-    height: auto;
+    font-size: 26px;
+    line-height: 36px;
   }
 
   .avatar-card__hint {
-    text-align: center;
     font-size: 18px;
-  }
-
-  .avatar-card__actions {
-    justify-content: center;
   }
 }
