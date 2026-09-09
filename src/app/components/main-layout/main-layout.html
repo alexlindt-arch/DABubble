@@ -93,7 +93,7 @@
   <app-chat [isSelfChat]="selfChatOpen" [userName]="userName" [userAvatarUrl]="userAvatarUrl"
     [directUser]="selectedDirectUser" [channel]="selectedChannel()" [users]="allUsers()"
     (profileRequested)="openProfilePopup()" (addPeopleRequested)="openMemberDialog()"
-    (membersRequested)="openMembersDialog($event)"></app-chat>
+    (membersRequested)="openMembersDialog($event)" (threadRequested)="openThread()"></app-chat>
   }
   @if (threadOpen && selectedChannel() && !selfChatOpen && !newMessageOpen) {
   <app-thread [channelName]="selectedChannel()?.name ?? 'Entwicklerteam'" (closed)="closeThread()"></app-thread>

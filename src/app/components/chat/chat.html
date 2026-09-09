@@ -217,7 +217,9 @@
                     }
 
                     @if (message.threadCount > 0) {
-                    <p class="channel-message-replies">{{ replyLabel(message.threadCount) }}</p>
+                    <button type="button" class="channel-message-replies" (click)="threadRequested.emit()">
+                        {{ replyLabel(message.threadCount) }}
+                    </button>
                     }
                 </div>
 
@@ -226,6 +228,10 @@
                         [attr.aria-expanded]="reactionPickerFor() === message.id"
                         (click)="toggleReactionPicker(message.id, $event)">
                         <span class="composer-icon reaction-icon" aria-hidden="true"></span>
+                    </button>
+                    <button type="button" class="channel-hover-button" aria-label="Thread starten"
+                        (click)="threadRequested.emit()">
+                        <span class="composer-icon thread-icon" aria-hidden="true"></span>
                     </button>
                 </div>
 

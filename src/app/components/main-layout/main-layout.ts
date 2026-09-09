@@ -249,6 +249,10 @@ export class MainLayout {
     this.selectedChannel.set(conversation.channel ?? null);
   }
 
+  openThread(): void {
+    this.threadOpen = true;
+  }
+
   closeThread(): void {
     this.threadOpen = false;
   }

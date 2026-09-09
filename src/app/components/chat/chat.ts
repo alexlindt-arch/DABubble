@@ -31,6 +31,7 @@ export class Chat {
   profileRequested = output<void>();
   addPeopleRequested = output<void>();
   membersRequested = output<DOMRect>();
+  threadRequested = output<void>();
   messages = signal<Message[]>([]);
   directMessages = signal<Message[]>([]);
   reactionPickerFor = signal<string | null>(null);
