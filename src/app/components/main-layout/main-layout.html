@@ -50,8 +50,8 @@
 
                 <div class="profile-name-row">
                     <h3>{{ userName }}</h3>
-                    <button type="button" class="edit-profile-button" disabled
-                        title="Die Profilbearbeitung wird noch angeschlossen">Bearbeiten</button>
+                    <button type="button" class="edit-profile-button"
+                        (click)="openProfileEdit()">Bearbeiten</button>
                 </div>
 
                 <p class="profile-status" [class.offline]="!isOnline">
@@ -157,5 +157,14 @@
     (confirmed)="addMembers($event)"
   />
 }
-
 </main>
+
+@if (profileEditOpen) {
+  <app-profile-edit-dialog
+    [userName]="userName"
+    [userAvatar]="currentUser()?.avatar ?? ''"
+    [saveError]="profileSaveError"
+    (closed)="closeProfileEdit()"
+    (saved)="saveProfile($event)"
+  />
+}

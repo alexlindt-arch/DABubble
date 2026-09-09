@@ -1,18 +1,10 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { AVATAR_FILES, avatarLabel } from '../../shared/avatars';
 import { RouterLink } from '@angular/router';
 
 const PLACEHOLDER_AVATAR = '/assets/img/Profile.svg';
-
-const AVATAR_FILES = [
-  'Property 1=Elias Neumann.png',
-  'Property 1=Elise Roth.png',
-  'Property 1=Frederik Beck.png',
-  'Property 1=Noah Braun.png',
-  'Property 1=Sofia Müller.png',
-  'Property 1=Steffen Hoffmann.png',
-];
 
 @Component({
   imports: [ RouterLink ],
@@ -27,7 +19,7 @@ export class ChooseAvatar {
   private readonly userEmail: string = history.state?.email ?? '';
 
   readonly avatars = AVATAR_FILES.map((file) => ({
-    label: file.replace('Property 1=', '').replace('.png', ''),
+    label: avatarLabel(file),
     url: `/assets/img/avatar/${encodeURIComponent(file)}`,
   }));
 

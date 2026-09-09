@@ -20,11 +20,12 @@ import { AddPeopleDialog } from '../add-people-dialog/add-people-dialog';
 import { MembersDialog } from '../members-dialog/members-dialog';
 import { CreateChannelDialog, NewChannel } from '../create-channel-dialog/create-channel-dialog';
 import { NewMessage } from '../new-message/new-message';
+import { ProfileEdit, ProfileEditDialog } from '../profile-edit-dialog/profile-edit-dialog';
 import { AppUser, Channel } from '../../models';
 
 @Component({
   selector: 'app-main-layout',
-  imports: [Sidebar, Chat, Thread, CreateChannelDialog, AddPeopleDialog, MembersDialog, NewMessage],
+  imports: [Sidebar, Chat, Thread, CreateChannelDialog, AddPeopleDialog, MembersDialog, NewMessage, ProfileEditDialog],
   templateUrl: './main-layout.html',
   styleUrl: './main-layout.scss',
 })
@@ -37,6 +38,8 @@ export class MainLayout {
 
   profileMenuOpen = false;
   profilePopupOpen = false;
+  profileEditOpen = false;
+  profileSaveError = '';
   createChannelDialogOpen = false;
   addPeopleDialogOpen = false;
   membersDialogOpen = false;
@@ -108,6 +111,24 @@ export class MainLayout {
 
   closeProfilePopup(): void {
     this.profilePopupOpen = false;
+  }
+
+  openProfileEdit(): void {
+    this.profileSaveError = '';
+    this.closeProfilePopup();
+    this.profileEditOpen = true;
+  }
+
+  closeProfileEdit(): void {
+    this.profileEditOpen = false;
+  }
+
+  saveProfile(edit: ProfileEdit): void {
+    this.profileSaveError = '';
+    this.authService
+      .saveUserProfile(edit.name, this.userEmail, edit.avatar)
+      .then(() => this.closeProfileEdit())
+      .catch(() => (this.profileSaveError = 'Profil konnte nicht gespeichert werden.'));
   }
 
   openCreateChannelDialog(): void {
@@ -205,6 +226,7 @@ export class MainLayout {
   closeDialogsWithEscape(): void {
     this.closeProfileMenu();
     this.closeProfilePopup();
+    this.closeProfileEdit();
     this.closeCreateChannelDialog();
     this.closeAddPeopleDialog();
     this.closeMembersDialog();
