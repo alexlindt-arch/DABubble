@@ -32,6 +32,7 @@ export class SendMail {
       this.sendMailForm.markAllAsTouched();
       return;
     }
-    this.router.navigateByUrl('/reset-password');
+    // Sending the reset mail belongs to the auth service. The reset page is never
+    // opened from here - it is reached through the link in that mail.
   }
 }
