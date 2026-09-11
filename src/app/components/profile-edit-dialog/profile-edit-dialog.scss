@@ -269,6 +269,76 @@ $error: #ed1e79;
     &:disabled { background: $muted; cursor: not-allowed; }
 }
 
+.danger-zone {
+    width: 100%;
+    padding-top: 24px;
+    border-top: 1px solid $line;
+
+    h3, p { margin: 0; }
+    p { margin-top: 8px; color: $muted; }
+
+    button {
+        margin-top: 16px;
+        padding: 10px 16px;
+        border: 1px solid #e64a4a;
+        border-radius: 25px;
+        background: white;
+        color: #e64a4a;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+
+        &:hover, &:focus-visible { background: #fdeaea; outline: none; }
+    }
+}
+
+.delete-confirmation {
+    position: fixed;
+    z-index: 1200;
+    top: 50%;
+    left: 50%;
+    width: min(390px, calc(100vw - 48px));
+    padding: 32px;
+    box-sizing: border-box;
+    border-radius: 30px;
+    background: white;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+    transform: translate(-50%, -50%);
+
+    h2, p { margin: 0; }
+    h2 { font-size: 22px; line-height: 1.3; }
+    p { margin-top: 14px; color: $muted; line-height: 1.5; }
+    > div { display: flex; justify-content: flex-end; gap: 12px; margin-top: 28px; }
+    label { display: block; margin-top: 20px; font-weight: 700; }
+}
+
+.delete-confirmation__input {
+    width: 100%;
+    margin-top: 8px;
+    padding: 12px 16px;
+    box-sizing: border-box;
+    border: 1px solid $purple-1;
+    border-radius: 20px;
+    font: inherit;
+}
+
+.delete-confirmation__error { color: $error !important; }
+
+.delete-confirmation__button {
+    padding: 12px 18px;
+    border: 0;
+    border-radius: 25px;
+    background: #e64a4a;
+    color: white;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+
+    &:hover, &:focus-visible { background: #c93636; outline: none; }
+    &:disabled { background: $muted; cursor: not-allowed; }
+}
+
 
 @media (max-width: 700px) {
     .profile-edit-backdrop { align-items: flex-end; padding: 0; margin-top: 0; }

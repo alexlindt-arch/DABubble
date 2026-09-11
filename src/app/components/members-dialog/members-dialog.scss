@@ -66,12 +66,26 @@
   list-style: none;
 
   li {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 4px 8px;
-    border-radius: 30px;
+    min-width: 0;
   }
+}
+
+.member-profile-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 30px;
+  background: transparent;
+  color: black;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+
+  &:hover, &:focus-visible { background: #eceefe; color: #535af1; outline: none; }
 }
 
 .avatar-wrapper {

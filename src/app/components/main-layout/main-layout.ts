@@ -15,36 +15,52 @@ import { Chat } from '../chat/chat';
 import { Thread } from '../thread/thread';
 import { AuthService } from '../../services/auth.service';
 import { ChannelService } from '../../services/channel.service';
+import { UserService } from '../../services/user.service';
 import { avatarUrl } from '../../shared/avatar-url';
 import { AddPeopleDialog } from '../add-people-dialog/add-people-dialog';
 import { MembersDialog } from '../members-dialog/members-dialog';
 import { CreateChannelDialog, NewChannel } from '../create-channel-dialog/create-channel-dialog';
 import { NewMessage } from '../new-message/new-message';
-import { ProfileEdit, ProfileEditDialog } from '../profile-edit-dialog/profile-edit-dialog';
+import { ProfileDialog, ProfileEdit } from '../profile-dialog/profile-dialog';
+import { ChannelInfoDialog } from '../channel-info-dialog/channel-info-dialog';
 import { AppUser, Channel } from '../../models';
+
+type SearchResult =
+  | { kind: 'channel'; id: string; label: string; channel: Channel }
+  | { kind: 'user'; id: string; label: string; user: AppUser };
 
 @Component({
   selector: 'app-main-layout',
-  imports: [Sidebar, Chat, Thread, CreateChannelDialog, AddPeopleDialog, MembersDialog, NewMessage, ProfileEditDialog],
+  imports: [Sidebar, Chat, Thread, CreateChannelDialog, AddPeopleDialog, MembersDialog, NewMessage, ProfileDialog, ChannelInfoDialog],
   templateUrl: './main-layout.html',
   styleUrl: './main-layout.scss',
 })
 export class MainLayout {
   private readonly authService = inject(AuthService);
   private readonly channelService = inject(ChannelService);
+  private readonly userService = inject(UserService);
   private readonly router = inject(Router);
 
   readonly currentUser = this.authService.currentUser;
+  readonly searchQuery = signal('');
+  readonly searchOpen = signal(false);
+  readonly searchIndex = signal(0);
+  readonly searchResults = computed(() => this.matchSearchResults());
 
   profileMenuOpen = false;
   profilePopupOpen = false;
   profileEditOpen = false;
   profileSaveError = '';
+  accountDeleteError = '';
+  accountDeleteBusy = false;
   createChannelDialogOpen = false;
   addPeopleDialogOpen = false;
   membersDialogOpen = false;
+  channelInfoOpen = false;
+  channelInfoAnchor = signal<DOMRect | null>(null);
   membersAnchor = signal<DOMRect | null>(null);
   memberDialogLabel = 'Erstellen';
+  memberDialogForExistingChannel = false;
   memberDialogChannel = signal<Channel | null>(null);
   sidebarOpen = true;
   selfChatOpen = false;
@@ -109,13 +125,39 @@ export class MainLayout {
     this.profilePopupOpen = true;
   }
 
+  onSearchInput(value: string): void {
+    this.searchQuery.set(value);
+    this.searchIndex.set(0);
+    this.searchOpen.set(true);
+  }
+
+  onSearchKeydown(event: KeyboardEvent): void {
+    const results = this.searchResults();
+    if (!results.length || !this.handleSearchNavigation(event, results.length)) return;
+    if (event.key === 'Enter') this.selectSearchResult(results[this.searchIndex()]);
+  }
+
+  selectSearchResult(result: SearchResult): void {
+    result.kind === 'channel' ? this.openMentionedChannel(result.channel) : this.openSearchedUser(result.user);
+    this.clearSearch();
+  }
+
+  closeSearch(): void {
+    this.searchOpen.set(false);
+    this.searchIndex.set(0);
+  }
+
+  private clearSearch(): void {
+    this.searchQuery.set('');
+    this.closeSearch();
+  }
+
   closeProfilePopup(): void {
     this.profilePopupOpen = false;
   }
 
   openProfileEdit(): void {
     this.profileSaveError = '';
-    this.closeProfilePopup();
     this.profileEditOpen = true;
   }
 
@@ -129,6 +171,25 @@ export class MainLayout {
       .saveUserProfile(edit.name, this.userEmail, edit.avatar)
       .then(() => this.closeProfileEdit())
       .catch(() => (this.profileSaveError = 'Profil konnte nicht gespeichert werden.'));
+  }
+
+  async deleteAccount(): Promise<void> {
+    const uid = this.authService.currentUserId;
+    if (!uid) return;
+    this.accountDeleteError = '';
+    this.accountDeleteBusy = true;
+    try {
+      await this.channelService.removeUserFromChannels(uid);
+      await this.userService.deleteUserProfile(uid);
+      await this.authService.deleteCurrentAccount();
+      await this.router.navigateByUrl('/login');
+    } catch (error) { this.accountDeleteError = this.accountDeletionError(error); }
+    finally { this.accountDeleteBusy = false; }
+  }
+
+  private accountDeletionError(error: unknown): string {
+    const code = (error as { code?: string }).code;
+    return code === 'auth/requires-recent-login' ? 'Bitte melde dich erneut an und versuche es dann noch einmal.' : 'Das Konto konnte nicht gelöscht werden.';
   }
 
   openCreateChannelDialog(): void {
@@ -155,6 +216,7 @@ export class MainLayout {
 
   private openAddPeopleDialog(created: Channel): void {
     this.memberDialogLabel = 'Erstellen';
+    this.memberDialogForExistingChannel = false;
     this.memberDialogChannel.set(created);
     this.addPeopleDialogOpen = true;
     this.sidebar()?.selectConversation('channel', created.id);
@@ -184,8 +246,46 @@ export class MainLayout {
     const channel = this.selectedChannel();
     if (!channel) return;
     this.memberDialogLabel = 'Hinzufügen';
+    this.memberDialogForExistingChannel = true;
     this.memberDialogChannel.set(channel);
     this.addPeopleDialogOpen = true;
+  }
+
+  openChannelInfo(anchor: DOMRect): void {
+    this.channelInfoAnchor.set(anchor);
+    this.channelInfoOpen = true;
+  }
+
+  closeChannelInfo(): void {
+    this.channelInfoOpen = false;
+    this.channelInfoAnchor.set(null);
+  }
+
+  saveChannelInfo(change: { name: string; description: string }): void {
+    const channel = this.selectedChannel();
+    if (!channel) return;
+    this.channelService.updateChannel(channel.id, change.name, change.description);
+  }
+
+  leaveSelectedChannel(): void {
+    const channel = this.selectedChannel();
+    const uid = this.authService.currentUserId;
+    if (!channel || !uid) return;
+    this.channelService.leaveChannel(channel.id, uid).then(() => this.openAfterLeaving(channel.id));
+  }
+
+  private openAfterLeaving(leftChannelId: string): void {
+    this.closeChannelInfo();
+    const nextChannel = this.allChannels().find(channel => channel.id !== leftChannelId);
+    if (nextChannel) return this.sidebar()?.selectConversation('channel', nextChannel.id);
+    const uid = this.authService.currentUserId;
+    if (uid) return this.sidebar()?.selectConversation('direct', uid);
+    this.openNewMessage();
+  }
+
+  selectedChannelCreator(): AppUser | null {
+    const creatorId = this.selectedChannel()?.createdBy;
+    return this.allUsers().find(user => user.uid === creatorId) ?? null;
   }
 
   closeAddPeopleDialog(): void {
@@ -203,8 +303,46 @@ export class MainLayout {
   }
 
   readonly allUsers = computed(() => this.sidebar()?.users() ?? []);
+  readonly allChannels = computed(() => this.sidebar()?.channels() ?? []);
   readonly directConversationUserIds = computed(() => this.sidebar()?.directConversationUserIds() ?? []);
   readonly channelMembers = computed(() => this.membersOfSelectedChannel());
+  readonly canManageSelectedChannel = computed(() => this.isSelectedChannelMember());
+
+  private matchSearchResults(): SearchResult[] {
+    const raw = this.searchQuery().trim();
+    const kind = raw.startsWith('#') ? 'channel' : raw.startsWith('@') ? 'user' : 'all';
+    const query = raw.replace(/^[@#]/, '').toLocaleLowerCase('de');
+    if (!query) return [];
+    const channels = kind !== 'user' ? this.allChannels().filter(item => this.matchesSearch(item.name, query)) : [];
+    const users = kind !== 'channel' ? this.allUsers().filter(item => this.matchesSearch(item.name, query)) : [];
+    return [...channels.map(channel => ({ kind: 'channel' as const, id: `channel-${channel.id}`, label: channel.name, channel })),
+      ...users.map(user => ({ kind: 'user' as const, id: `user-${user.uid}`, label: user.name, user }))];
+  }
+
+  private matchesSearch(value: string, query: string): boolean {
+    return value.toLocaleLowerCase('de').includes(query);
+  }
+
+  private handleSearchNavigation(event: KeyboardEvent, count: number): boolean {
+    if (event.key === 'ArrowDown') this.searchIndex.update(index => (index + 1) % count);
+    else if (event.key === 'ArrowUp') this.searchIndex.update(index => (index - 1 + count) % count);
+    else if (event.key === 'Escape') return this.closeSearch(), false;
+    else if (event.key !== 'Enter') return false;
+    event.preventDefault();
+    return true;
+  }
+
+  private openSearchedUser(user: AppUser): void {
+    const sidebar = this.sidebar();
+    if (sidebar) return sidebar.selectConversation('direct', user.uid);
+    this.startDirectConversation(user);
+  }
+
+  private isSelectedChannelMember(): boolean {
+    const selected = this.selectedChannel();
+    const channel = this.allChannels().find(item => item.id === selected?.id) ?? selected;
+    return !!this.currentUserId && !!channel?.members.includes(this.currentUserId);
+  }
 
   private membersOfSelectedChannel(): AppUser[] {
     const members = this.selectedChannel()?.members ?? [];
@@ -270,5 +408,11 @@ export class MainLayout {
   startDirectConversation(user: AppUser): void {
     this.selectConversation({ type: 'direct', id: user.uid, user });
     this.threadOpen = false;
+  }
+
+  openMentionedChannel(channel: Channel): void {
+    const sidebar = this.sidebar();
+    if (sidebar) return sidebar.selectConversation('channel', channel.id);
+    this.selectConversation({ type: 'channel', id: channel.id, channel });
   }
 }

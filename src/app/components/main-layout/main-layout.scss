@@ -28,6 +28,7 @@ main header {
   }
 
   .input-wrapper {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -75,6 +76,39 @@ main header {
         .icon-hover {
           opacity: 1;
         }
+      }
+    }
+
+    .search-results {
+      position: absolute;
+      z-index: 1200;
+      top: calc(100% + 8px);
+      left: 0;
+      right: 0;
+      max-height: 320px;
+      margin: 0;
+      padding: 10px;
+      overflow-y: auto;
+      list-style: none;
+      border-radius: 0 0 30px 30px;
+      background: white;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+
+      button {
+        width: 100%;
+        min-height: 48px;
+        padding: 10px 20px;
+        border: 0;
+        border-radius: 30px;
+        background: transparent;
+        color: black;
+        font: inherit;
+        font-size: 18px;
+        text-align: left;
+        cursor: pointer;
+
+        span { margin-right: 10px; color: #535af1; font-weight: 700; }
+        &.active, &:hover { background: #eceefe; color: #535af1; }
       }
     }
   }
@@ -314,6 +348,8 @@ main header {
   padding: 8px;
   color: #535af1;
   font-size: 18px;
+  transition: all ease 0.2s;
+  &:hover, &:focus-visible { color: #444df2; font-weight: 700; cursor: pointer; outline: none; }
 
   &:disabled { cursor: not-allowed; opacity: 1; }
 }

@@ -1,0 +1,18 @@
+<div class="channel-info-backdrop" [style.--anchor-top]="offsetTop" [style.--anchor-left]="offsetLeft" (click)="closed.emit()">
+  <section class="channel-info-dialog" role="dialog" aria-modal="true" aria-labelledby="channel-info-title" (click)="$event.stopPropagation()">
+    <header><h2 id="channel-info-title"><span>#</span>{{ channel().name }}</h2><button type="button" aria-label="Dialog schließen" (click)="closed.emit()">×</button></header>
+    <section class="info-section"><div class="section-heading"><h3>Channel-Name</h3><button type="button" (click)="editingName() ? saveName() : editName()">{{ editingName() ? 'Speichern' : 'Bearbeiten' }}</button></div>
+      @if (editingName()) {<div class="editor"><input [value]="nameDraft()" (input)="nameDraft.set($any($event.target).value)"></div>}
+      @else {<p class="channel-value"><span>#</span>{{ channel().name }}</p>}</section>
+    <section class="info-section description-section"><div class="section-heading"><h3>Beschreibung</h3><button type="button" (click)="editingDescription() ? saveDescription() : editDescription()">{{ editingDescription() ? 'Speichern' : 'Bearbeiten' }}</button></div>
+      @if (editingDescription()) {<div class="editor"><textarea [value]="descriptionDraft()" (input)="descriptionDraft.set($any($event.target).value)"></textarea></div>}
+      @else {<p>{{ channel().description }}</p>}
+      <div class="created-by"><h3>Erstellt von</h3>@if (creator(); as channelCreator) {<button type="button" (click)="openCreatorProfile()">{{ channelCreator.name }}</button>} @else {<span>Unbekannt</span>}</div></section>
+    <button type="button" class="leave-button" (click)="left.emit()">Channel verlassen</button>
+  </section>
+</div>
+
+@if (creatorProfileOpen() && creator(); as channelCreator) {
+<app-profile-dialog [profile]="channelCreator" [canMessage]="channelCreator.uid !== currentUserId()"
+  (closed)="closeCreatorProfile()" (messageRequested)="messageRequested.emit($event)" />
+}

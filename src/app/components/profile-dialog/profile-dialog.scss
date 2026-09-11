@@ -1,0 +1,44 @@
+:host { position: fixed; z-index: 1300; inset: 0; }
+
+.profile-backdrop {
+  position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+  padding: 24px; box-sizing: border-box; background: rgba(0, 0, 0, 0.6);
+}
+
+.profile-dialog {
+  display: flex; flex-direction: column; width: min(500px, 100%); max-height: calc(100dvh - 48px);
+  padding: 40px; box-sizing: border-box; overflow-y: auto; border-radius: 30px; background: white;
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+  header { display: flex; align-items: center; justify-content: space-between; }
+  header h2 { margin: 0; font-size: 24px; }
+  h3 { margin: 35px 0 12px; font-size: 32px; }
+}
+
+.dialog-close {
+  display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 0;
+  border-radius: 50%; background: transparent; font-size: 30px; cursor: pointer;
+  transition: color 0.3s ease, background-color 0.3s ease;
+  &:hover, &:focus-visible { color: #535af1; background: #eceefe; }
+}
+
+.dialog-avatar { align-self: center; width: 200px; height: 200px; margin-top: 40px; border-radius: 50%; object-fit: cover; }
+.dialog-status {
+  display: flex; align-items: center; gap: 15px; margin: 0 0 35px; color: #92c83e; font-size: 20px;
+  span { width: 16px; height: 16px; border-radius: 50%; background: currentColor; }
+  &.offline { color: #686868; }
+}
+.dialog-email {
+  display: flex; align-items: flex-start; gap: 20px;
+  h4 { margin: 0 0 16px; font-size: 20px; }
+  a { color: #1381ff; font-size: 18px; text-decoration: none; overflow-wrap: anywhere; }
+}
+.mail-symbol { width: 28px; height: 28px; background: black; mask: url('/assets/img/icons/mail.svg') center / contain no-repeat; }
+.dialog-message-button {
+  display: flex; align-items: center; gap: 8px; align-self: center; margin-top: 45px; padding: 12px 24px; border: 0; border-radius: 25px;
+  background: #444df2; color: white; font: inherit; font-size: 18px; font-weight: 700; cursor: pointer;
+  transition: background-color 0.3s ease;
+  &:hover, &:focus-visible { background: #797ef3; }
+}
+.message-symbol { width: 20px; height: 20px; background: currentColor; mask: url('/assets/img/icons/mode_comment.svg') center / contain no-repeat; }
+
+@media (max-width: 600px) { .profile-backdrop { padding: 16px; } .profile-dialog { padding: 28px 24px; } .dialog-avatar { width: 150px; height: 150px; } }

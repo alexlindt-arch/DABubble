@@ -108,54 +108,15 @@
 
 .inline-profile-button { padding: 0; border: 0; background: transparent; color: #535af1; font: inherit; cursor: pointer; }
 
-.direct-profile-backdrop {
-    position: fixed; inset: 0; z-index: 1200; display: flex; align-items: center; justify-content: center;
-    padding: 24px; box-sizing: border-box; background: rgba(0, 0, 0, 0.6);
-}
-
-.direct-profile-dialog {
-    display: flex; flex-direction: column; width: min(500px, 100%); max-height: calc(100dvh - 48px);
-    padding: 40px; box-sizing: border-box; overflow-y: auto; border-radius: 30px; background: white;
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
-    header { display: flex; align-items: center; justify-content: space-between; }
-    header h2 { margin: 0; font-size: 24px; }
-    h3 { margin: 35px 0 12px; font-size: 32px; }
-}
-
-.dialog-close {
-    display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 0;
-    border-radius: 50%; background: transparent; font-size: 30px; cursor: pointer;
-    transition: color 0.3s ease, background-color 0.3s ease;
-    &:hover, &:focus-visible { color: #535af1; background: #eceefe; }
-}
-
-.dialog-avatar { align-self: center; width: 200px; height: 200px; margin-top: 40px; border-radius: 50%; object-fit: cover; }
-.dialog-status {
-    display: flex; align-items: center; gap: 15px; margin: 0 0 35px; color: #92c83e; font-size: 20px;
-    span { width: 16px; height: 16px; border-radius: 50%; background: currentColor; }
-    &.offline { color: #686868; }
-}
-.dialog-email {
-    display: flex; align-items: flex-start; gap: 20px;
-    h4 { margin: 0 0 16px; font-size: 20px; }
-    a { color: #1381ff; font-size: 18px; text-decoration: none; overflow-wrap: anywhere; }
-}
-.mail-symbol { width: 28px; height: 28px; background: black; mask: url('/assets/img/icons/mail.svg') center / contain no-repeat; }
-.dialog-message-button {
-    align-self: center; margin-top: 45px; padding: 12px 24px; border: 0; border-radius: 25px;
-    background: #444df2; color: white; font: inherit; font-size: 18px; font-weight: 700; cursor: pointer;
-    transition: background-color 0.3s ease;
-    &:hover, &:focus-visible { background: #797ef3; }
-}
-
 .chat-body {
+    --chat-horizontal-padding: 40px;
     display: flex;
     flex-direction: column;
     flex: 1;
     min-height: 0;
     min-width: 0;
     gap: 25px;
-    padding: 30px 40px 40px;
+    padding: 30px var(--chat-horizontal-padding) 40px;
 }
 
 .chat-history {
@@ -163,11 +124,18 @@
     flex-direction: column;
     flex: 1;
     min-height: 0;
-    padding: 20px 0 2px;
+    width: calc(100% + var(--chat-horizontal-padding) + var(--chat-horizontal-padding));
+    margin-inline: calc(0px - var(--chat-horizontal-padding));
+    padding: 20px var(--chat-horizontal-padding) 2px;
     box-sizing: border-box;
+    overflow-x: hidden;
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: #adb0d9 transparent;
+}
+
+.chat-history > :first-child {
+    margin-top: auto;
 }
 
 .self-introduction {
@@ -285,6 +253,42 @@
     }
 }
 
+.mention-suggestions {
+    position: absolute;
+    z-index: 20;
+    bottom: calc(100% + 8px);
+    left: 0;
+    width: min(340px, 100%);
+    max-height: 250px;
+    margin: 0;
+    padding: 8px;
+    overflow-y: auto;
+    box-sizing: border-box;
+    border: 1px solid #adb0d9;
+    border-radius: 20px;
+    background: white;
+    box-shadow: 0 3px 12px #0002;
+    list-style: none;
+
+    button {
+        display: flex;
+        width: 100%;
+        gap: 8px;
+        padding: 10px 12px;
+        border: 0;
+        border-radius: 12px;
+        background: transparent;
+        color: black;
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+        transition: background-color 0.3s ease, color 0.3s ease;
+
+        &:hover, &.active { background: #eceefe; color: #535af1; }
+        span { font-weight: 700; }
+    }
+}
+
 .own-message {
     align-self: flex-end;
     max-width: 85%;
@@ -307,7 +311,7 @@
 @media (max-width: 700px) {
     .chat-header { min-height: 80px; padding: 15px; }
     .self-profile-name, .self-introduction h2 { font-size: 18px; }
-    .chat-body { padding: 20px 15px; gap: 16px; }
+    .chat-body { --chat-horizontal-padding: 15px; padding: 20px var(--chat-horizontal-padding); gap: 16px; }
     .self-introduction img { width: 70px; height: 70px; }
     .self-introduction .introduction-profile { gap: 12px; }
     .self-introduction p { font-size: 16px; }

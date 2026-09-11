@@ -1,6 +1,7 @@
 import {
   afterRenderEffect,
   Component,
+  computed,
   effect,
   ElementRef,
   HostListener,
@@ -14,9 +15,23 @@ import { AppUser, Channel, Message } from '../../models';
 import { avatarUrl } from '../../shared/avatar-url';
 import { AuthService } from '../../services/auth.service';
 import { MessageService } from '../../services/message.service';
+import { ProfileDialog } from '../profile-dialog/profile-dialog';
+
+type MentionKind = 'user' | 'channel';
+
+interface MentionSuggestion {
+  kind: MentionKind;
+  label: string;
+  user?: AppUser;
+  channel?: Channel;
+}
+
+interface MessagePart extends MentionSuggestion {
+  text: string;
+}
 
 @Component({
-  imports: [],
+  imports: [ProfileDialog],
   selector: 'app-chat',
   styleUrls: ['./chat.scss', './chat-channel.scss'],
   templateUrl: './chat.html',
@@ -28,7 +43,11 @@ export class Chat {
   directUser = input<AppUser | null>(null);
   channel = input<Channel | null>(null);
   users = input<AppUser[]>([]);
+  channels = input<Channel[]>([]);
   profileRequested = output<void>();
+  messageRequested = output<AppUser>();
+  channelInfoRequested = output<DOMRect>();
+  channelRequested = output<Channel>();
   addPeopleRequested = output<void>();
   membersRequested = output<DOMRect>();
   threadRequested = output<void>();
@@ -38,10 +57,17 @@ export class Chat {
   reactionPickerPosition = signal({ top: 0, left: 0 });
   editingMessageId = signal<string | null>(null);
   editingText = signal('');
-  profileDialogOpen = signal(false);
+  editMenuFor = signal<string | null>(null);
+  selectedProfile = signal<AppUser | null>(null);
   draft = signal('');
   notes = signal<string[]>([]);
   emojiPickerOpen = signal(false);
+  mentionOpen = signal(false);
+  mentionKind = signal<MentionKind>('user');
+  mentionQuery = signal('');
+  mentionStart = signal(0);
+  mentionIndex = signal(0);
+  readonly mentionSuggestions = computed(() => this.filteredMentionSuggestions());
   emojis = [
     '😂', '❤️', '🤣', '👍', '😭',
     '💀', '🔥', '🥰', '😊', '🙏',
@@ -69,11 +95,21 @@ export class Chat {
   }
 
   private watchChannelMessages(onCleanup: (cleanup: () => void) => void): void {
-    const channelId = this.channel()?.id;
+    const channelId = this.currentChannel()?.id;
     this.messages.set([]);
     if (!channelId) return;
     const stop = this.messageService.watchMessages(channelId, messages => this.messages.set(messages));
     onCleanup(() => stop());
+  }
+
+  isChannelMember(): boolean {
+    const uid = this.authService.currentUserId;
+    return !!uid && !!this.currentChannel()?.members.includes(uid);
+  }
+
+  private currentChannel(): Channel | null {
+    const selected = this.channel();
+    return this.channels().find(channel => channel.id === selected?.id) ?? selected;
   }
 
   private watchDirectMessages(onCleanup: (cleanup: () => void) => void): void {
@@ -101,6 +137,7 @@ export class Chat {
   }
 
   onEditorKeydown(event: KeyboardEvent): void {
+    if (this.handleMentionKeydown(event)) return;
     if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
       this.sendNote(event);
     }
@@ -114,7 +151,13 @@ export class Chat {
     editor.value = this.draft();
     editor.focus();
     editor.setSelectionRange(start + text.length, start + text.length);
+    this.updateMentionContext(editor);
     this.emojiPickerOpen.set(false);
+  }
+
+  onDraftInput(editor: HTMLTextAreaElement): void {
+    this.draft.set(editor.value);
+    this.updateMentionContext(editor);
   }
 
   sendChannelMessage(event: Event): void {
@@ -144,12 +187,14 @@ export class Chat {
   }
 
   onChannelKeydown(event: KeyboardEvent): void {
+    if (this.handleMentionKeydown(event)) return;
     if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
       this.sendChannelMessage(event);
     }
   }
 
   onDirectKeydown(event: KeyboardEvent): void {
+    if (this.handleMentionKeydown(event)) return;
     if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
       this.sendDirectMessage(event);
     }
@@ -158,7 +203,24 @@ export class Chat {
   authorName(message: Message): string {
     return this.isOwnMessage(message)
       ? `${this.userName()} (Du)`
-      : this.userById(message.senderId)?.name ?? message.senderId;
+      : this.userById(message.senderId)?.name ?? 'Gelöschter Account';
+  }
+
+  selectMention(suggestion: MentionSuggestion): void {
+    const editor = this.editor()?.nativeElement;
+    if (!editor) return;
+    const token = `${suggestion.kind === 'user' ? '@' : '#'}${suggestion.label} `;
+    const next = this.draft().slice(0, this.mentionStart()) + token + this.draft().slice(editor.selectionStart);
+    this.draft.set(next);
+    editor.value = next;
+    editor.focus();
+    const position = this.mentionStart() + token.length;
+    editor.setSelectionRange(position, position);
+    this.closeMentionSuggestions();
+  }
+
+  messageParts(message: Message): MessagePart[] {
+    return this.createMessageParts(message.text);
   }
 
   showDateDivider(index: number): boolean {
@@ -183,6 +245,86 @@ export class Chat {
     return message.timestamp?.toDate?.()?.toDateString() ?? '';
   }
 
+  private filteredMentionSuggestions(): MentionSuggestion[] {
+    const query = this.mentionQuery().toLocaleLowerCase('de');
+    const source = this.mentionKind() === 'user' ? this.userSuggestions() : this.channelSuggestions();
+    return source.filter(item => item.label.toLocaleLowerCase('de').includes(query)).slice(0, 6);
+  }
+
+  private userSuggestions(): MentionSuggestion[] {
+    return this.users().map(user => ({ kind: 'user', label: user.name, user }));
+  }
+
+  private channelSuggestions(): MentionSuggestion[] {
+    return this.channels().map(channel => ({ kind: 'channel', label: channel.name, channel }));
+  }
+
+  private updateMentionContext(editor: HTMLTextAreaElement): void {
+    const before = editor.value.slice(0, editor.selectionStart);
+    const match = before.match(/(^|\s)([@#])([^\s@#]*)$/);
+    if (!match) return this.closeMentionSuggestions();
+    this.mentionKind.set(match[2] === '@' ? 'user' : 'channel');
+    this.mentionQuery.set(match[3]);
+    this.mentionStart.set(before.length - match[3].length - 1);
+    this.mentionIndex.set(0);
+    this.mentionOpen.set(true);
+  }
+
+  private handleMentionKeydown(event: KeyboardEvent): boolean {
+    const suggestions = this.mentionSuggestions();
+    if (!this.mentionOpen() || !suggestions.length) return false;
+    if (event.key === 'ArrowDown') return this.moveMentionSelection(event, 1);
+    if (event.key === 'ArrowUp') return this.moveMentionSelection(event, -1);
+    if (event.key === 'Escape') return this.closeMentionFromKeyboard(event);
+    if (event.key !== 'Enter') return false;
+    event.preventDefault();
+    this.selectMention(suggestions[this.mentionIndex()]);
+    return true;
+  }
+
+  private moveMentionSelection(event: KeyboardEvent, step: number): boolean {
+    event.preventDefault();
+    const length = this.mentionSuggestions().length;
+    this.mentionIndex.update(index => (index + step + length) % length);
+    return true;
+  }
+
+  private closeMentionFromKeyboard(event: KeyboardEvent): boolean {
+    event.preventDefault();
+    this.closeMentionSuggestions();
+    return true;
+  }
+
+  private closeMentionSuggestions(): void {
+    this.mentionOpen.set(false);
+    this.mentionIndex.set(0);
+  }
+
+  private createMessageParts(text: string): MessagePart[] {
+    const parts: MessagePart[] = [];
+    let cursor = 0;
+    let match = this.findNextMention(text, cursor);
+    while (match) {
+      if (match.index > cursor) parts.push({ kind: 'user', label: '', text: text.slice(cursor, match.index) });
+      parts.push({ ...match, text: `${match.kind === 'user' ? '@' : '#'}${match.label}` });
+      cursor = match.index + match.text.length;
+      match = this.findNextMention(text, cursor);
+    }
+    if (cursor < text.length) parts.push({ kind: 'user', label: '', text: text.slice(cursor) });
+    return parts;
+  }
+
+  private findNextMention(text: string, from: number): (MessagePart & { index: number }) | undefined {
+    return this.allMentionTargets().map(target => ({ ...target, index: text.indexOf(target.text, from) }))
+      .filter(target => target.index >= 0).sort((a, b) => a.index - b.index)[0];
+  }
+
+  private allMentionTargets(): MessagePart[] {
+    return [...this.userSuggestions(), ...this.channelSuggestions()]
+      .map(item => ({ ...item, text: `${item.kind === 'user' ? '@' : '#'}${item.label}` }))
+      .sort((a, b) => b.text.length - a.text.length);
+  }
+
   authorAvatar(message: Message): string {
     return this.isOwnMessage(message)
       ? this.userAvatarUrl()
@@ -202,6 +344,11 @@ export class Chat {
   openMembers(event: MouseEvent): void {
     const button = event.currentTarget as HTMLElement;
     this.membersRequested.emit(button.getBoundingClientRect());
+  }
+
+  openChannelInfo(event: MouseEvent): void {
+    const button = event.currentTarget as HTMLElement;
+    this.channelInfoRequested.emit(button.getBoundingClientRect());
   }
 
   memberAvatar(member: AppUser): string {
@@ -230,6 +377,23 @@ export class Chat {
 
   reactionTitle(uids: string[]): string {
     return uids.map(uid => this.userById(uid)?.name ?? uid).join(', ');
+  }
+
+  reactionTooltipText(uids: string[]): string {
+    return uids.length === 1 ? 'hat reagiert' : 'haben reagiert';
+  }
+
+  reactionTooltipNames(uids: string[]): string {
+    if (uids.length === 1) return this.userById(uids[0])?.name ?? uids[0];
+    const names = uids.map(uid => this.shortReactionName(uid));
+    if (names.length === 2) return names.join(' und ');
+    if (names.length === 3) return `${names[0]}, ${names[1]} und ${names[2]}`;
+    return `${names[0]}, ${names[1]} und ${names.length - 2} weitere`;
+  }
+
+  private shortReactionName(uid: string): string {
+    if (uid === this.authService.currentUserId) return 'Du';
+    return this.userById(uid)?.name.split(' ')[0] ?? uid;
   }
 
   toggleReaction(message: Message, emoji: string): void {
@@ -275,11 +439,30 @@ export class Chat {
     return ownMessages.at(-1)?.id === message.id;
   }
 
+  isLastOwnChannelMessage(message: Message): boolean {
+    const ownUid = this.authService.currentUserId;
+    if (!ownUid || message.senderId !== ownUid) return false;
+    const ownMessages = this.messages().filter(item => item.senderId === ownUid);
+    return ownMessages.at(-1)?.id === message.id;
+  }
+
   startEditingDirectMessage(message: Message): void {
     if (!this.isLastOwnDirectMessage(message)) return;
     this.editingMessageId.set(message.id);
     this.editingText.set(message.text);
+    this.editMenuFor.set(null);
     this.reactionPickerFor.set(null);
+  }
+
+  startEditingChannelMessage(message: Message): void {
+    if (!this.isLastOwnChannelMessage(message)) return;
+    this.editingMessageId.set(message.id);
+    this.editingText.set(message.text);
+    this.editMenuFor.set(null);
+  }
+
+  toggleEditMenu(messageId: string): void {
+    this.editMenuFor.update(openId => openId === messageId ? null : messageId);
   }
 
   cancelEditingDirectMessage(): void {
@@ -298,13 +481,36 @@ export class Chat {
     this.cancelEditingDirectMessage();
   }
 
+  saveChannelMessage(message: Message): void {
+    const channelId = this.channel()?.id;
+    const text = this.editingText().trim();
+    if (!channelId || !text || !this.isLastOwnChannelMessage(message)) return;
+    this.messageService.editMessage(channelId, message.id, text).catch(() => undefined);
+    this.cancelEditingDirectMessage();
+  }
+
   private userById(uid: string): AppUser | undefined {
     return this.users().find(user => user.uid === uid);
   }
 
   directUserAvatar(): string { return avatarUrl(this.directUser()?.avatar); }
-  openDirectProfile(): void { if (this.directUser()) this.profileDialogOpen.set(true); }
-  closeDirectProfile(): void { this.profileDialogOpen.set(false); }
+  openDirectProfile(): void { this.selectedProfile.set(this.directUser()); }
+  closeDirectProfile(): void { this.selectedProfile.set(null); }
+
+  startDirectMessage(profile: AppUser): void {
+    this.messageRequested.emit(profile);
+    this.closeDirectProfile();
+  }
+
+  openMessageProfile(message: Message): void {
+    if (this.isOwnMessage(message)) return this.profileRequested.emit();
+    this.selectedProfile.set(this.userById(message.senderId) ?? null);
+  }
+
+  openMentionProfile(user: AppUser): void {
+    if (user.uid === this.authService.currentUserId) return this.profileRequested.emit();
+    this.selectedProfile.set(user);
+  }
 
   @HostListener('document:keydown.escape')
   closeProfileWithEscape(): void { this.closeDirectProfile(); }
@@ -312,9 +518,10 @@ export class Chat {
   @HostListener('document:click', ['$event'])
   closeEmojiPickersOutside(event: MouseEvent): void {
     const target = event.target as HTMLElement;
-    const selector = '.emoji-picker, .channel-reaction-picker, .composer-button, .channel-hover-button';
+    const selector = '.emoji-picker, .channel-reaction-picker, .edit-message-menu, .composer-button, .channel-hover-button';
     if (target.closest(selector)) return;
     this.emojiPickerOpen.set(false);
     this.reactionPickerFor.set(null);
+    this.editMenuFor.set(null);
   }
 }

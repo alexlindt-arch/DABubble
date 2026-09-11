@@ -55,6 +55,10 @@ export class MessageService {
     });
   }
 
+  editMessage(channelId: string, messageId: string, text: string): Promise<void> {
+    return updateDoc(this.messageRef(channelId, messageId), { text, editedAt: Timestamp.now() });
+  }
+
   /** Ein direkter Chat hat immer dieselbe ID – egal, wer ihn öffnet. */
   directConversationId(firstUid: string, secondUid: string): string {
     return [firstUid, secondUid].sort().join('_');

@@ -1,10 +1,11 @@
-import { Component, HostListener, input, output } from '@angular/core';
+import { Component, HostListener, input, output, signal } from '@angular/core';
 import { AppUser } from '../../models';
 import { avatarUrl } from '../../shared/avatar-url';
+import { ProfileDialog } from '../profile-dialog/profile-dialog';
 
 @Component({
   selector: 'app-members-dialog',
-  imports: [],
+  imports: [ProfileDialog],
   templateUrl: './members-dialog.html',
   styleUrl: './members-dialog.scss',
 })
@@ -12,8 +13,11 @@ export class MembersDialog {
   members = input<AppUser[]>([]);
   currentUserId = input<string | null>(null);
   anchor = input<DOMRect | null>(null);
+  canAddMembers = input(false);
+  selectedMember = signal<AppUser | null>(null);
   closed = output<void>();
   addRequested = output<void>();
+  messageRequested = output<AppUser>();
 
   get offsetTop(): string {
     const rect = this.anchor();
@@ -39,6 +43,15 @@ export class MembersDialog {
 
   isOnline(member: AppUser): boolean {
     return member.status === 'online';
+  }
+
+  openProfile(member: AppUser): void { this.selectedMember.set(member); }
+
+  closeProfile(): void { this.selectedMember.set(null); }
+
+  startDirectMessage(member: AppUser): void {
+    this.messageRequested.emit(member);
+    this.closed.emit();
   }
 
   closeOnBackdrop(event: MouseEvent): void {

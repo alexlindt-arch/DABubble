@@ -11,21 +11,29 @@
     <ul class="member-list">
       @for (member of members(); track member.uid) {
       <li>
-        <span class="avatar-wrapper">
-          <img [src]="avatar(member)" alt="">
-          <span class="status-dot" [class.offline]="!isOnline(member)" role="img"
-            [attr.aria-label]="isOnline(member) ? 'Online' : 'Offline'"></span>
-        </span>
-        <span class="member-name">{{ displayName(member) }}</span>
+        <button type="button" class="member-profile-button" (click)="openProfile(member)"
+          [attr.aria-label]="'Profil von ' + displayName(member) + ' öffnen'">
+          <span class="avatar-wrapper">
+            <img [src]="avatar(member)" alt="">
+            <span class="status-dot" [class.offline]="!isOnline(member)" role="img"
+              [attr.aria-label]="isOnline(member) ? 'Online' : 'Offline'"></span>
+          </span>
+          <span class="member-name">{{ displayName(member) }}</span>
+        </button>
       </li>
       }
     </ul>
 
-    <button type="button" class="add-member-button" (click)="addRequested.emit()">
+    @if (canAddMembers()) {<button type="button" class="add-member-button" (click)="addRequested.emit()">
       <span class="add-icon-circle" aria-hidden="true">
         <span class="icon add-user-icon"></span>
       </span>
       <span>Mitglieder hinzufügen</span>
-    </button>
+    </button>}
   </section>
 </div>
+
+@if (selectedMember(); as member) {
+<app-profile-dialog [profile]="member" [canMessage]="!isCurrentUser(member)" (closed)="closeProfile()"
+  (messageRequested)="startDirectMessage($event)" />
+}

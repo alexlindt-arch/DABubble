@@ -2,7 +2,22 @@
     <header>
         <img class="logo" src="./assets/img/Home-Workspaces.svg" alt="Logo" />
         <div class="input-wrapper">
-            <input type="text" placeholder="Devspace durchsuchen" />
+            <input type="text" placeholder="Devspace durchsuchen" [value]="searchQuery()"
+                role="combobox" aria-autocomplete="list" [attr.aria-expanded]="searchOpen() && searchResults().length > 0"
+                [attr.aria-activedescendant]="searchOpen() && searchResults().length ? 'search-result-' + searchIndex() : null"
+                (input)="onSearchInput($any($event.target).value)" (focus)="searchOpen.set(true)"
+                (focusout)="closeSearch()" (keydown)="onSearchKeydown($event)" />
+            @if (searchOpen() && searchResults().length) {
+            <ul class="search-results" role="listbox" aria-label="Suchvorschläge">
+                @for (result of searchResults(); track result.id; let index = $index) {
+                <li><button type="button" [id]="'search-result-' + index" role="option"
+                    [attr.aria-selected]="index === searchIndex()" [class.active]="index === searchIndex()"
+                    (mousedown)="$event.preventDefault()" (click)="selectSearchResult(result)">
+                    <span aria-hidden="true">{{ result.kind === 'channel' ? '#' : '@' }}</span>{{ result.label }}
+                </button></li>
+                }
+            </ul>
+            }
             <div class="search-icon">
                 <img class="icon-default" src="./assets/img/icons/search-default.svg" alt="Suchen">
 
@@ -91,9 +106,12 @@
     (conversationStarted)="startDirectConversation($event)"></app-new-message>
   } @else {
   <app-chat [isSelfChat]="selfChatOpen" [userName]="userName" [userAvatarUrl]="userAvatarUrl"
-    [directUser]="selectedDirectUser" [channel]="selectedChannel()" [users]="allUsers()"
+    [directUser]="selectedDirectUser" [channel]="selectedChannel()" [users]="allUsers()" [channels]="allChannels()"
     (profileRequested)="openProfilePopup()" (addPeopleRequested)="openMemberDialog()"
-    (membersRequested)="openMembersDialog($event)" (threadRequested)="openThread()"></app-chat>
+    (messageRequested)="startDirectConversation($event)"
+    (channelInfoRequested)="openChannelInfo($event)"
+    (membersRequested)="openMembersDialog($event)" (threadRequested)="openThread()"
+    (channelRequested)="openMentionedChannel($event)"></app-chat>
   }
   @if (threadOpen && selectedChannel() && !selfChatOpen && !newMessageOpen) {
   <app-thread [channelName]="selectedChannel()?.name ?? 'Entwicklerteam'" (closed)="closeThread()"></app-thread>
@@ -144,8 +162,10 @@
     [members]="channelMembers()"
     [currentUserId]="currentUserId"
     [anchor]="membersAnchor()"
+    [canAddMembers]="canManageSelectedChannel()"
     (closed)="closeMembersDialog()"
     (addRequested)="openMemberDialogFromList()"
+    (messageRequested)="startDirectConversation($event)"
   />
 }
 
@@ -153,18 +173,29 @@
   <app-add-people-dialog
     [users]="invitableUsers()"
     [submitLabel]="memberDialogLabel"
+    [channelName]="memberDialogChannel()?.name ?? ''"
+    [compact]="memberDialogForExistingChannel"
     (closed)="closeAddPeopleDialog()"
     (confirmed)="addMembers($event)"
   />
 }
+
+@if (channelInfoOpen && selectedChannel(); as channel) {
+  <app-channel-info-dialog [channel]="channel" [creator]="selectedChannelCreator()" [currentUserId]="currentUserId" [anchor]="channelInfoAnchor()"
+    (closed)="closeChannelInfo()" (saved)="saveChannelInfo($event)" (left)="leaveSelectedChannel()"
+    (messageRequested)="startDirectConversation($event)" />
+}
 </main>
 
 @if (profileEditOpen) {
-  <app-profile-edit-dialog
-    [userName]="userName"
-    [userAvatar]="currentUser()?.avatar ?? ''"
+  <app-profile-dialog
+    [profile]="currentUser()!"
+    [editMode]="true"
     [saveError]="profileSaveError"
+    [deleteError]="accountDeleteError"
+    [deleteBusy]="accountDeleteBusy"
     (closed)="closeProfileEdit()"
     (saved)="saveProfile($event)"
+    (deleteConfirmed)="deleteAccount()"
   />
 }

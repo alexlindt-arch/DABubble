@@ -24,6 +24,8 @@ export class AddPeopleDialog {
   users = input<AppUser[]>([]);
   workspaceName = input('Devspace');
   submitLabel = input('Erstellen');
+  channelName = input('');
+  compact = input(false);
   closed = output<void>();
   confirmed = output<string[]>();
   mode = signal<AddMode>('all');
@@ -35,12 +37,12 @@ export class AddPeopleDialog {
 
   constructor() {
     effect(() => {
-      if (this.mode() === 'specific') this.searchInput()?.nativeElement.focus();
+      if (this.compact() || this.mode() === 'specific') this.searchInput()?.nativeElement.focus();
     });
   }
 
   get formValid(): boolean {
-    return this.mode() === 'all' || this.selected().length > 0;
+    return this.compact() || this.mode() === 'specific' ? this.selected().length > 0 : true;
   }
 
   avatar(user: AppUser): string {
@@ -72,7 +74,7 @@ export class AddPeopleDialog {
   }
 
   private memberUids(): string[] {
-    const chosen = this.mode() === 'all' ? this.users() : this.selected();
+    const chosen = this.compact() || this.mode() === 'specific' ? this.selected() : this.users();
     return chosen.map(user => user.uid);
   }
 

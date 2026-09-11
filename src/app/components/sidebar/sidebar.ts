@@ -33,13 +33,14 @@ export class Sidebar implements OnDestroy {
     channel?: Channel;
   }>();
 
-  readonly channels = this.firestoreChannels.asReadonly();
+  readonly channels = computed(() => this.memberChannels());
   readonly users = computed(() => this.sortedAccountUsers());
   readonly directConversationUserIds = computed(() => this.directConversationPartners());
 
   constructor(userService: UserService, channelService: ChannelService, messageService: MessageService) {
     this.stopWatchingUsers = userService.watchUsers(users => this.firestoreUsers.set(users));
     this.stopWatchingChannels = channelService.watchChannels(channels => this.updateChannels(channels));
+    effect(() => this.selectInitialConversation());
     effect(onCleanup => {
       const uid = this.authService.currentUser()?.uid;
       this.directConversations.set([]);
@@ -80,9 +81,30 @@ export class Sidebar implements OnDestroy {
 
   private updateChannels(channels: Channel[]): void {
     this.firestoreChannels.set(channels);
-    if (this.selectedConversation || !channels.length) return;
-    this.selectConversation('channel', channels[0].id);
+  }
+
+  private selectInitialConversation(): void {
+    if (this.selectedConversation) return;
+    const channel = this.channels()[0];
+    if (channel) return this.selectInitialChannel(channel);
+    const currentUid = this.authService.currentUser()?.uid;
+    const user = this.users().find(item => item.uid === currentUid);
+    if (user) this.selectInitialUser(user);
+  }
+
+  private selectInitialChannel(channel: Channel): void {
+    this.selectConversation('channel', channel.id);
     this.initialChannelSelected.emit();
+  }
+
+  private selectInitialUser(user: AppUser): void {
+    this.selectConversation('direct', user.uid);
+    this.initialChannelSelected.emit();
+  }
+
+  private memberChannels(): Channel[] {
+    const uid = this.authService.currentUser()?.uid;
+    return uid ? this.firestoreChannels().filter(channel => channel.members.includes(uid)) : [];
   }
 
   private lastMessageTimeWith(otherUid: string, currentUid?: string): number {

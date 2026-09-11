@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {
   addDoc,
+  arrayRemove,
   arrayUnion,
   collection,
   CollectionReference,
@@ -8,11 +9,14 @@ import {
   DocumentReference,
   Firestore,
   getFirestore,
+  getDocs,
   onSnapshot,
   QueryDocumentSnapshot,
   Timestamp,
   Unsubscribe,
   updateDoc,
+  query,
+  where,
 } from 'firebase/firestore';
 import { firebaseApp } from '../firebase';
 import { Channel, ChannelProfile } from '../models';
@@ -47,6 +51,19 @@ export class ChannelService {
 
   addMembers(channelId: string, uids: string[]): Promise<void> {
     return updateDoc(this.channelRef(channelId), { members: arrayUnion(...uids) });
+  }
+
+  updateChannel(channelId: string, name: string, description: string): Promise<void> {
+    return updateDoc(this.channelRef(channelId), { name, description });
+  }
+
+  leaveChannel(channelId: string, uid: string): Promise<void> {
+    return updateDoc(this.channelRef(channelId), { members: arrayRemove(uid) });
+  }
+
+  async removeUserFromChannels(uid: string): Promise<void> {
+    const channels = await getDocs(query(this.channelsRef(), where('members', 'array-contains', uid)));
+    await Promise.all(channels.docs.map(channel => updateDoc(channel.ref, { members: arrayRemove(uid) })));
   }
 
   private channelsRef(): CollectionReference {

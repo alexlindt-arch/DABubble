@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {
   collection,
+  deleteDoc,
   doc,
   DocumentReference,
   Firestore,
@@ -37,6 +38,10 @@ export class UserService {
 
   updateStatus(uid: string, status: UserStatus): Promise<void> {
     return updateDoc(this.userRef(uid), { status });
+  }
+
+  deleteUserProfile(uid: string): Promise<void> {
+    return deleteDoc(this.userRef(uid));
   }
 
   watchUser(uid: string, onChange: (user: AppUser | null) => void): Unsubscribe {

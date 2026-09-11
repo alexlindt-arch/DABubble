@@ -2,6 +2,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import {
   Auth,
   createUserWithEmailAndPassword,
+  deleteUser,
   getAuth,
   GoogleAuthProvider,
   onAuthStateChanged,
@@ -79,6 +80,11 @@ export class AuthService {
     return signOut(this.auth);
   }
 
+  async deleteCurrentAccount(): Promise<void> {
+    await deleteUser(this.deletionUser());
+    this.setProfile(null);
+  }
+
   /** Profil laden ist optional: Die Anmeldung gilt auch, wenn Firestore nicht antwortet. */
   private async activateProfile(user: User, fallbackName: string): Promise<AppUser | null> {
     try {
@@ -87,6 +93,12 @@ export class AuthService {
       console.error('Profil konnte nicht aus Firestore geladen werden:', error);
       return null;
     }
+  }
+
+  private deletionUser(): User {
+    const user = this.auth.currentUser;
+    if (!user) throw new Error('Kein angemeldeter Benutzer.');
+    return user;
   }
 
   private async loadOrCreateProfile(user: User, fallbackName: string): Promise<AppUser> {
