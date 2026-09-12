@@ -12,7 +12,7 @@ export interface ProfileEdit {
   selector: 'app-profile-dialog',
   imports: [],
   templateUrl: './profile-dialog.html',
-  styleUrls: ['./profile-dialog.scss', '../profile-edit-dialog/profile-edit-dialog.scss'],
+  styleUrl: './profile-dialog.scss',
 })
 export class ProfileDialog {
   profile = input.required<AppUser>();
