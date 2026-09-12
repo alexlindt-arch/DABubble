@@ -33,6 +33,45 @@
     a:hover, a:focus-visible { text-decoration: underline; }
 }
 
+.back-button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    margin: -8px 0 10px -8px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: black;
+    font: inherit;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    img {
+        position: absolute;
+        inset: 8px;
+        width: 24px;
+        height: 24px;
+        transition: opacity 0.3s ease;
+    }
+
+    .back-icon-default { opacity: 1; }
+    .back-icon-hover { opacity: 0; }
+
+    &:hover, &:focus-visible {
+        color: #535af1;
+        background: #eceefe;
+
+        .back-icon-default { opacity: 0; }
+        .back-icon-hover { opacity: 1; }
+    }
+
+    &:focus-visible { outline: 2px solid #535af1; outline-offset: 2px; }
+}
+
 h1 { margin: 0 0 20px; color: #444df2; font-size: 46px; line-height: 1.2; }
 
 .placeholder {
@@ -60,4 +99,8 @@ h1 { margin: 0 0 20px; color: #444df2; font-size: 46px; line-height: 1.2; }
     h1 { font-size: 34px; }
     .privacy-content { font-size: 15px; }
     .privacy-content h2 { font-size: 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .back-button { transition: none; }
 }
