@@ -1,5 +1,7 @@
+// The channel header always stays on one line; a long name is shortened instead of wrapping.
 .channel-chat-header {
     justify-content: space-between;
+    flex-wrap: nowrap;
 }
 
 .channel-chat-body {
@@ -32,6 +34,7 @@
 .channel-header-actions {
     display: flex;
     align-items: center;
+    flex-shrink: 0;
     gap: 20px;
     margin-left: auto;
 }
@@ -571,21 +574,27 @@
 
 .channel-arrow { flex-shrink: 0; }
 
+// Tablets keep the avatars and member count but in a compact size, so the channel name keeps room;
+// the header never wraps because it is nowrap and the name shortens instead.
 @media (max-width: 1023px) {
     .channel-title { font-size: 22px; }
+    .channel-header-actions,
+    .channel-members { gap: 10px; }
+    .member-avatars img { width: 30px; height: 30px; }
+    .member-count { font-size: 15px; }
+}
+
+// Phones follow Figma: only the add-member button stays next to the channel name.
+@media (max-width: 767px) {
+    .channel-members { display: none; }
 }
 
 @media (max-width: 767px) {
-    .channel-chat-header { flex-wrap: nowrap; }
-    .channel-header-actions { flex-shrink: 0; }
-
     .channel-title {
         padding: 6px 8px;
         font-size: 18px;
     }
 
-    // Figma mobile: only the add-member button stays next to the channel name; the avatars return from 768px.
-    .channel-members { display: none; }
 
     .channel-hover-button {
         width: 28px;
