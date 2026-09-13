@@ -263,27 +263,26 @@
         }
     }
 
-    .unread-dot {
-        flex: 0 0 10px;
-        width: 10px;
-        height: 10px;
-        margin: 0 8px 0 auto;
-        border-radius: 50%;
-        background: #444df2;
-    }
-
+    // The online dot follows the name at a fixed gap, so it never drifts under the new-message button.
     .status-dot {
         flex: 0 0 10px;
         width: 10px;
         height: 10px;
-        margin-left: auto;
+        margin-left: 10px;
         border-radius: 50%;
         background-color: #2ecc71;
 
         &.offline { background-color: #bbb; }
     }
 
-    .unread-dot + .status-dot { margin-left: 0; }
+    .unread-dot {
+        flex: 0 0 10px;
+        width: 10px;
+        height: 10px;
+        margin-left: auto;
+        border-radius: 50%;
+        background: #444df2;
+    }
 }
 
 @media (max-width: 1023px) {
