@@ -87,9 +87,18 @@ export class MainLayout {
   }
 
   private updateToggleHeight(): void {
-    // Text plus vertical padding (20), icon (20), and gap (6).
-    this.closeLabelHeight.set(this.closeLabel().nativeElement.offsetHeight + 46);
-    this.openLabelHeight.set(this.openLabel().nativeElement.offsetHeight + 46);
+    const chrome = this.toggleChromeHeight(this.closeLabel().nativeElement);
+    this.closeLabelHeight.set(this.closeLabel().nativeElement.offsetHeight + chrome);
+    this.openLabelHeight.set(this.openLabel().nativeElement.offsetHeight + chrome);
+  }
+
+  /** Vertical padding, icon and gap of the toggle; they scale with the window, so they are read live. */
+  private toggleChromeHeight(label: HTMLElement): number {
+    const button = label.closest('button');
+    if (!button) return 0;
+    const style = getComputedStyle(button);
+    const icon = button.querySelector<HTMLElement>('.toggle-icon')?.offsetHeight ?? 0;
+    return parseFloat(style.paddingTop) + parseFloat(style.paddingBottom) + parseFloat(style.rowGap) + icon;
   }
 
   get userName(): string {

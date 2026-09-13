@@ -1,31 +1,33 @@
+// Figma "77. Hide/show navigation bar" at the 1920 x 1080 frame. Between 1200px and 1920px window
+// width every size scales together from the compact toggle (40px wide, 12px text) up to the Figma size.
+// Its bottom edge sits 152px above the frame bottom (14.07vh), so it grows upwards and never leaves the window.
 .sidebar-toggle {
   position: fixed;
-  top: calc(50% + clamp(32px, 3.125vw, 60px));
-  left: -2px;
+  bottom: 14.07vh;
+  left: 0;
   z-index: 30;
 
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
-  gap: 6px;
+  gap: clamp(6px, calc(0.278vw + 2.667px), 8px);
 
-  width: 40px;
-  padding: 10px;
+  width: clamp(40px, calc(2.222vw + 13.333px), 56px);
+  padding: clamp(10px, calc(1.389vw - 6.667px), 20px) clamp(10px, calc(0.278vw + 6.667px), 12px);
   box-sizing: border-box;
   overflow: hidden;
 
   border: none;
-  border-radius: 0 16px 16px 0;
+  border-radius: 0 clamp(16px, calc(1.944vw - 7.333px), 30px) clamp(16px, calc(1.944vw - 7.333px), 30px) 0;
   background-color: white;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  box-shadow: 4px 4px 7px rgba(0, 0, 0, 0.2);
 
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.2px;
-  color: #2b2d42;
+  font-size: clamp(12px, calc(1.111vw - 1.333px), 20px);
+  font-weight: 500;
+  color: #000;
 
   cursor: pointer;
-  transform: translateY(-50%);
   transition: color 0.3s ease, height 0.3s ease, transform 0.2s ease;
 
   @media (prefers-reduced-motion: reduce) {
@@ -37,7 +39,6 @@
     flex: 1;
     width: 100%;
     min-height: 0;
-    opacity: 0.9;
 
     .toggle-text {
       position: absolute;
@@ -69,8 +70,8 @@
     position: relative;
     order: -1;
     flex-shrink: 0;
-    width: 20px;
-    height: 20px;
+    width: clamp(20px, 1.667vw, 32px);
+    height: clamp(20px, 1.667vw, 32px);
 
     img {
       position: absolute;
@@ -88,7 +89,7 @@
   &:hover,
   &:focus-visible {
     color: rgba(83, 90, 241, 1);
-    transform: translateY(-50%) translateX(1px);
+    transform: translateX(1px);
 
     .toggle-icon {
       .toggle-icon-default { opacity: 0; }
