@@ -35,12 +35,12 @@
 .channel-hash {
     width: 24px;
     height: 24px;
-    background: url('/assets/img/icons/tag.svg') center / contain no-repeat;
+    background: url('../../../../public/assets/img/icons/tag.svg') center / contain no-repeat;
 }
 
-.channel-arrow { width: 24px; height: 24px; margin-left: 6px; background: url('/assets/img/icons/arrow.svg') center / contain no-repeat; }
-.channel-title:hover .channel-arrow, .channel-title:focus-visible .channel-arrow { background-image: url('/assets/img/icons/arrow-hover.svg'); }
-.channel-title:hover .channel-hash, .channel-title:focus-visible .channel-hash { background-image: url('/assets/img/icons/tag-hover.svg'); }
+.channel-arrow { width: 24px; height: 24px; margin-left: 6px; background: url('../../../../public/assets/img/icons/arrow.svg') center / contain no-repeat; }
+.channel-title:hover .channel-arrow, .channel-title:focus-visible .channel-arrow { background-image: url('../../../../public/assets/img/icons/arrow-hover.svg'); }
+.channel-title:hover .channel-hash, .channel-title:focus-visible .channel-hash { background-image: url('../../../../public/assets/img/icons/tag-hover.svg'); }
 
 .channel-header-actions {
     display: flex;
@@ -112,7 +112,7 @@
 }
 
 .add-member-icon {
-    --icon: url('/assets/img/icons/add-user.svg');
+    --icon: url('../../../../public/assets/img/icons/add-user.svg');
 }
 
 .chat-date-divider {
@@ -518,15 +518,15 @@
 .channel-message.own .edit-menu-anchor { order: 1; }
 
 .reaction-icon {
-    --icon: url('/assets/img/icons/add_reaction.svg');
+    --icon: url('../../../../public/assets/img/icons/add_reaction.svg');
 }
 
 .thread-icon {
-    --icon: url('/assets/img/icons/comment.svg');
+    --icon: url('../../../../public/assets/img/icons/comment.svg');
 }
 
 .more-icon {
-    --icon: url('/assets/img/icons/more_vert.svg');
+    --icon: url('../../../../public/assets/img/icons/more_vert.svg');
 }
 
 .edit-message-menu {

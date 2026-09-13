@@ -150,7 +150,7 @@
     }
 
     .dropdown-icon {
-        --icon: url('/assets/img/icons/arrow_drop_down.svg');
+        --icon: url('../../../../public/assets/img/icons/arrow_drop_down.svg');
         flex-basis: 20px;
         width: 20px;
         transition: transform 0.3s ease;
@@ -160,11 +160,11 @@
         }
     }
 
-    .channels-icon { --icon: url('/assets/img/icons/workspaces.svg'); }
-    .account-icon { --icon: url('/assets/img/icons/account_circle.svg'); }
-    .plus-icon { --icon: url('/assets/img/icons/add.svg'); }
-    .tag-icon { --icon: url('/assets/img/icons/tag.svg'); }
-    .add-circle-icon { --icon: url('/assets/img/icons/add_circle.svg'); }
+    .channels-icon { --icon: url('../../../../public/assets/img/icons/workspaces.svg'); }
+    .account-icon { --icon: url('../../../../public/assets/img/icons/account_circle.svg'); }
+    .plus-icon { --icon: url('../../../../public/assets/img/icons/add.svg'); }
+    .tag-icon { --icon: url('../../../../public/assets/img/icons/tag.svg'); }
+    .add-circle-icon { --icon: url('../../../../public/assets/img/icons/add_circle.svg'); }
 
     .group-heading {
         display: flex;

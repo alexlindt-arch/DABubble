@@ -52,7 +52,7 @@
   mask: var(--icon) center / contain no-repeat;
 }
 
-.close-icon { --icon: url('/assets/img/icons/close.svg'); }
+.close-icon { --icon: url('../../../../public/assets/img/icons/close.svg'); }
 
 form { display: flex; flex-direction: column; }
 

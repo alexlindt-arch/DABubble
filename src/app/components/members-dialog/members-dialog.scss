@@ -54,8 +54,8 @@
   mask: var(--icon) center / contain no-repeat;
 }
 
-.close-icon { --icon: url('/assets/img/icons/close.svg'); }
-.add-user-icon { --icon: url('/assets/img/icons/add-user.svg'); }
+.close-icon { --icon: url('../../../../public/assets/img/icons/close.svg'); }
+.add-user-icon { --icon: url('../../../../public/assets/img/icons/add-user.svg'); }
 
 .member-list {
   display: flex;

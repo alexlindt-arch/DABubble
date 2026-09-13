@@ -85,12 +85,12 @@
     mask: var(--icon) center / contain no-repeat;
 }
 
-.tag-icon { --icon: url('/assets/img/icons/tag.svg'); width: 16px; height: 16px; }
-.close-icon { --icon: url('/assets/img/icons/close.svg'); }
-.reaction-icon { --icon: url('/assets/img/icons/add_reaction.svg'); }
-.emoji-icon { --icon: url('/assets/img/icons/sentiment_satisfied.svg'); }
-.mention-icon { --icon: url('/assets/img/icons/alternate_email.svg'); }
-.send-icon { --icon: url('/assets/img/icons/send.svg'); }
+.tag-icon { --icon: url('../../../../public/assets/img/icons/tag.svg'); width: 16px; height: 16px; }
+.close-icon { --icon: url('../../../../public/assets/img/icons/close.svg'); }
+.reaction-icon { --icon: url('../../../../public/assets/img/icons/add_reaction.svg'); }
+.emoji-icon { --icon: url('../../../../public/assets/img/icons/sentiment_satisfied.svg'); }
+.mention-icon { --icon: url('../../../../public/assets/img/icons/alternate_email.svg'); }
+.send-icon { --icon: url('../../../../public/assets/img/icons/send.svg'); }
 
 
 .thread-history {

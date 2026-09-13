@@ -168,13 +168,13 @@ $color-disabled-bg: rgba(215, 216, 250, 1);
   flex-shrink: 0;
   height: 24px;
   width: 24px;
-  background-image: url("/assets/img/icons/Property 1=Default.svg");
+  background-image: url("../../../../public/assets/img/icons/Property 1=Default.svg");
   background-repeat: no-repeat;
   background-size: contain;
 }
 
 .checkbox-group__input:checked ~ .checkbox-group__box {
-  background-image: url("/assets/img/icons/Property 1=Checked.svg");
+  background-image: url("../../../../public/assets/img/icons/Property 1=Checked.svg");
 }
 
 .checkbox-group__text {

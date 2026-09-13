@@ -32,14 +32,14 @@
   h4 { margin: 0 0 16px; font-size: 20px; }
   a { color: #1381ff; font-size: 18px; text-decoration: none; overflow-wrap: anywhere; }
 }
-.mail-symbol { width: 28px; height: 28px; background: black; mask: url('/assets/img/icons/mail.svg') center / contain no-repeat; }
+.mail-symbol { width: 28px; height: 28px; background: black; mask: url('../../../../public/assets/img/icons/mail.svg') center / contain no-repeat; }
 .dialog-message-button {
   display: flex; align-items: center; gap: 8px; align-self: center; margin-top: 45px; padding: 12px 24px; border: 0; border-radius: 25px;
   background: #444df2; color: white; font: inherit; font-size: 18px; font-weight: 700; cursor: pointer;
   transition: background-color 0.3s ease;
   &:hover, &:focus-visible { background: #797ef3; }
 }
-.message-symbol { width: 20px; height: 20px; background: currentColor; mask: url('/assets/img/icons/mode_comment.svg') center / contain no-repeat; }
+.message-symbol { width: 20px; height: 20px; background: currentColor; mask: url('../../../../public/assets/img/icons/mode_comment.svg') center / contain no-repeat; }
 
 @media (max-width: 600px) { .profile-backdrop { padding: 16px; } .profile-dialog { padding: 28px 24px; } .dialog-avatar { width: 150px; height: 150px; } }
 
@@ -64,9 +64,9 @@ $error: #ed1e79;
 .icon-button { display: flex; align-items: center; justify-content: center; flex: none; width: 40px; height: 40px; padding: 0; border: none; border-radius: 20px; background: transparent; color: black; cursor: pointer; transition: background-color 0.1s ease;
   &:hover, &:focus-visible { background: $ground; } }
 .dialog-icon { display: block; width: 24px; height: 24px; background: currentColor; mask: var(--icon) center / contain no-repeat; }
-.close-icon { --icon: url('/assets/img/icons/close.svg'); }
-.pencil-icon { --icon: url('/assets/img/icons/edit.svg'); }
-.person-icon { --icon: url('/assets/img/icons/account_circle.svg'); width: 30px; height: 30px; }
+.close-icon { --icon: url('../../../../public/assets/img/icons/close.svg'); }
+.pencil-icon { --icon: url('../../../../public/assets/img/icons/edit.svg'); }
+.person-icon { --icon: url('../../../../public/assets/img/icons/account_circle.svg'); width: 30px; height: 30px; }
 .profile-edit__avatar { position: relative; display: flex; flex-direction: column; align-items: center; flex: none; width: 200px; height: 200px;
   > img { display: block; width: 200px; height: 200px; border-radius: 100px; object-fit: cover; } }
 .avatar-edit { position: absolute; right: 4px; bottom: 4px; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border: 2px solid white; border-radius: 22px; background: $purple-1; color: white; cursor: pointer; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); transition: background-color 0.1s ease;

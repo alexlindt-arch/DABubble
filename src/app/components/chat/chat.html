@@ -136,7 +136,7 @@
                     <div class="edit-menu-anchor">
                         <button type="button" class="channel-hover-button direct-edit-button" aria-label="Nachrichtenoptionen"
                             [attr.aria-expanded]="editMenuFor() === message.id" (click)="toggleEditMenu(message.id)">
-                            <img class="hover-control-icon" src="/assets/img/icons/more_vert.svg" alt=""></button>
+                            <img class="hover-control-icon" src="assets/img/icons/more_vert.svg" alt=""></button>
                         @if (editMenuFor() === message.id) {
                         <div class="edit-message-menu"><button type="button" (click)="startEditingDirectMessage(message)">Nachricht bearbeiten</button></div>
                         }
@@ -144,7 +144,7 @@
                     }
                     <button type="button" class="channel-hover-button reaction-picker-button" aria-label="Reaktion hinzufügen"
                         [attr.aria-expanded]="reactionPickerFor() === message.id" (click)="toggleReactionPicker(message.id, $event)">
-                        <img class="hover-control-icon" src="/assets/img/icons/add_reaction.svg" alt="">
+                        <img class="hover-control-icon" src="assets/img/icons/add_reaction.svg" alt="">
                     </button>
                     <button type="button" class="channel-hover-button quick-thumb" aria-label="Mit Daumen hoch reagieren"
                         (click)="toggleDirectReaction(message, '👍')"><span aria-hidden="true">👍</span></button>
@@ -271,7 +271,7 @@
                     <div class="edit-menu-anchor">
                         <button type="button" class="channel-hover-button direct-edit-button" aria-label="Nachrichtenoptionen"
                             [attr.aria-expanded]="editMenuFor() === message.id" (click)="toggleEditMenu(message.id)">
-                            <img class="hover-control-icon" src="/assets/img/icons/more_vert.svg" alt=""></button>
+                            <img class="hover-control-icon" src="assets/img/icons/more_vert.svg" alt=""></button>
                         @if (editMenuFor() === message.id) {
                         <div class="edit-message-menu"><button type="button" (click)="startEditingChannelMessage(message)">Nachricht bearbeiten</button></div>
                         }
@@ -284,7 +284,7 @@
                     <button type="button" class="channel-hover-button reaction-picker-button" aria-label="Reaktion hinzufügen"
                         [attr.aria-expanded]="reactionPickerFor() === message.id"
                         (click)="toggleReactionPicker(message.id, $event)">
-                        <img class="hover-control-icon" src="/assets/img/icons/add_reaction.svg" alt="">
+                        <img class="hover-control-icon" src="assets/img/icons/add_reaction.svg" alt="">
                     </button>
                 </div>
 

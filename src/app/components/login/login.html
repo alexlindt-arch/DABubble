@@ -1,6 +1,6 @@
 <div class="login-page">
   <header class="login-page__header">
-    <img class="login-page__logo" src="/assets/img/Home-Workspaces.svg" alt="DABubble Logo" />
+    <img class="login-page__logo" src="assets/img/Home-Workspaces.svg" alt="DABubble Logo" />
 
     <div class="signup-hint">
       <span>Neu bei DABubble?</span>
@@ -17,7 +17,7 @@
     <form class="login-form" [formGroup]="loginForm" (ngSubmit)="submitLogin()" novalidate>
       <div class="form-field">
         <label class="input-group">
-          <img class="input-group__icon" src="/assets/img/icons/mail-default.svg" alt="" />
+          <img class="input-group__icon" src="assets/img/icons/mail-default.svg" alt="" />
           <input
             class="input-group__input"
             type="email"
@@ -34,7 +34,7 @@
 
       <div class="form-field">
         <label class="input-group">
-          <img class="input-group__icon" src="/assets/img/icons/lock-default.svg" alt="" />
+          <img class="input-group__icon" src="assets/img/icons/lock-default.svg" alt="" />
           <input
             class="input-group__input"
             type="password"
@@ -63,7 +63,7 @@
         [disabled]="isSubmitting"
         (click)="loginWithGoogle()"
       >
-        <img class="google-button__icon" src="/assets/img/icons/google.svg" alt="" />
+        <img class="google-button__icon" src="assets/img/icons/google.svg" alt="" />
         <span>Anmelden mit Google</span>
       </button>
 

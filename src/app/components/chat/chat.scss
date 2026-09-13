@@ -224,9 +224,9 @@
     mask: var(--icon) center / contain no-repeat;
 }
 
-.emoji-icon { --icon: url('/assets/img/icons/sentiment_satisfied.svg'); }
-.mention-icon { --icon: url('/assets/img/icons/alternate_email.svg'); }
-.send-icon { --icon: url('/assets/img/icons/send.svg'); }
+.emoji-icon { --icon: url('../../../../public/assets/img/icons/sentiment_satisfied.svg'); }
+.mention-icon { --icon: url('../../../../public/assets/img/icons/alternate_email.svg'); }
+.send-icon { --icon: url('../../../../public/assets/img/icons/send.svg'); }
 .send-button { margin-left: auto; color: #444df2; }
 
 .emoji-picker {

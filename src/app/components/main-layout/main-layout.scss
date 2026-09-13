@@ -379,8 +379,8 @@ main header {
   mask: var(--icon) center / contain no-repeat;
 }
 
-.close-icon { --icon: url('/assets/img/icons/close.svg'); }
-.mail-icon { --icon: url('/assets/img/icons/mail.svg'); }
+.close-icon { --icon: url('../../../../public/assets/img/icons/close.svg'); }
+.mail-icon { --icon: url('../../../../public/assets/img/icons/mail.svg'); }
 
 .profile-status {
   display: flex;

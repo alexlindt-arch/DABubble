@@ -39,7 +39,7 @@ interface MessagePart extends MentionSuggestion {
 export class Chat {
   isSelfChat = input(false);
   userName = input('Gast');
-  userAvatarUrl = input('/assets/img/avatar/Property 1=Frederik Beck.png');
+  userAvatarUrl = input('assets/img/avatar/Property 1=Frederik Beck.png');
   directUser = input<AppUser | null>(null);
   channel = input<Channel | null>(null);
   users = input<AppUser[]>([]);

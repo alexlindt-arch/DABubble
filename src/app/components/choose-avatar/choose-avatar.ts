@@ -4,7 +4,7 @@ import { AuthService } from '../../services/auth.service';
 import { AVATAR_FILES, avatarLabel } from '../../shared/avatars';
 import { RouterLink } from '@angular/router';
 
-const PLACEHOLDER_AVATAR = '/assets/img/Profile.svg';
+const PLACEHOLDER_AVATAR = 'assets/img/Profile.svg';
 
 @Component({
   imports: [ RouterLink ],

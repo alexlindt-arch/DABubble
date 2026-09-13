@@ -1,6 +1,6 @@
-const AVATAR_BASE = '/assets/img/avatar/';
+const AVATAR_BASE = 'assets/img/avatar/';
 
-export const PLACEHOLDER_AVATAR = '/assets/img/Profile.svg';
+export const PLACEHOLDER_AVATAR = 'assets/img/Profile.svg';
 
 /** Builds the asset path for an avatar file name stored in Firestore. */
 export function avatarUrl(avatar: string | null | undefined): string {
