@@ -225,24 +225,24 @@ main > header .mobile-brand,
   main:not(.sidebar-closed) .fab-compose { display: flex; }
   .sidebar-toggle { display: none; }
 
-  // Figma 64b, placed under the 56px top bar, so its rounding and shadow face down instead of up.
+  // Figma 64b (handle on top, rounded top corners), laid over the top bar so it covers logo and avatar.
   .profile-menu {
-    top: 56px;
+    top: 0;
     right: 0;
     left: 0;
     align-items: flex-start;
     gap: 15px;
     min-width: 0;
     padding: 30px 26px;
-    border-radius: 0 0 30px 30px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 30px 30px 0 0;
+    box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.2);
 
-    &::after {
+    &::before {
       content: '';
       align-self: center;
       width: 62px;
       height: 6px;
-      margin-top: 10px;
+      margin-bottom: 10px;
       border-radius: 23px;
       background: #d9d9d9;
     }
