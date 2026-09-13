@@ -5,7 +5,8 @@
     width: 366px;
     min-width: 0;
     min-height: 0;
-    padding: 16px;
+    // A little more white below the list than on the other sides, so the last row never sits on the edge.
+    padding: 16px 16px 24px;
     box-sizing: border-box;
     overflow: hidden;
     border-radius: 18px;

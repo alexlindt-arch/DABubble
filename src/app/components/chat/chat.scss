@@ -7,7 +7,8 @@
     min-height: 0;
     box-sizing: border-box;
     overflow: hidden;
-    padding: 20px;
+    // A little more white below the message box than on the other sides.
+    padding: 20px 20px 28px;
     border-radius: 18px;
     background-color: #fff;
     color: #2b2d42;
@@ -302,7 +303,7 @@
 }
 
 @media (max-width: 1023px) {
-    .chat-content { padding: 12px; }
+    .chat-content { padding: 12px 12px 20px; }
     .direct-profile-name, .self-profile-name { font-size: 22px; }
 }
 
