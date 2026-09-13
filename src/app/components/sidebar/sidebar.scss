@@ -300,9 +300,8 @@
 @media (max-width: 767px) {
     // The list runs to the bottom edge and ends with the last row, without empty space to scroll into.
     .sidebar-content { width: 100%; padding: 66px 8px 0; border-radius: 0; }
-    .sidebar-header { margin-top: 8px; }
-    .sidebar-header p { font-size: 20px; }
-    .sidebar-header .toggle-icon { display: none; }
+    // Phones follow Figma: the menu view shows only "DABubble" in the top bar, "Devspace" belongs to the chat view.
+    .sidebar-header { display: none; }
 
     .sidebar-navigation {
         margin-top: 12px;
