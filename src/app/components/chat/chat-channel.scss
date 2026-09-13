@@ -113,8 +113,12 @@
     }
 }
 
-.add-member-icon {
-    --icon: url('../../../../public/assets/img/icons/add-user.svg');
+// Figma "44. Add members button" (person_add on #ECEEFE). The circle always matches the member
+// avatars next to it; the icon is a little larger than in Figma, 65% of the circle instead of 60%.
+.add-member-button .add-member-icon {
+    --icon: url('../../../../public/assets/img/icons/person_add.svg');
+    width: 65%;
+    height: 65%;
 }
 
 .chat-date-divider {
@@ -591,6 +595,7 @@
     .channel-header-actions { column-gap: 10px; }
     .channel-members { gap: 10px; }
     .member-avatars img { width: 30px; height: 30px; }
+    .add-member-button { width: 30px; height: 30px; }
     .member-count { font-size: 15px; }
 }
 
