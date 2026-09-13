@@ -1,6 +1,6 @@
 .sidebar-toggle {
   position: fixed;
-  top: calc(50% + 32px);
+  top: calc(50% + clamp(32px, 3.125vw, 60px));
   left: -2px;
   z-index: 30;
 

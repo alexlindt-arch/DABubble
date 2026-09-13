@@ -51,7 +51,7 @@ $error: #ed1e79;
 
 .profile-edit-backdrop {
   position: fixed; inset: 0; z-index: 1100; display: flex; align-items: flex-start; justify-content: flex-end;
-  box-sizing: border-box; padding: 72px calc(clamp(0px, 1.2vw, 16px) + 16px) 16px; background: rgba(0, 0, 0, 0.6);
+  box-sizing: border-box; padding: calc(clamp(64px, 6.25vw, 120px) + 8px) calc(clamp(0px, 1.2vw, 16px) + 16px) 16px; background: rgba(0, 0, 0, 0.6);
 }
 .profile-edit {
   display: flex; flex-direction: column; align-items: center; box-sizing: border-box; width: min(420px, 100%);

@@ -43,7 +43,9 @@
                     [attr.aria-label]="isOnline ? 'Online' : 'Offline'"></span>
             </div>
 
-            <button type="button" class="profile-chevron" aria-label="Profilmenü öffnen">▾</button>
+            <button type="button" class="profile-chevron" aria-label="Profilmenü öffnen">
+                <span class="chevron-icon" aria-hidden="true"></span>
+            </button>
         </div>
         @if (profileMenuOpen) {
         <div class="overlay" (click)="closeProfileMenu()">

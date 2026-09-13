@@ -17,24 +17,26 @@ main > header {
   align-items: center;
   flex-shrink: 0;
   gap: 16px;
-  height: 64px;
+  // Figma "14. Home-Workspaces", "Search bar" and "65. Profile menu" at most; below the 1920px
+  // Figma frame every size scales down with the window, so the bar grows only when there is room.
+  height: clamp(64px, 6.25vw, 120px);
   padding: 0 16px;
   box-sizing: border-box;
 
   .brand {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: clamp(10px, 0.833vw, 16px);
     min-width: 0;
   }
 
   .logo {
-    width: 32px;
-    height: 32px;
+    width: clamp(32px, 3.646vw, 70px);
+    height: clamp(32px, 3.646vw, 70px);
   }
 
   .brand-name {
-    font-size: 16px;
+    font-size: clamp(16px, 1.667vw, 32px);
     font-weight: 700;
     white-space: nowrap;
   }
@@ -45,14 +47,14 @@ main > header {
     display: flex;
     align-items: center;
     width: 100%;
-    max-width: 520px;
+    max-width: 989px;
     min-width: 0;
-    height: 40px;
-    padding: 0 14px;
+    height: clamp(40px, 3.646vw, 70px);
+    padding: 0 clamp(14px, 2.344vw, 45px);
     box-sizing: border-box;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    border-radius: 999px;
-    background: #fafbff;
+    border: 0;
+    border-radius: 42px;
+    background: #fff;
 
     input {
       flex: 1;
@@ -62,11 +64,11 @@ main > header {
       padding: 0 12px 0 0;
       border: none;
       background: transparent;
-      font-size: 13px;
+      font-size: clamp(13px, 1.25vw, 24px);
       color: #000;
 
       &::placeholder {
-        color: #757575;
+        color: #686868;
         opacity: 1;
       }
     }
@@ -109,14 +111,14 @@ main > header {
   .search-icon {
     position: relative;
     flex-shrink: 0;
-    width: 20px;
-    height: 20px;
+    width: clamp(20px, 1.823vw, 35px);
+    height: clamp(20px, 1.823vw, 35px);
 
     img {
       position: absolute;
       inset: 0;
-      width: 20px;
-      height: 20px;
+      width: 100%;
+      height: 100%;
       transition: opacity 0.3s ease;
     }
 
@@ -132,28 +134,33 @@ main > header {
     display: flex;
     align-items: center;
     justify-self: end;
-    gap: 10px;
+    gap: clamp(10px, 1.042vw, 20px);
     min-width: 0;
     cursor: pointer;
 
     p {
-      font-size: 16px;
-      font-weight: 600;
+      color: #000;
+      font-size: clamp(16px, 1.667vw, 32px);
+      font-weight: 700;
       white-space: nowrap;
+      transition: color 0.2s ease;
     }
+
+    &:hover p,
+    &:hover .profile-chevron { color: #535af1; }
   }
 
   .profile-picture-div {
     position: relative;
     flex-shrink: 0;
-    width: 34px;
-    height: 34px;
+    width: clamp(34px, 3.646vw, 70px);
+    height: clamp(34px, 3.646vw, 70px);
   }
 
   .profile-picture {
     display: block;
-    width: 34px;
-    height: 34px;
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
     object-fit: cover;
     background: #dfe3ff;
@@ -163,10 +170,10 @@ main > header {
     position: absolute;
     right: -1px;
     bottom: -1px;
-    width: 11px;
-    height: 11px;
+    width: clamp(11px, 0.868vw, 16.67px);
+    height: clamp(11px, 0.868vw, 16.67px);
     box-sizing: border-box;
-    border: 2px solid #fff;
+    border: 2px solid #f6f7fb;
     border-radius: 50%;
     background: #22c55e;
 
@@ -174,16 +181,26 @@ main > header {
   }
 
   .profile-chevron {
-    width: 34px;
-    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: clamp(24px, 1.5625vw, 30px);
+    height: clamp(24px, 1.5625vw, 30px);
+    padding: 0;
     border: 0;
-    border-radius: 10px;
-    background: #f1f3ff;
+    background: transparent;
     color: #000;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: color 0.2s ease;
+  }
 
-    &:hover { background: #e4e7ff; }
+  .chevron-icon {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: currentColor;
+    mask: url('../../../../public/assets/img/icons/arrow.svg') center / contain no-repeat;
   }
 }
 
@@ -239,7 +256,7 @@ main > header {
 
 .profile-menu {
   position: absolute;
-  top: 70px;
+  top: calc(clamp(64px, 6.25vw, 120px) + 6px);
   right: 16px;
   display: flex;
   flex-direction: column;
@@ -273,7 +290,7 @@ main > header {
   display: flex;
   align-items: flex-start;
   justify-content: flex-end;
-  padding: 72px calc(clamp(0px, 1.2vw, 16px) + 16px) 16px;
+  padding: calc(clamp(64px, 6.25vw, 120px) + 8px) calc(clamp(0px, 1.2vw, 16px) + 16px) 16px;
   box-sizing: border-box;
   background: rgba(0, 0, 0, 0.6);
 }
