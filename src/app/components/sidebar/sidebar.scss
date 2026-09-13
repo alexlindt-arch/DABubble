@@ -297,9 +297,8 @@
 
 // The search field from the top bar sits over the first 66px of the menu on phones.
 @media (max-width: 767px) {
+    // The list runs to the bottom edge and ends with the last row, without empty space to scroll into.
     .sidebar-content { width: 100%; padding: 66px 8px 0; border-radius: 0; }
-    // The list runs to the bottom edge; the extra space lets the last row scroll clear of the new-message button.
-    .sidebar-scroll { padding-bottom: 88px; }
     .sidebar-header { margin-top: 8px; }
     .sidebar-header p { font-size: 20px; }
     .sidebar-header .toggle-icon { display: none; }
