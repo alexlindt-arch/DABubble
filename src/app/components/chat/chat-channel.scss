@@ -584,19 +584,8 @@
         font-size: 18px;
     }
 
-    .channel-header-actions,
-    .channel-members {
-        gap: 10px;
-    }
-
-    .member-avatars img {
-        width: 30px;
-        height: 30px;
-    }
-
-    .member-count {
-        font-size: 15px;
-    }
+    // Figma mobile: only the add-member button stays next to the channel name; the avatars return from 768px.
+    .channel-members { display: none; }
 
     .channel-hover-button {
         width: 28px;

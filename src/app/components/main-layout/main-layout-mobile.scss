@@ -145,8 +145,8 @@ main > header .mobile-brand,
   width: 25px;
   height: 25px;
   background: currentColor;
+  // The Figma export of keyboard_arrow_down is already turned to point left, so it needs no rotation.
   mask: url('../../../../public/assets/img/icons/keyboard_arrow_down.svg') center / contain no-repeat;
-  transform: rotate(90deg);
 }
 
 .fab-compose {
