@@ -289,6 +289,11 @@
 @media (max-width: 1023px) {
     .sidebar-content { width: 260px; }
 
+    // The 260px menu leaves only 104px next to a 60px logo, too little for "Devspace" at 28px.
+    // A smaller logo and 24px text let the full name fit instead of cutting it to "Devsp…".
+    .sidebar-header .logo { width: 40px; height: 40px; }
+    .sidebar-header p { font-size: 24px; }
+
     .sidebar-navigation {
         .group-toggle { gap: 8px; font-size: 20px; }
         .conversation { padding: 8px 24px; font-size: 16px; }
