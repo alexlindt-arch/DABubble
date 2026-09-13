@@ -107,15 +107,18 @@ main > header .mobile-brand,
   display: none;
 }
 
+// Figma "Component 2": 25px arrow, 2px gap, 50px workspace logo, 10px gap, "Devspace".
 .mobile-brand {
   align-items: center;
-  gap: 10px;
+  gap: 2px;
   min-width: 0;
 
   .workspace-logo {
     flex-shrink: 0;
-    width: 28px;
-    height: 28px;
+    width: 50px;
+    height: 50px;
+    margin-right: 8px;
+    border-radius: 30px;
   }
 }
 
@@ -124,24 +127,25 @@ main > header .mobile-brand,
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
+  width: 25px;
+  height: 25px;
   padding: 0;
   border: 0;
-  border-radius: 10px;
+  border-radius: 50%;
   background: transparent;
-  color: #444df2;
+  color: #000;
   cursor: pointer;
+  transition: color 0.2s ease;
 
-  &:hover { background: rgba(68, 77, 242, 0.08); }
+  &:hover { color: #535af1; }
 }
 
 .back-icon {
   display: block;
-  width: 28px;
-  height: 28px;
+  width: 25px;
+  height: 25px;
   background: currentColor;
-  mask: url('../../../../public/assets/img/icons/arrow.svg') center / contain no-repeat;
+  mask: url('../../../../public/assets/img/icons/keyboard_arrow_down.svg') center / contain no-repeat;
   transform: rotate(90deg);
 }
 
@@ -175,19 +179,28 @@ main > header .mobile-brand,
 @media (max-width: 767px) {
   main { position: relative; padding: 0; }
 
+  // Figma "Component 2": 80px bar on the light purple ground with 50px logo and avatar.
   main > header {
     grid-template-columns: minmax(0, 1fr) auto;
-    height: 56px;
-    padding: 0 10px;
+    height: 80px;
+    padding: 15px 16px;
     gap: 8px;
+    background: #eceefe;
+
+    .logo { width: 50px; height: 50px; }
+    .brand-name { font-size: 24px; color: #000; }
 
     .profile-wrapper p,
-    .profile-chevron { display: none; }
+    .profile-chevron,
+    .status-dot { display: none; }
+
+    .profile-picture-div,
+    .profile-picture { width: 50px; height: 50px; }
 
     .input-wrapper {
       position: absolute;
       z-index: 5;
-      top: 68px;
+      top: 92px;
       right: 8px;
       left: 8px;
       justify-self: stretch;
@@ -218,7 +231,7 @@ main > header .mobile-brand,
 
   .content > app-thread {
     position: fixed;
-    inset: 56px 0 0;
+    inset: 80px 0 0;
     z-index: 20;
   }
 

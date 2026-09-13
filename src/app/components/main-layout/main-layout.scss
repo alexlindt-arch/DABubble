@@ -391,9 +391,9 @@ main > header {
   .profile-dialog-backdrop { padding: 72px 24px 16px; }
 }
 
-// Phones: the card sits under the 56px top bar with a small side margin.
+// Phones: the card sits under the 80px top bar with a small side margin.
 @media (max-width: 767px) {
-  .profile-dialog-backdrop { padding: 64px 8px 8px; }
+  .profile-dialog-backdrop { padding: 88px 8px 8px; }
   .profile-dialog { padding: 24px 20px; }
   .profile-dialog-header h2 { font-size: 20px; }
   .profile-dialog-avatar { width: 120px; height: 120px; margin: 16px 0; }
