@@ -265,15 +265,15 @@ main > header {
   .menu-icon { display: none; }
 }
 
+// The own profile card hangs right under the avatar in the top bar on every screen size.
 .profile-dialog-backdrop {
   position: fixed;
   inset: 0;
   z-index: 1100;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-end;
-  padding: 0px 20px;
-  margin-top: -110px;
+  padding: 72px calc(clamp(0px, 1.2vw, 16px) + 16px) 16px;
   box-sizing: border-box;
   background: rgba(0, 0, 0, 0.6);
 }
@@ -281,12 +281,12 @@ main > header {
 .profile-dialog {
   display: flex;
   flex-direction: column;
-  width: min(500px, 100%);
-  max-height: calc(100dvh - 48px);
-  padding: 45px 40px;
+  width: min(420px, 100%);
+  max-height: 100%;
+  padding: 32px;
   box-sizing: border-box;
   overflow-y: auto;
-  border-radius: 30px 0px 30px 30px;
+  border-radius: 30px 0 30px 30px;
   background: white;
   box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
 }
@@ -306,9 +306,9 @@ main > header {
 
 .profile-dialog-avatar {
   align-self: center;
-  width: 200px;
-  height: 200px;
-  margin: 45px 0 35px;
+  width: 160px;
+  height: 160px;
+  margin: 28px 0 24px;
   border-radius: 50%;
   object-fit: cover;
 }
@@ -317,7 +317,7 @@ main > header {
   justify-content: space-between;
   gap: 20px;
 
-  h3 { min-width: 0; margin: 0; overflow-wrap: anywhere; font-size: 32px; }
+  h3 { min-width: 0; margin: 0; overflow-wrap: anywhere; font-size: 28px; }
 }
 
 .edit-profile-button,
@@ -369,27 +369,41 @@ main > header {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin: 20px 0 40px;
+  margin: 12px 0 28px;
   color: #92c83e;
-  font-size: 20px;
+  font-size: 18px;
 
-  span { width: 16px; height: 16px; border-radius: 50%; background: currentColor; }
+  span { width: 14px; height: 14px; border-radius: 50%; background: currentColor; }
   &.offline { color: #686868; }
 }
 
 .profile-email {
   align-items: flex-start;
-  gap: 20px;
+  gap: 16px;
 
-  h4 { margin: 0 0 14px; font-size: 20px; }
-  a { color: #1381ff; font-size: 18px; text-decoration: none; overflow-wrap: anywhere; }
+  h4 { margin: 0 0 8px; font-size: 18px; }
+  a { color: #1381ff; font-size: 16px; text-decoration: none; overflow-wrap: anywhere; }
   a:hover, a:focus-visible { text-decoration: underline; }
   p { margin: 0; color: #686868; }
 }
 
-@media (max-width: 700px) {
-  .profile-dialog-backdrop { align-items: flex-end; padding: 0; }
-  .profile-dialog { width: 100%; max-height: 90dvh; padding: 30px 24px; border-radius: 30px 30px 0 0; }
-  .profile-dialog-avatar { width: 150px; height: 150px; margin: 30px 0; }
-  .profile-name-row h3 { font-size: 26px; }
+@media (max-width: 1023px) {
+  .profile-dialog-backdrop { padding: 72px 24px 16px; }
+}
+
+// Phones: the card sits under the 56px top bar with a small side margin.
+@media (max-width: 767px) {
+  .profile-dialog-backdrop { padding: 64px 8px 8px; }
+  .profile-dialog { padding: 24px 20px; }
+  .profile-dialog-header h2 { font-size: 20px; }
+  .profile-dialog-avatar { width: 120px; height: 120px; margin: 16px 0; }
+  .profile-name-row h3 { font-size: 22px; }
+  .edit-profile-button { font-size: 16px; }
+  .profile-status { margin: 8px 0 20px; font-size: 16px; }
+  .profile-email h4 { font-size: 16px; }
+  .profile-email a { font-size: 15px; }
+}
+
+@media (max-height: 560px) {
+  .profile-dialog-avatar { width: 96px; height: 96px; margin: 12px 0; }
 }
