@@ -199,15 +199,28 @@ main > header .mobile-brand,
     .profile-picture-div,
     .profile-picture { width: 50px; height: 50px; }
 
+    // Figma mobile "Search bar": 48px high, 8px/24px padding, 1px #ADB0D9 border, 17px text, 32px icon.
     .input-wrapper {
       position: absolute;
       z-index: 5;
       top: 92px;
-      right: 8px;
-      left: 8px;
+      right: 16px;
+      left: 16px;
       justify-self: stretch;
       width: auto;
       max-width: none;
+      height: 48px;
+      padding: 8px 24px;
+      border: 1px solid #adb0d9;
+      border-radius: 42px;
+      background: #fff;
+
+      input { font-size: 17px; }
+    }
+
+    .search-icon {
+      width: 32px;
+      height: 32px;
     }
   }
 
