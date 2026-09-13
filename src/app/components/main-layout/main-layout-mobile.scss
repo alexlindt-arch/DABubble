@@ -1,0 +1,253 @@
+.sidebar-toggle {
+  position: fixed;
+  top: calc(50% + 32px);
+  left: -2px;
+  z-index: 30;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+
+  width: 40px;
+  padding: 10px;
+  box-sizing: border-box;
+  overflow: hidden;
+
+  border: none;
+  border-radius: 0 16px 16px 0;
+  background-color: white;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: #2b2d42;
+
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: color 0.3s ease, height 0.3s ease, transform 0.2s ease;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+
+  .toggle-label {
+    position: relative;
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+    opacity: 0.9;
+
+    .toggle-text {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: max-content;
+      height: max-content;
+      line-height: 1.2;
+      writing-mode: vertical-rl;
+      white-space: nowrap;
+      opacity: 0;
+      transform: translateX(-50%) rotate(180deg) scaleY(0.88);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+
+      &.is-visible {
+        opacity: 1;
+        transform: translateX(-50%) rotate(180deg) scaleY(1);
+      }
+
+      &.toggle-measure {
+        visibility: hidden;
+        transition: none;
+        pointer-events: none;
+      }
+    }
+  }
+
+  .toggle-icon {
+    position: relative;
+    order: -1;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+
+    img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      transition: opacity 0.3s ease;
+    }
+
+    .toggle-icon-hover {
+      opacity: 0;
+    }
+  }
+
+  &:hover,
+  &:focus-visible {
+    color: rgba(83, 90, 241, 1);
+    transform: translateY(-50%) translateX(1px);
+
+    .toggle-icon {
+      .toggle-icon-default { opacity: 0; }
+      .toggle-icon-hover { opacity: 1; }
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid #535af1;
+    outline-offset: 3px;
+  }
+}
+
+main > header .mobile-brand,
+.fab-compose {
+  display: none;
+}
+
+.mobile-brand {
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+
+  .workspace-logo {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+  }
+}
+
+.mobile-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #444df2;
+  cursor: pointer;
+
+  &:hover { background: rgba(68, 77, 242, 0.08); }
+}
+
+.back-icon {
+  display: block;
+  width: 28px;
+  height: 28px;
+  background: currentColor;
+  mask: url('../../../../public/assets/img/icons/arrow.svg') center / contain no-repeat;
+  transform: rotate(90deg);
+}
+
+.fab-compose {
+  position: fixed;
+  right: 16px;
+  bottom: 24px;
+  z-index: 50;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #444df2;
+  box-shadow: 0 4px 16px rgba(68, 77, 242, 0.45);
+  cursor: pointer;
+
+  img { width: 24px; height: 24px; }
+  &:hover { background: #535af1; }
+}
+
+@media (max-width: 1023px) {
+  main { padding: 0 12px; }
+  main > header { padding: 0 12px; gap: 10px; }
+  .content > app-sidebar { flex-basis: 260px; }
+}
+
+// Below 768px the workspace shows either the menu or the chat, like the reference app.
+@media (max-width: 767px) {
+  main { position: relative; padding: 0; }
+
+  main > header {
+    grid-template-columns: minmax(0, 1fr) auto;
+    height: 56px;
+    padding: 0 10px;
+    gap: 8px;
+
+    .profile-wrapper p,
+    .profile-chevron { display: none; }
+
+    .input-wrapper {
+      position: absolute;
+      z-index: 5;
+      top: 68px;
+      right: 8px;
+      left: 8px;
+      justify-self: stretch;
+      width: auto;
+      max-width: none;
+    }
+  }
+
+  main.sidebar-closed > header {
+    .brand,
+    .input-wrapper { display: none; }
+    .mobile-brand { display: flex; }
+  }
+
+  .content > app-sidebar,
+  .content > app-chat,
+  .content > app-new-message,
+  .content > app-thread { margin: 0; }
+
+  main:not(.sidebar-closed) .content {
+    > app-sidebar { flex: 1 1 100%; }
+    > app-chat,
+    > app-new-message,
+    > app-thread { display: none; }
+  }
+
+  main.sidebar-closed .content > app-sidebar { display: none; }
+
+  .content > app-thread {
+    position: fixed;
+    inset: 56px 0 0;
+    z-index: 20;
+  }
+
+  main:not(.sidebar-closed) .fab-compose { display: flex; }
+  .sidebar-toggle { display: none; }
+  .overlay { background: rgba(0, 0, 0, 0.22); }
+
+  .profile-menu {
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    padding: 28px 20px 22px;
+    border-radius: 28px 28px 0 0;
+    box-shadow: 0 -10px 28px rgba(0, 0, 0, 0.14);
+
+    &::before {
+      content: '';
+      width: 84px;
+      height: 8px;
+      margin: 0 auto 16px;
+      border-radius: 999px;
+      background: #d4d4d8;
+    }
+
+    button { max-width: 320px; padding: 14px 18px; border-radius: 999px; font-size: 18px; }
+    button:first-of-type { background: #eceefe; color: #444df2; }
+  }
+}

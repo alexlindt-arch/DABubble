@@ -26,6 +26,7 @@ export class Sidebar implements OnDestroy {
   channelCreateRequested = output<void>();
   newMessageRequested = output<void>();
   initialChannelSelected = output<void>();
+  conversationOpened = output<void>();
   conversationSelected = output<{
     type: 'channel' | 'direct';
     id: string;
@@ -148,5 +149,10 @@ export class Sidebar implements OnDestroy {
     const user = type === 'direct' ? this.users().find(item => item.uid === id) : undefined;
     const channel = type === 'channel' ? this.channels().find(item => item.id === id) : undefined;
     this.conversationSelected.emit({ type, id, user, channel });
+  }
+
+  openConversation(type: 'channel' | 'direct', id: string): void {
+    this.selectConversation(type, id);
+    this.conversationOpened.emit();
   }
 }

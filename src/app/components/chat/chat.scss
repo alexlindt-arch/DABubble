@@ -306,17 +306,24 @@
     .direct-profile-name, .self-profile-name { font-size: 22px; }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 767px) {
+    .chat-content { gap: 0; padding: 0; border-radius: 0; }
     .chat-header { padding: 10px 14px 8px; gap: 10px; }
     .self-profile-button, .direct-profile-button { padding: 6px 8px; }
     .direct-profile-name, .self-profile-name, .self-introduction h2 { font-size: 18px; }
-    .chat-body { --chat-horizontal-padding: 12px; gap: 8px; }
+    .chat-body { --chat-horizontal-padding: 12px; gap: 0; }
+    .chat-history { gap: 8px; padding-block: 10px; }
     .self-introduction img { width: 70px; height: 70px; }
     .self-introduction .introduction-profile { gap: 12px; }
     .self-introduction p { font-size: 16px; }
-    .message-composer { height: 110px; border-radius: 20px; }
-    .message-composer textarea { padding: 16px 70px 50px 16px; font-size: 16px; }
-    .composer-actions { right: 12px; bottom: 10px; left: 12px; gap: 8px; }
+    .message-composer { height: 110px; margin: 0 8px 8px; border-radius: 20px; }
+    .message-composer textarea {
+        padding-right: 22px;
+        font-size: 16px;
+        scrollbar-width: none;
+
+        &::placeholder { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {

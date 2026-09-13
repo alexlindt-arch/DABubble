@@ -295,11 +295,12 @@
     }
 }
 
+// The search field from the top bar sits over the first 66px of the menu on phones.
 @media (max-width: 767px) {
-    .sidebar-content { width: 240px; padding: 12px 8px; }
+    .sidebar-content { width: 100%; padding: 66px 8px 88px; border-radius: 0; }
     .sidebar-header { margin-top: 8px; }
     .sidebar-header p { font-size: 20px; }
-    .sidebar-header .logo { width: 40px; height: 40px; }
+    .sidebar-header .toggle-icon { display: none; }
 
     .sidebar-navigation {
         margin-top: 12px;

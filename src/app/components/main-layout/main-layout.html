@@ -1,5 +1,12 @@
-<main>
+<main [class.sidebar-closed]="!sidebarOpen">
     <header>
+        <div class="mobile-brand">
+            <button type="button" class="mobile-back" aria-label="Zurück zum Workspace-Menü" (click)="toggleSidebar()">
+                <span class="back-icon" aria-hidden="true"></span>
+            </button>
+            <img class="workspace-logo" src="./assets/img/Workspace-logo.svg" alt="" />
+            <span class="brand-name">Devspace</span>
+        </div>
         <div class="brand">
             <img class="logo" src="./assets/img/Logo.svg" alt="" />
             <span class="brand-name">DABubble</span>
@@ -97,7 +104,12 @@
       (initialChannelSelected)="hideInitialThread()"
       (channelCreateRequested)="openCreateChannelDialog()"
       (newMessageRequested)="openNewMessage()"
+      (conversationOpened)="showChatOnMobile()"
     ></app-sidebar>
+
+    <button type="button" class="fab-compose" aria-label="Neue Nachricht" (click)="openNewMessage(); showChatOnMobile()">
+      <img src="./assets/img/icons/edit_square-white.svg" alt="" />
+    </button>
 
   @if (newMessageOpen) {
   <app-new-message [users]="allUsers()" [existingConversationUserIds]="directConversationUserIds()"

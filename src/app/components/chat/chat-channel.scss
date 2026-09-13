@@ -560,25 +560,28 @@
     }
 }
 
+.channel-title { min-width: 0; }
+
+.channel-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.channel-arrow { flex-shrink: 0; }
+
 @media (max-width: 1023px) {
     .channel-title { font-size: 22px; }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 767px) {
+    .channel-chat-header { flex-wrap: nowrap; }
+    .channel-header-actions { flex-shrink: 0; }
+
     .channel-title {
         padding: 6px 8px;
         font-size: 18px;
-    }
-
-    .channel-message {
-        gap: 12px;
-        padding: 10px;
-    }
-
-    .channel-message-avatar,
-    .message-avatar-button {
-        width: 50px;
-        height: 50px;
     }
 
     .channel-header-actions,

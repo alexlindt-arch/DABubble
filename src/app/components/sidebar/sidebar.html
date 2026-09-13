@@ -32,7 +32,7 @@
                             <button type="button" class="conversation channel-row" [title]="channel.name"
                                 [class.selected]="selectedConversation === 'channel:' + channel.id"
                                 [attr.aria-pressed]="selectedConversation === 'channel:' + channel.id"
-                                (click)="selectConversation('channel', channel.id)">
+                                (click)="openConversation('channel', channel.id)">
                                 <span class="nav-icon tag-icon" aria-hidden="true"></span>
                                 <span class="row-label">{{ channel.name }}</span>
                             </button>
@@ -61,7 +61,7 @@
                             <button type="button" class="conversation user-row" [title]="user.name"
                                 [class.selected]="selectedConversation === 'direct:' + user.uid"
                                 [attr.aria-pressed]="selectedConversation === 'direct:' + user.uid"
-                                (click)="selectConversation('direct', user.uid)">
+                                (click)="openConversation('direct', user.uid)">
                                 <span class="avatar-wrapper">
                                     <img [src]="avatar(user)" alt="">
                                 </span>

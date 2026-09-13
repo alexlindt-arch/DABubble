@@ -17,6 +17,7 @@ import { AuthService } from '../../services/auth.service';
 import { ChannelService } from '../../services/channel.service';
 import { UserService } from '../../services/user.service';
 import { avatarUrl } from '../../shared/avatar-url';
+import { isMobileViewport } from '../../shared/is-mobile-viewport';
 import { AddPeopleDialog } from '../add-people-dialog/add-people-dialog';
 import { MembersDialog } from '../members-dialog/members-dialog';
 import { CreateChannelDialog, NewChannel } from '../create-channel-dialog/create-channel-dialog';
@@ -33,7 +34,7 @@ type SearchResult =
   selector: 'app-main-layout',
   imports: [Sidebar, Chat, Thread, CreateChannelDialog, AddPeopleDialog, MembersDialog, NewMessage, ProfileDialog, ChannelInfoDialog],
   templateUrl: './main-layout.html',
-  styleUrl: './main-layout.scss',
+  styleUrls: ['./main-layout.scss', './main-layout-mobile.scss'],
 })
 export class MainLayout {
   private readonly authService = inject(AuthService);
@@ -137,8 +138,13 @@ export class MainLayout {
     if (event.key === 'Enter') this.selectSearchResult(results[this.searchIndex()]);
   }
 
+  showChatOnMobile(): void {
+    if (isMobileViewport()) this.sidebarOpen = false;
+  }
+
   selectSearchResult(result: SearchResult): void {
     result.kind === 'channel' ? this.openMentionedChannel(result.channel) : this.openSearchedUser(result.user);
+    this.showChatOnMobile();
     this.clearSearch();
   }
 
