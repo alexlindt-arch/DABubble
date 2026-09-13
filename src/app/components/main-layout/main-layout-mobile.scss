@@ -224,30 +224,10 @@ main > header .mobile-brand,
 
   main:not(.sidebar-closed) .fab-compose { display: flex; }
   .sidebar-toggle { display: none; }
-  .overlay { background: rgba(0, 0, 0, 0.22); }
 
+  // The profile menu opens right under the avatar in the 56px top bar.
   .profile-menu {
-    top: auto;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    align-items: center;
-    gap: 8px;
-    min-width: 0;
-    padding: 28px 20px 22px;
-    border-radius: 28px 28px 0 0;
-    box-shadow: 0 -10px 28px rgba(0, 0, 0, 0.14);
-
-    &::before {
-      content: '';
-      width: 84px;
-      height: 8px;
-      margin: 0 auto 16px;
-      border-radius: 999px;
-      background: #d4d4d8;
-    }
-
-    button { max-width: 320px; padding: 14px 18px; border-radius: 999px; font-size: 18px; }
-    button:first-of-type { background: #eceefe; color: #444df2; }
+    top: 56px;
+    right: 10px;
   }
 }
