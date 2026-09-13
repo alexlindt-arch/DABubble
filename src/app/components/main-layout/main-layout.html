@@ -1,6 +1,9 @@
 <main>
     <header>
-        <img class="logo" src="./assets/img/Home-Workspaces.svg" alt="Logo" />
+        <div class="brand">
+            <img class="logo" src="./assets/img/Logo.svg" alt="" />
+            <span class="brand-name">DABubble</span>
+        </div>
         <div class="input-wrapper">
             <input type="text" placeholder="Devspace durchsuchen" [value]="searchQuery()"
                 role="combobox" aria-autocomplete="list" [attr.aria-expanded]="searchOpen() && searchResults().length > 0"
@@ -29,16 +32,11 @@
             <p>{{ userName }}</p>
             <div class="profile-picture-div">
                 <img class="profile-picture" [src]="userAvatarUrl" alt="Profilbild">
-                @if (isOnline) {
-                <img class="online-dot" src="./assets/img/icons/Online.svg" alt="Online">
-                }
+                <span class="status-dot" [class.offline]="!isOnline" role="img"
+                    [attr.aria-label]="isOnline ? 'Online' : 'Offline'"></span>
             </div>
 
-            <div class="arrow-icon">
-                <img class="icon-default" src="./assets/img/icons/arrow.svg" alt="Suchen">
-
-                <img class="icon-hover" src="./assets/img/icons/arrow-hover.svg" alt="">
-            </div>
+            <button type="button" class="profile-chevron" aria-label="Profilmenü öffnen">▾</button>
         </div>
         @if (profileMenuOpen) {
         <div class="overlay" (click)="closeProfileMenu()">

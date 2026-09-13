@@ -191,7 +191,7 @@
 
     } @else if (channel(); as activeChannel) {
     <header class="chat-header channel-chat-header">
-        <button type="button" class="channel-title" (click)="openChannelInfo($event)"><span class="channel-hash" aria-hidden="true"></span>{{ activeChannel.name }}<span class="channel-arrow" aria-hidden="true"></span></button>
+        <button type="button" class="channel-title" (click)="openChannelInfo($event)"># {{ activeChannel.name }}<span class="channel-arrow" aria-hidden="true"></span></button>
 
         <div class="channel-header-actions">
             <button type="button" class="channel-members" (click)="openMembers($event)"

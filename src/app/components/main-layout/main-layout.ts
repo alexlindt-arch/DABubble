@@ -86,9 +86,9 @@ export class MainLayout {
   }
 
   private updateToggleHeight(): void {
-    // Text plus vertical padding (40), icon (24), gap (8), and rounding room.
-    this.closeLabelHeight.set(this.closeLabel().nativeElement.offsetHeight + 76);
-    this.openLabelHeight.set(this.openLabel().nativeElement.offsetHeight + 76);
+    // Text plus vertical padding (20), icon (20), and gap (6).
+    this.closeLabelHeight.set(this.closeLabel().nativeElement.offsetHeight + 46);
+    this.openLabelHeight.set(this.openLabel().nativeElement.offsetHeight + 46);
   }
 
   get userName(): string {

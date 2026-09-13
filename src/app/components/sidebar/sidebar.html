@@ -38,12 +38,6 @@
                             </button>
                         </li>
                         }
-                        <li class="add-channel-row">
-                            <button type="button" class="conversation" (click)="channelCreateRequested.emit()">
-                                <span class="nav-icon add-circle-icon" aria-hidden="true"></span>
-                                <span class="row-label">Channel hinzufügen</span>
-                            </button>
-                        </li>
                     </ul>
                 </div>
             </div>
@@ -70,13 +64,13 @@
                                 (click)="selectConversation('direct', user.uid)">
                                 <span class="avatar-wrapper">
                                     <img [src]="avatar(user)" alt="">
-                                    <span class="status-dot" [class.offline]="user.status !== 'online'"
-                                        role="img" [attr.aria-label]="user.status === 'online' ? 'Online' : 'Offline'"></span>
                                 </span>
                                 <span class="row-label">{{ user.name }}{{ isSelf(user) ? ' (Du)' : '' }}</span>
                                 @if (hasUnreadMessages(user)) {
                                 <span class="unread-dot" role="img" aria-label="Ungelesene Nachricht"></span>
                                 }
+                                <span class="status-dot" [class.offline]="user.status !== 'online'"
+                                    role="img" [attr.aria-label]="user.status === 'online' ? 'Online' : 'Offline'"></span>
                             </button>
                         </li>
                         }
