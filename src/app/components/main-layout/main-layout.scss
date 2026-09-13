@@ -48,7 +48,8 @@ main > header {
     justify-self: start;
     display: flex;
     align-items: center;
-    width: 100%;
+    // Leaves Figma's 149px of air before the profile at 1920px, scaling down to 16px.
+    width: calc(100% - clamp(16px, 7.76vw, 149px));
     max-width: 989px;
     min-width: 0;
     height: clamp(40px, 3.646vw, 70px);
