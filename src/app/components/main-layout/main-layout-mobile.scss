@@ -225,9 +225,55 @@ main > header .mobile-brand,
   main:not(.sidebar-closed) .fab-compose { display: flex; }
   .sidebar-toggle { display: none; }
 
-  // The profile menu opens right under the avatar in the 56px top bar.
+  // Figma 64b, placed under the 56px top bar, so its rounding and shadow face down instead of up.
   .profile-menu {
     top: 56px;
-    right: 10px;
+    right: 0;
+    left: 0;
+    align-items: flex-start;
+    gap: 15px;
+    min-width: 0;
+    padding: 30px 26px;
+    border-radius: 0 0 30px 30px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+
+    &::after {
+      content: '';
+      align-self: center;
+      width: 62px;
+      height: 6px;
+      margin-top: 10px;
+      border-radius: 23px;
+      background: #d9d9d9;
+    }
+
+    button {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      width: auto;
+      height: 50px;
+      padding: 10px 30px;
+      border-radius: 100px;
+      color: #000;
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 27px;
+      transition: background-color 0.2s ease, color 0.2s ease;
+
+      &:hover { background: #eceefe; color: #535af1; }
+    }
+
+    .menu-icon {
+      display: block;
+      flex: 0 0 30px;
+      width: 30px;
+      height: 30px;
+      background: currentColor;
+      mask: var(--icon) center / contain no-repeat;
+    }
+
+    .account-icon { --icon: url('../../../../public/assets/img/icons/account_circle.svg'); }
+    .logout-icon { --icon: url('../../../../public/assets/img/icons/logout.svg'); }
   }
 }

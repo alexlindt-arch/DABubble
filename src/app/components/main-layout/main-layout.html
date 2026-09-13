@@ -49,8 +49,12 @@
         <div class="overlay" (click)="closeProfileMenu()">
 
             <div class="profile-menu" (click)="$event.stopPropagation()">
-                <button type="button" (click)="openProfilePopup()">Profil</button>
-                <button type="button" (click)="logout()">Log out</button>
+                <button type="button" (click)="openProfilePopup()">
+                    <span class="menu-icon account-icon" aria-hidden="true"></span>Profil
+                </button>
+                <button type="button" (click)="logout()">
+                    <span class="menu-icon logout-icon" aria-hidden="true"></span>Log out
+                </button>
             </div>
         </div>
         }
