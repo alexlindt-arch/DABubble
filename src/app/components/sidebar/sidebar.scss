@@ -119,9 +119,8 @@
 
     .dropdown-icon {
         --icon: url('../../../../public/assets/img/icons/arrow_drop_down.svg');
-        flex-basis: 30px;
-        width: 30px;
-        height: 30px;
+        flex-basis: 20px;
+        width: 20px;
         transition: transform 0.3s ease;
 
         &.collapsed {
@@ -307,7 +306,6 @@
         margin-top: 12px;
 
         .group-toggle { font-size: 16px; }
-        .dropdown-icon { flex-basis: 24px; width: 24px; height: 24px; }
         .conversation { padding: 10px 16px; font-size: 16px; border-radius: 30px; }
         .avatar-wrapper { flex-basis: 36px; width: 36px; height: 36px; }
     }
