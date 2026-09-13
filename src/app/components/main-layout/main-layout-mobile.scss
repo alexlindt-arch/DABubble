@@ -236,7 +236,9 @@ main > header .mobile-brand,
   }
 
   main:not(.sidebar-closed) .fab-compose { display: flex; }
-  .sidebar-toggle { display: none; }
+  // Hidden without display: none, so its label keeps a measurable height and the toggle is sized
+  // correctly when the window grows past the phone breakpoint after loading narrow.
+  .sidebar-toggle { visibility: hidden; pointer-events: none; }
 
   // Figma 64b (handle on top, rounded top corners), laid over the top bar so it covers logo and avatar.
   .profile-menu {
