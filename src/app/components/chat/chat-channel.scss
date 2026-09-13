@@ -1,4 +1,5 @@
-// The channel header always stays on one line; a long name is shortened instead of wrapping.
+// The channel header stays on one line and the channel name is always written out in full:
+// the name keeps its natural width and the member avatars only use the space that is left.
 .channel-chat-header {
     justify-content: space-between;
     flex-wrap: nowrap;
@@ -31,12 +32,22 @@
 .channel-arrow { width: 24px; height: 24px; background: url('../../../../public/assets/img/icons/arrow.svg') center / contain no-repeat; }
 .channel-title:hover .channel-arrow, .channel-title:focus-visible .channel-arrow { background-image: url('../../../../public/assets/img/icons/arrow-hover.svg'); }
 
+// The actions take only the space the name leaves. When the avatars and count do not fit,
+// they wrap onto a second row that is clipped away, while the add-member button stays visible.
 .channel-header-actions {
     display: flex;
+    flex: 1 1 0;
+    flex-direction: row-reverse;
+    flex-wrap: wrap;
     align-items: center;
-    flex-shrink: 0;
-    gap: 20px;
+    justify-content: flex-start;
+    column-gap: 20px;
+    row-gap: 20px;
+    min-width: 40px;
+    height: 40px;
     margin-left: auto;
+    overflow: clip;
+    overflow-clip-margin: 6px;
 }
 
 .channel-members {
@@ -81,6 +92,7 @@
 }
 
 .add-member-button {
+    order: -1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -563,25 +575,27 @@
     }
 }
 
-.channel-title { min-width: 0; }
+.channel-title { flex: 0 1 auto; min-width: 0; }
 
+// Never shortened with an ellipsis; only a name wider than the whole header breaks inside the title.
 .channel-name {
     min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
 }
 
 .channel-arrow { flex-shrink: 0; }
 
-// Tablets keep the avatars and member count but in a compact size, so the channel name keeps room;
-// the header never wraps because it is nowrap and the name shortens instead.
-@media (max-width: 1023px) {
-    .channel-title { font-size: 22px; }
-    .channel-header-actions,
+// Up to 1279px the avatars and member count use a compact size, so they still fit next to the
+// full channel name, also right after 1024px where the menu grows to 366px.
+@media (max-width: 1279px) {
+    .channel-header-actions { column-gap: 10px; }
     .channel-members { gap: 10px; }
     .member-avatars img { width: 30px; height: 30px; }
     .member-count { font-size: 15px; }
+}
+
+@media (max-width: 1023px) {
+    .channel-title { font-size: 22px; }
 }
 
 // Phones follow Figma: only the add-member button stays next to the channel name.
