@@ -13,7 +13,9 @@ main {
 
 main > header {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  // The brand column is as wide as the menu (366px menu + 16px chat margin - 16px padding - 16px gap),
+  // so the search bar starts exactly where the chat card starts and never reaches over the menu.
+  grid-template-columns: 350px minmax(0, 1fr) auto;
   align-items: center;
   flex-shrink: 0;
   gap: 16px;
@@ -43,7 +45,7 @@ main > header {
 
   .input-wrapper {
     position: relative;
-    justify-self: center;
+    justify-self: start;
     display: flex;
     align-items: center;
     width: 100%;

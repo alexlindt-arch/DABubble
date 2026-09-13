@@ -172,7 +172,8 @@ main > header .mobile-brand,
 
 @media (max-width: 1023px) {
   main { padding: 0 12px; }
-  main > header { padding: 0 12px; gap: 10px; }
+  // Brand column = 260px menu + 16px chat margin - 12px padding - 10px gap, so the search starts at the chat card.
+  main > header { grid-template-columns: 254px minmax(0, 1fr) auto; padding: 0 12px; gap: 10px; }
   .content > app-sidebar { flex-basis: 260px; }
 }
 
