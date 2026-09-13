@@ -21,10 +21,29 @@
     overflow-y: auto;
     overflow-x: hidden;
     overscroll-behavior-y: contain;
-    scrollbar-width: none;
+    // Julia's thin scrollbar; it only shows when the channels and direct messages need more room.
+    scrollbar-width: thin;
+    scrollbar-color: #c4c6eb transparent;
+
+    &:hover {
+        scrollbar-color: #adb0d9 transparent;
+    }
 
     &::-webkit-scrollbar {
-        display: none;
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #c4c6eb;
+        border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background: #adb0d9;
     }
 }
 
