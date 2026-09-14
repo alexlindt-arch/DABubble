@@ -276,10 +276,15 @@ export class MainLayout {
     this.channelInfoAnchor.set(null);
   }
 
-  saveChannelInfo(change: { name: string; description: string }): void {
+  async saveChannelInfo(change: { name: string; description: string }): Promise<void> {
     const channel = this.selectedChannel();
     if (!channel) return;
-    this.channelService.updateChannel(channel.id, change.name, change.description);
+    try {
+      await this.channelService.updateChannel(channel.id, change.name, change.description);
+      this.selectedChannel.set({ ...channel, ...change });
+    } catch (error) {
+      console.error('Channel-Informationen konnten nicht gespeichert werden:', error);
+    }
   }
 
   leaveSelectedChannel(): void {

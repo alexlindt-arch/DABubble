@@ -26,7 +26,7 @@ export class ChannelInfoDialog {
   openCreatorProfile(): void { this.creatorProfileOpen.set(true); }
   closeCreatorProfile(): void { this.creatorProfileOpen.set(false); }
   private save(name: string, description: string): void {
-    if (!name || !description) return;
+    if (!name) return;
     this.saved.emit({ name, description });
     this.editingName.set(false);
     this.editingDescription.set(false);

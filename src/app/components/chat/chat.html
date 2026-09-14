@@ -127,6 +127,12 @@
                                 <strong>{{ reactionTooltipNames(reaction.uids) }}</strong><span>{{ reactionTooltipText(reaction.uids) }}</span></span>
                         </button>
                         }
+                        <button type="button" class="reaction-add-button" [class.is-open]="reactionPickerFor() === message.id"
+                            aria-label="Reaktion hinzufügen" [attr.aria-expanded]="reactionPickerFor() === message.id"
+                            (click)="toggleReactionPicker(message.id, $event)">
+                            <img class="reaction-add-icon" src="assets/img/icons/add_reaction.svg" alt="">
+                            <img class="reaction-add-icon reaction-add-icon--hover" src="assets/img/icons/add_reaction-hover.svg" alt="">
+                        </button>
                     </div>
                     }
                 </div>
@@ -205,7 +211,10 @@
             </button>
             @if (isChannelMember()) {<button type="button" class="add-member-button" aria-label="Mitglieder hinzufügen"
                 (click)="addPeopleRequested.emit()">
-                <span class="composer-icon add-member-icon" aria-hidden="true"></span>
+                <span class="add-member-icon" aria-hidden="true">
+                    <img src="assets/img/icons/add-user.svg" alt="">
+                    <img class="add-member-icon-hover" src="assets/img/icons/add-user-hover.svg" alt="">
+                </span>
             </button>}
         </div>
     </header>
@@ -256,6 +265,12 @@
                                 <strong>{{ reactionTooltipNames(reaction.uids) }}</strong><span>{{ reactionTooltipText(reaction.uids) }}</span></span>
                         </button>
                         }
+                        <button type="button" class="reaction-add-button" [class.is-open]="reactionPickerFor() === message.id"
+                            aria-label="Reaktion hinzufügen" [attr.aria-expanded]="reactionPickerFor() === message.id"
+                            (click)="toggleReactionPicker(message.id, $event)">
+                            <img class="reaction-add-icon" src="assets/img/icons/add_reaction.svg" alt="">
+                            <img class="reaction-add-icon reaction-add-icon--hover" src="assets/img/icons/add_reaction-hover.svg" alt="">
+                        </button>
                     </div>
                     }
 

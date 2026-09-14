@@ -84,7 +84,7 @@
     height: 40px;
     padding: 0;
     border: none;
-    border-radius: 6px;
+    border-radius: 50%;
     background: transparent;
     cursor: pointer;
     transition: background-color 0.2s ease;
@@ -102,7 +102,7 @@
     }
 
     &:hover {
-        background: rgba(68, 77, 242, 0.08);
+        background: #eceefe;
 
         .toggle-header-icon { opacity: 0; }
         .toggle-header-icon-hover { opacity: 1; }
@@ -195,19 +195,24 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        flex: 0 0 30px;
-        height: 30px;
-        padding: 0;
+        flex: 0 0 40px;
+        width: 40px;
+        height: 40px;
+        padding: 8px;
+        box-sizing: border-box;
+        border-radius: 50%;
         color: #000;
 
         .plus-icon {
-            flex-basis: 30px;
-            width: 30px;
-            height: 30px;
+            flex-basis: 24px;
+            width: 24px;
+            height: 24px;
         }
 
         &:hover, &:focus-visible {
             color: #535af1;
+            background-color: #eceefe;
+            outline: none;
         }
     }
 

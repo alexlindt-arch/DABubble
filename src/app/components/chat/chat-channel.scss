@@ -60,9 +60,16 @@
     font: inherit;
     cursor: pointer;
 
-    &:hover img,
-    &:focus-visible img { transform: translateY(-3px); }
-    &:focus-visible { outline: 2px solid #535af1; outline-offset: 2px; }
+    border-radius: 30px;
+    transition: background-color 0.3s ease;
+
+    &:hover,
+    &:focus-visible {
+        background: #eceefe;
+        outline: none;
+
+        .member-count { color: #535af1; }
+    }
 }
 
 .member-avatars {
@@ -115,11 +122,29 @@
 
 // Figma "44. Add members button" (person_add on #ECEEFE). The circle always matches the member
 // avatars next to it; the icon is a little larger than in Figma, 65% of the circle instead of 60%.
-.add-member-button .add-member-icon {
-    --icon: url('../../../../public/assets/img/icons/person_add.svg');
-    width: 65%;
-    height: 65%;
+.add-member-icon {
+    position: relative;
+    display: block;
+    width: 40px;
+    height: 40px;
+
+    img {
+        position: absolute;
+        inset: 0;
+        display: block;
+        width: 40px;
+        height: 40px;
+        transition: opacity 0.2s ease;
+    }
 }
+
+.add-member-icon-hover { opacity: 0; }
+
+.add-member-button:hover .add-member-icon img:not(.add-member-icon-hover),
+.add-member-button:focus-visible .add-member-icon img:not(.add-member-icon-hover) { opacity: 0; }
+
+.add-member-button:hover .add-member-icon-hover,
+.add-member-button:focus-visible .add-member-icon-hover { opacity: 1; }
 
 .chat-date-divider {
     display: flex;
@@ -356,6 +381,39 @@
     align-items: center;
     gap: 4px;
 }
+
+.reaction-add-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: white;
+    cursor: pointer;
+
+    .reaction-add-icon {
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        transition: opacity 0.2s ease;
+    }
+
+    .reaction-add-icon--hover { opacity: 0; }
+
+    &:hover,
+    &:focus-visible {
+        outline: none;
+
+        .reaction-add-icon:not(.reaction-add-icon--hover) { opacity: 0; }
+        .reaction-add-icon--hover { opacity: 1; }
+    }
+}
+
+.channel-message:not(.own) .reaction-add-button { order: -1; }
 
 .channel-reaction {
     position: relative;
@@ -606,6 +664,194 @@
 // Phones follow Figma: only the add-member button stays next to the channel name.
 @media (max-width: 767px) {
     .channel-members { display: none; }
+}
+
+// The mobile/tablet breakpoints remain compact; these values restore the original desktop
+// Figma proportions for the channel view.
+@media (min-width: 1024px) {
+    .chat-content:has(.channel-chat-header) { padding: 0; overflow: hidden; }
+
+    .channel-title {
+        gap: 6px;
+        padding: 8px 12px;
+        border-radius: 30px;
+        color: #000;
+        font-size: 24px;
+    }
+
+    .channel-header-actions { flex: initial; flex-direction: row; flex-wrap: nowrap; justify-content: initial; gap: 20px; height: auto; overflow: visible; }
+    .channel-members { gap: 10px; padding: 6px 12px; border-radius: 30px; }
+    .member-count { font-size: 20px; font-weight: normal; }
+    .add-member-button { order: 0; }
+
+    .chat-date-divider { gap: 16px; margin: 0; padding: 10px 0; }
+    .chat-date-divider::before, .chat-date-divider::after { background: #adb0d9; }
+    .chat-date-divider span {
+        padding: 5px 15px;
+        border-color: #adb0d9;
+        border-radius: 30px;
+        color: #000;
+        font-size: 18px;
+        font-weight: normal;
+        line-height: 25px;
+    }
+
+    .channel-message {
+        gap: 20px;
+        width: calc(100% + var(--chat-horizontal-padding) + var(--chat-horizontal-padding));
+        margin-inline: calc(0px - var(--chat-horizontal-padding));
+        margin-bottom: 0;
+        padding: 10px var(--chat-horizontal-padding);
+        border-radius: 0;
+    }
+
+    .channel-message:hover { background-color: rgba(236, 238, 254, 1); }
+    .channel-message:not(.own):hover .channel-message-bubble { background: white; }
+    .channel-message.own .channel-message-meta { flex-direction: row-reverse; }
+    .channel-message.own .channel-message-bubble { border-radius: 20px 0 20px 20px; }
+    .channel-message-column { gap: 8px; flex: initial; }
+    .channel-message-meta { gap: 20px; }
+    .channel-message-author { font-size: 18px; line-height: 25px; font-weight: 700; }
+    .channel-message-time { color: #686868; font-size: 14px; line-height: 19px; }
+    .channel-message-bubble { max-width: none; padding: 15px; border-radius: 0 20px 20px 20px; font-size: 18px; line-height: 25px; }
+    .channel-message-replies { margin: 0; color: #535af1; font-size: 18px; }
+
+    .direct-edit-form button {
+        min-height: 0;
+        padding: 6px 12px;
+        border: 1px solid #535af1;
+        border-radius: 18px;
+        background: white;
+        color: #535af1;
+        font-size: inherit;
+        font-weight: normal;
+        transition: all 0.3s ease;
+
+        &[type='submit'] {
+            background: #444df2;
+            color: white;
+        }
+
+        &:not(:disabled):hover,
+        &:not(:disabled):focus-visible {
+            background: #eceefe;
+            outline: none;
+        }
+
+        &[type='submit']:not(:disabled):hover,
+        &[type='submit']:not(:disabled):focus-visible {
+            border-color: #797ef3;
+            background: #797ef3;
+            color: white;
+        }
+    }
+
+    .channel-reactions { gap: 8px; }
+    .channel-reaction {
+        display: flex;
+        justify-content: initial;
+        gap: 10px;
+        min-width: 0;
+        height: auto;
+        padding: 5px 10px;
+        border-color: rgba(173, 176, 217, 1);
+        border-radius: 20px;
+        font-size: 20px;
+        line-height: 24px;
+    }
+
+    .channel-reaction:hover,
+    .channel-reaction:focus-visible {
+        border-color: rgba(121, 126, 243, 1);
+        outline: none;
+    }
+
+    .channel-reaction.active {
+        border-color: rgba(173, 176, 217, 1);
+        background: white;
+    }
+
+    .channel-reaction.active:hover,
+    .channel-reaction.active:focus-visible {
+        border-color: rgba(121, 126, 243, 1);
+    }
+    .channel-reaction-count { font-size: 16px; line-height: 22px; }
+    .channel-hover-bar {
+        top: -20px;
+        right: var(--chat-horizontal-padding);
+        padding: 3px 13px;
+        border-color: #adb0d9;
+        border-radius: 25px 25px 25px 0;
+        box-shadow: none;
+        visibility: visible;
+        transform: none;
+        transition: opacity 0.15s ease;
+    }
+    .channel-message.own .channel-hover-bar { right: auto; left: var(--chat-horizontal-padding); border-radius: 25px 25px 0 25px; }
+    .channel-hover-button {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        font-size: initial;
+        transition: background-color 0.3s ease;
+
+        &:hover,
+        &:focus-visible { background: #eceefe; transform: none; }
+    }
+    .hover-control-icon { flex-basis: 24px; width: 24px !important; height: 24px !important; }
+
+    .edit-message-menu {
+        top: 100%;
+        left: 50%;
+        width: min(308px, calc(100vw - 48px));
+        min-width: 0;
+        padding: 10px;
+        border-radius: 0 30px 30px 30px;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+
+        button {
+            min-height: 53px;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 18px;
+            text-align: center;
+            transition: background-color 0.3s ease, color 0.3s ease;
+
+            &:hover,
+            &:focus-visible { background: #eceefe; color: #535af1; outline: none; }
+        }
+    }
+
+    .reaction-tooltip {
+        bottom: calc(100% + 6px);
+        align-items: center;
+        gap: 0;
+        width: min(158px, calc(100vw - 32px));
+        max-width: none;
+        border-radius: 20px 20px 20px 0;
+        background: #444df2;
+        color: white;
+        box-shadow: none;
+        font-size: 16px;
+        transform: translateY(4px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+
+        > span:first-child { font-size: 24px; }
+        strong { text-align: center; }
+    }
+
+    .channel-reaction:hover .reaction-tooltip,
+    .channel-reaction:focus-visible .reaction-tooltip { transform: translateY(0); }
+
+    .channel-message.own .reaction-tooltip {
+        right: 50%;
+        left: auto;
+        border-radius: 20px 20px 0 20px;
+        transform: translateY(4px);
+    }
+
+    .channel-message.own .channel-reaction:hover .reaction-tooltip,
+    .channel-message.own .channel-reaction:focus-visible .reaction-tooltip { transform: translateY(0); }
 }
 
 @media (max-width: 767px) {

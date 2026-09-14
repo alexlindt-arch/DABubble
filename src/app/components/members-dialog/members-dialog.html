@@ -26,9 +26,12 @@
 
     @if (canAddMembers()) {<button type="button" class="add-member-button" (click)="addRequested.emit()">
       <span class="add-icon-circle" aria-hidden="true">
-        <span class="icon add-user-icon"></span>
+        <span class="add-user-icon">
+          <img src="assets/img/icons/add-user.svg" alt="">
+          <img class="add-user-icon-hover" src="assets/img/icons/add-user-hover.svg" alt="">
+        </span>
       </span>
-      <span>Mitglieder hinzufügen</span>
+      <span class="add-member-label">Mitglieder hinzufügen</span>
     </button>}
   </section>
 </div>

@@ -518,7 +518,7 @@ export class Chat {
   @HostListener('document:click', ['$event'])
   closeEmojiPickersOutside(event: MouseEvent): void {
     const target = event.target as HTMLElement;
-    const selector = '.emoji-picker, .channel-reaction-picker, .edit-message-menu, .composer-button, .channel-hover-button';
+    const selector = '.emoji-picker, .channel-reaction-picker, .edit-message-menu, .composer-button, .channel-hover-button, .reaction-add-button';
     if (target.closest(selector)) return;
     this.emojiPickerOpen.set(false);
     this.reactionPickerFor.set(null);

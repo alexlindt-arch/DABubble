@@ -55,7 +55,23 @@
 }
 
 .close-icon { --icon: url('../../../../public/assets/img/icons/close.svg'); }
-.add-user-icon { --icon: url('../../../../public/assets/img/icons/add-user.svg'); }
+.add-user-icon {
+  position: relative;
+  display: block;
+  width: 40px;
+  height: 40px;
+
+  img {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 40px;
+    height: 40px;
+    transition: opacity 0.2s ease;
+  }
+}
+
+.add-user-icon-hover { opacity: 0; }
 
 .member-list {
   display: flex;
@@ -124,13 +140,25 @@
   border: none;
   border-radius: 30px;
   background: transparent;
-  color: #535af1;
+  color: #000;
   font: inherit;
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 
-  &:hover, &:focus-visible { background: #eceefe; outline: none; }
+  &:hover, &:focus-visible {
+    background: #eceefe;
+    outline: none;
+
+    .add-member-label { color: #535af1; }
+    .add-user-icon img:not(.add-user-icon-hover) { opacity: 0; }
+    .add-user-icon-hover { opacity: 1; }
+  }
+}
+
+.add-member-label {
+  color: #000;
+  transition: color 0.3s ease;
 }
 
 .add-icon-circle {
