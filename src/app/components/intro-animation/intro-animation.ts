@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { Component, ElementRef, OnDestroy, computed, inject, signal } from '@angular/core';
 
 type IntroPhase = 'hidden' | 'ready' | 'running' | 'done' | 'removed';
@@ -28,6 +29,7 @@ const removeDelay = 60;
 })
 export class IntroAnimation implements OnDestroy {
   private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
+  private readonly location = inject(Location);
   private readonly timers: number[] = [];
   private startedAt = 0;
 
@@ -37,7 +39,7 @@ export class IntroAnimation implements OnDestroy {
   readonly hasStarted = computed(() => this.phase() === 'running' || this.isDone());
 
   constructor() {
-    if (!canPlayIntro()) return;
+    if (!canPlayIntro(this.location.path())) return;
     markIntroPlayed();
     this.phase.set('ready');
     this.timers.push(window.setTimeout(() => this.start(), startFallbackDelay));
@@ -91,15 +93,15 @@ export class IntroAnimation implements OnDestroy {
   };
 }
 
-function canPlayIntro(): boolean {
-  if (!isLoginRoute()) return false;
+function canPlayIntro(path: string): boolean {
+  if (!isLoginRoute(path)) return false;
   if (introAlreadyPlayed()) return false;
   return !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
-function isLoginRoute(): boolean {
-  const path = window.location.pathname;
-  return path === '/' || path === '/login';
+function isLoginRoute(path: string): boolean {
+  const route = path.split(/[?#]/)[0].replace(/\/+$/, '');
+  return route === '' || route === '/login';
 }
 
 function introAlreadyPlayed(): boolean {
