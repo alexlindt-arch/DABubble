@@ -98,6 +98,10 @@
 @media (max-width: 767px) {
     .thread-content { border-radius: 0; }
 
+    // Figma 08 keeps the floating reaction bar invisible here: a finger cannot hover, and with a
+    // mouse it would otherwise sit on top of the name row.
+    .thread-hover-bar { display: none; }
+
     @include compact-thread;
 }
 
