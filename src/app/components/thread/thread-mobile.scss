@@ -30,11 +30,8 @@
         &.own { padding: 10px 16px 10px 50px; }
     }
 
+    // The avatar keeps the 70px of the main chat, only the own one gets the Figma shadow.
     .thread-avatar {
-        width: 50px;
-        height: 50px;
-        border-radius: 25px;
-
         .own & { box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
     }
 
@@ -49,11 +46,6 @@
             .thread-bubble,
             .thread-reactions { align-self: flex-end; }
         }
-    }
-
-    .thread-bubble {
-        font-size: 17px;
-        line-height: 23px;
     }
 
     // Figma "Reaction indicator": 34px high pill next to the 34px add button.
@@ -104,24 +96,9 @@
         &.own { padding: 10px 12px; }
     }
 
-    .thread-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 20px;
-    }
-
     .thread-meta {
         flex-wrap: wrap;
         gap: 8px;
-    }
-
-    .thread-author { font-size: 15px; }
-    .thread-time { font-size: 12px; }
-
-    .thread-bubble {
-        padding: 10px;
-        font-size: 15px;
-        line-height: 21px;
     }
 
     .thread-hover-bar { right: 12px; }
