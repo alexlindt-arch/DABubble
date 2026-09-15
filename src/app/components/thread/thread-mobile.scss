@@ -72,37 +72,18 @@
 
     .own .thread-reaction-picker { left: 16px; }
 
-    // Figma "63. Write text box aux": 398 x 145, 16px from the sides, 30px from the bottom,
-    // 40px between the one-line text and the 40px icon row.
+    // Figma "63. Write text box aux": 398 x 145, 16px from the sides, one line of text and the
+    // 40px icon row at the bottom edge.
     .thread-composer {
-        margin: 0 16px 30px;
+        margin: 0 16px 40px;
 
-        textarea { height: 25px; }
+        textarea { flex: none; height: 25px; }
     }
-
-    .thread-composer-actions { margin-top: 40px; }
 
     .thread-composer-button { color: #686868; }
 
-    .thread-send {
-        color: #444df2;
-
-        .send-icon {
-            width: 30px;
-            height: 30px;
-        }
-    }
-}
-
-// Phones: full-width thread under the 80px top bar.
-@media (max-width: 767px) {
-    .thread-content { border-radius: 0; }
-
-    // Figma 08 keeps the floating reaction bar invisible here: a finger cannot hover, and with a
-    // mouse it would otherwise sit on top of the name row.
-    .thread-hover-bar { display: none; }
-
-    @include compact-thread;
+    // The arrow keeps the 24px of the chat composer so both send buttons look alike.
+    .thread-send { color: #444df2; }
 }
 
 // Desktop: a thread narrower than the 430px phone frame keeps its rounded card but uses the phone sizes.
@@ -153,10 +134,20 @@
 
     .own .thread-reaction-picker { left: 12px; }
 
-    .thread-composer {
-        margin: 0 12px 16px;
-        padding: 12px;
-    }
+    // The bottom gap stays at 40px so the box ends level with the chat composer.
+    .thread-composer { margin: 0 12px 40px; padding: 12px; }
+}
 
-    .thread-composer-actions { margin-top: 16px; }
+// Phones last, so the phone frame wins over the container steps above.
+@media (max-width: 767px) {
+    .thread-content { border-radius: 0; }
+
+    // Figma 08 keeps the floating reaction bar invisible here: a finger cannot hover, and with a
+    // mouse it would otherwise sit on top of the name row.
+    .thread-hover-bar { display: none; }
+
+    @include compact-thread;
+
+    // Figma 08: 30px from the bottom edge of the phone frame.
+    .thread-composer { margin: 0 16px 30px; padding: 20px; }
 }

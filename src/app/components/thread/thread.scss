@@ -311,9 +311,13 @@
 }
 
 
+// Figma 63: 145px high like the chat composer, with the icon row pinned to the bottom edge.
 .thread-composer {
     position: relative;
+    display: flex;
+    flex-direction: column;
     flex: none;
+    height: 145px;
     box-sizing: border-box;
     margin: 0 20px 40px;
     padding: 20px;
@@ -345,7 +349,7 @@
     flex-direction: row;
     align-items: center;
     gap: 5px;
-    margin-top: 20px;
+    margin-top: auto;
 }
 
 .thread-composer-button {
