@@ -301,6 +301,10 @@
                         (click)="toggleReactionPicker(message.id, $event)">
                         <img class="hover-control-icon" src="assets/img/icons/add_reaction.svg" alt="">
                     </button>
+                    <button type="button" class="channel-hover-button thread-button" aria-label="Thread öffnen"
+                        (click)="threadRequested.emit()">
+                        <img class="hover-control-icon" src="assets/img/icons/comment.svg" alt="">
+                    </button>
                 </div>
 
                 @if (reactionPickerFor() === message.id) {
