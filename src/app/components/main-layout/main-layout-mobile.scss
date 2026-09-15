@@ -244,10 +244,13 @@ main > header .mobile-brand,
 
   main.sidebar-closed .content > app-sidebar { display: none; }
 
+  // The desktop cap of 485px must not apply here, otherwise the thread sticks to the left edge
+  // instead of covering the chat.
   .content > app-thread {
     position: fixed;
     inset: 80px 0 0;
     z-index: 20;
+    max-width: none;
   }
 
   main:not(.sidebar-closed) .fab-compose { display: flex; }
