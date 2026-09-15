@@ -50,7 +50,7 @@ const SEED_MESSAGES: ThreadMessage[] = [
 @Component({
   imports: [],
   selector: 'app-thread',
-  styleUrl: './thread.scss',
+  styleUrls: ['./thread.scss', './thread-pickers.scss', './thread-mobile.scss'],
   templateUrl: './thread.html',
 })
 export class Thread {

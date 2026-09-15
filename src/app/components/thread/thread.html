@@ -43,6 +43,10 @@
                             <span class="thread-reaction-count">{{ reaction.count }}</span>
                         </button>
                         }
+                        <button type="button" class="thread-reaction-add" aria-label="Reaktion hinzufügen"
+                            [attr.aria-expanded]="reactionPickerFor() === i" (click)="toggleReactionPicker(i)">
+                            <span class="thread-icon reaction-icon" aria-hidden="true"></span>
+                        </button>
                     </div>
                     }
                 </div>
