@@ -252,14 +252,17 @@ main>header {
         transition: flex-basis 0.3s ease;
     }
 
+    // Figma 06: 989px chat next to a 485px thread. Both share the space in that ratio and the
+    // thread stops at 485px, so the chat always stays about twice as wide as the thread.
     >app-chat,
     >app-new-message {
-        flex: 1 1 0;
+        flex: 989 1 0;
         margin: 16px;
     }
 
     >app-thread {
-        flex: 0 0 485px;
+        flex: 485 1 0;
+        max-width: 485px;
     }
 
     &.sidebar-closed>app-sidebar {

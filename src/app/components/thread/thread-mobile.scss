@@ -1,7 +1,6 @@
-// Figma "08-Secondary Chat mobile": full-width thread under the 80px top bar.
-@media (max-width: 767px) {
-    .thread-content { border-radius: 0; }
-
+// Figma "08-Secondary Chat mobile": the compact thread used on phones and whenever the
+// desktop thread gets squeezed below the phone frame width.
+@mixin compact-thread {
     // Figma "Header": 60px, 10px/16px padding, 20px title, tag and channel name 5px apart.
     .thread-header {
         box-sizing: border-box;
@@ -93,4 +92,67 @@
             height: 30px;
         }
     }
+}
+
+// Phones: full-width thread under the 80px top bar.
+@media (max-width: 767px) {
+    .thread-content { border-radius: 0; }
+
+    @include compact-thread;
+}
+
+// Desktop: a thread narrower than the 430px phone frame keeps its rounded card but uses the phone sizes.
+@container thread (max-width: 430px) {
+    @include compact-thread;
+}
+
+// Narrower still: the side gaps and the avatar give way, otherwise the bubbles break per word.
+@container thread (max-width: 340px) {
+    .thread-header { padding: 10px 12px; }
+
+    .thread-divider { padding: 10px 12px; }
+
+    .thread-message {
+        gap: 8px;
+        padding: 10px 12px;
+
+        &.own { padding: 10px 12px; }
+    }
+
+    .thread-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 20px;
+    }
+
+    .thread-meta {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .thread-author { font-size: 15px; }
+    .thread-time { font-size: 12px; }
+
+    .thread-bubble {
+        padding: 10px;
+        font-size: 15px;
+        line-height: 21px;
+    }
+
+    .thread-hover-bar { right: 12px; }
+    .own .thread-hover-bar { left: 12px; }
+
+    .thread-reaction-picker {
+        right: 12px;
+        max-width: calc(100% - 24px);
+    }
+
+    .own .thread-reaction-picker { left: 12px; }
+
+    .thread-composer {
+        margin: 0 12px 16px;
+        padding: 12px;
+    }
+
+    .thread-composer-actions { margin-top: 16px; }
 }

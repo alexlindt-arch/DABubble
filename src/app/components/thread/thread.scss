@@ -1,3 +1,6 @@
+// Lets thread-mobile.scss switch to the compact layout whenever the thread itself gets narrow.
+:host { container: thread / inline-size; }
+
 .thread-content {
     flex: 1;
     min-width: 0;
