@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FirebaseError } from 'firebase/app';
 import { AppUser } from '../../models';
 import { AuthService } from '../../services/auth.service';
@@ -15,6 +15,10 @@ export class Login {
   private readonly formBuilder = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+
+  /** Kommt der Nutzer frisch vom Passwort-Reset, bestätigt der Login den Wechsel. */
+  readonly passwordReset = this.route.snapshot.queryParamMap.get('reset') === 'success';
 
   readonly loginForm = this.formBuilder.group({
     email: ['', [Validators.required, Validators.email]],

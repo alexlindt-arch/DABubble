@@ -15,6 +15,12 @@
       Wir empfehlen dir, die E-Mail-Adresse zu nutzen, die du bei der Arbeit verwendest.
     </p>
 
+    @if (passwordReset) {
+      <p class="login-card__notice" role="status">
+        Dein Passwort wurde geändert. Melde dich mit dem neuen Passwort an.
+      </p>
+    }
+
     <form class="login-form" [formGroup]="loginForm" (ngSubmit)="submitLogin()" novalidate>
       <div class="form-field">
         <label class="input-group">

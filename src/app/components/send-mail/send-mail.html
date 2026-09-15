@@ -45,13 +45,28 @@
         Wir senden dir eine E-Mail, über die du dein Passwort ändern kannst.
       </p>
 
+      @if (sendError) {
+        <p class="send-mail-form__error" role="alert">{{ sendError }}</p>
+      }
+
       <div class="send-mail-form__actions">
-        <button type="submit" class="btn btn--primary" [disabled]="sendMailForm.invalid">
+        <button
+          type="submit"
+          class="btn btn--primary"
+          [disabled]="sendMailForm.invalid || isSubmitting || mailSent"
+        >
           E-Mail senden
         </button>
       </div>
     </form>
   </section>
+
+  @if (mailSent) {
+    <div class="send-mail-toast" role="status">
+      <img src="assets/img/icons/mail-default.svg" alt="" />
+      <span>E-Mail gesendet</span>
+    </div>
+  }
 
   <footer class="send-mail-page__footer">
     <a class="send-mail-page__footer-link" routerLink="/imprint">Impressum</a>

@@ -1,6 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import {
   Auth,
+  confirmPasswordReset,
   createUserWithEmailAndPassword,
   deleteUser,
   getAuth,
@@ -8,10 +9,12 @@ import {
   onAuthStateChanged,
   signInAnonymously,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail,
   signInWithPopup,
   signOut,
   User,
   UserCredential,
+  verifyPasswordResetCode,
 } from 'firebase/auth';
 import { Unsubscribe } from 'firebase/firestore';
 import { firebaseApp } from '../firebase';
@@ -60,6 +63,23 @@ export class AuthService {
   async loginAsGuest(): Promise<AppUser | null> {
     const credential = await signInAnonymously(this.auth);
     return this.activateProfile(credential.user, 'Gast');
+  }
+
+  /**
+   * Verschickt die Reset-Mail. Ohne ActionCodeSettings gilt die Aktions-URL aus der
+   * Firebase-Konsole - eine Continue-URL im Code müsste zusätzlich freigegeben sein.
+   * Firebase meldet keinen Fehler bei unbekannter Adresse.
+   */
+  sendResetMail(email: string): Promise<void> {
+    return sendPasswordResetEmail(this.auth, email);
+  }
+
+  verifyResetCode(oobCode: string): Promise<string> {
+    return verifyPasswordResetCode(this.auth, oobCode);
+  }
+
+  confirmReset(oobCode: string, newPassword: string): Promise<void> {
+    return confirmPasswordReset(this.auth, oobCode, newPassword);
   }
 
   register(email: string, password: string): Promise<UserCredential> {
