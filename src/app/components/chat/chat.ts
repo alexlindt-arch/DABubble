@@ -48,7 +48,7 @@ export class Chat {
   messageRequested = output<AppUser>();
   channelInfoRequested = output<DOMRect>();
   channelRequested = output<Channel>();
-  addPeopleRequested = output<void>();
+  addPeopleRequested = output<DOMRect>();
   membersRequested = output<DOMRect>();
   threadRequested = output<void>();
   messages = signal<Message[]>([]);
@@ -78,6 +78,11 @@ export class Chat {
   private readonly messageService = inject(MessageService);
   private editor = viewChild<ElementRef<HTMLTextAreaElement>>('editor');
   private history = viewChild<ElementRef<HTMLElement>>('history');
+
+  requestAddPeople(event: MouseEvent): void {
+    const button = event.currentTarget as HTMLElement;
+    this.addPeopleRequested.emit(button.getBoundingClientRect());
+  }
 
   constructor() {
     afterRenderEffect(() => {

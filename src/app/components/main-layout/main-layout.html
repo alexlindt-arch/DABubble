@@ -123,7 +123,7 @@
   } @else {
   <app-chat [isSelfChat]="selfChatOpen" [userName]="userName" [userAvatarUrl]="userAvatarUrl"
     [directUser]="selectedDirectUser" [channel]="selectedChannel()" [users]="allUsers()" [channels]="allChannels()"
-    (profileRequested)="openProfilePopup()" (addPeopleRequested)="openMemberDialog()"
+    (profileRequested)="openProfilePopup()" (addPeopleRequested)="openMemberDialog($event)"
     (messageRequested)="startDirectConversation($event)"
     (channelInfoRequested)="openChannelInfo($event)"
     (membersRequested)="openMembersDialog($event)" (threadRequested)="openThread()"
@@ -191,6 +191,7 @@
     [submitLabel]="memberDialogLabel"
     [channelName]="memberDialogChannel()?.name ?? ''"
     [compact]="memberDialogForExistingChannel"
+    [anchor]="addPeopleAnchor()"
     (closed)="closeAddPeopleDialog()"
     (confirmed)="addMembers($event)"
   />

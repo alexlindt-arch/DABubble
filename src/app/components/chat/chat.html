@@ -210,7 +210,7 @@
                 <span class="member-count">{{ memberCount() }}</span>
             </button>
             @if (isChannelMember()) {<button type="button" class="add-member-button" aria-label="Mitglieder hinzufügen"
-                (click)="addPeopleRequested.emit()">
+                (click)="requestAddPeople($event)">
                 <span class="add-member-icon" aria-hidden="true">
                     <img src="assets/img/icons/add-user.svg" alt="">
                     <img class="add-member-icon-hover" src="assets/img/icons/add-user-hover.svg" alt="">

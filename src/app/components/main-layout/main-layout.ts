@@ -60,6 +60,7 @@ export class MainLayout {
   channelInfoOpen = false;
   channelInfoAnchor = signal<DOMRect | null>(null);
   membersAnchor = signal<DOMRect | null>(null);
+  addPeopleAnchor = signal<DOMRect | null>(null);
   memberDialogLabel = 'Erstellen';
   memberDialogForExistingChannel = false;
   memberDialogChannel = signal<Channel | null>(null);
@@ -232,6 +233,7 @@ export class MainLayout {
   private openAddPeopleDialog(created: Channel): void {
     this.memberDialogLabel = 'Erstellen';
     this.memberDialogForExistingChannel = false;
+    this.addPeopleAnchor.set(null);
     this.memberDialogChannel.set(created);
     this.addPeopleDialogOpen = true;
     this.sidebar()?.selectConversation('channel', created.id);
@@ -250,18 +252,19 @@ export class MainLayout {
 
   openMemberDialogFromList(): void {
     this.closeMembersDialog();
-    this.openMemberDialog();
+    this.openMemberDialog(this.membersAnchor());
   }
 
   get currentUserId(): string | null {
     return this.authService.currentUserId;
   }
 
-  openMemberDialog(): void {
+  openMemberDialog(anchor: DOMRect | null = null): void {
     const channel = this.selectedChannel();
     if (!channel) return;
     this.memberDialogLabel = 'Hinzufügen';
     this.memberDialogForExistingChannel = true;
+    this.addPeopleAnchor.set(anchor);
     this.memberDialogChannel.set(channel);
     this.addPeopleDialogOpen = true;
   }
@@ -310,6 +313,7 @@ export class MainLayout {
 
   closeAddPeopleDialog(): void {
     this.addPeopleDialogOpen = false;
+    this.addPeopleAnchor.set(null);
     this.memberDialogChannel.set(null);
   }
 

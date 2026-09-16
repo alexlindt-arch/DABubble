@@ -26,6 +26,7 @@ export class AddPeopleDialog {
   submitLabel = input('Erstellen');
   channelName = input('');
   compact = input(false);
+  anchor = input<DOMRect | null>(null);
   closed = output<void>();
   confirmed = output<string[]>();
   mode = signal<AddMode>('all');
@@ -44,6 +45,9 @@ export class AddPeopleDialog {
   get formValid(): boolean {
     return this.compact() || this.mode() === 'specific' ? this.selected().length > 0 : true;
   }
+
+  get offsetTop(): string { return `${Math.round((this.anchor()?.bottom ?? 0) + 8)}px`; }
+  get offsetRight(): string { return `${Math.max(16, Math.round(window.innerWidth - (this.anchor()?.right ?? window.innerWidth - 24)))}px`; }
 
   avatar(user: AppUser): string {
     return avatarUrl(user.avatar);

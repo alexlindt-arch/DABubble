@@ -1,5 +1,5 @@
 <div class="dialog-backdrop" (click)="closeOnBackdrop($event)">
-  <section class="people-dialog" [class.compact]="compact()" role="dialog" aria-modal="true" aria-labelledby="people-dialog-title">
+  <section class="people-dialog" [class.compact]="compact()" [style.--anchor-top]="offsetTop" [style.--anchor-right]="offsetRight" role="dialog" aria-modal="true" aria-labelledby="people-dialog-title">
     <header>
       <h2 id="people-dialog-title">Leute hinzufügen</h2>
       <button type="button" class="close-button" aria-label="Dialog schließen" (click)="closed.emit()">
