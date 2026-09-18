@@ -40,6 +40,27 @@ export class MessageService {
     await addDoc(this.messagesRef(channelId), profile);
   }
 
+  /** A reply lives in the same collection as the channel messages and points at its parent. */
+  async sendReply(channelId: string, parentId: string, text: string, senderId: string): Promise<void> {
+    const profile: MessageProfile = {
+      text, senderId, timestamp: Timestamp.now(), reactions: {}, threadCount: 0, parentId,
+    };
+    const batch = writeBatch(this.firestore);
+    batch.set(doc(this.messagesRef(channelId)), profile);
+    batch.update(this.messageRef(channelId, parentId), { threadCount: increment(1) });
+    await batch.commit();
+  }
+
+  watchReplies(channelId: string, parentId: string, onChange: (replies: Message[]) => void): Unsubscribe {
+    return onSnapshot(
+      query(this.messagesRef(channelId), where('parentId', '==', parentId)),
+      snapshot => onChange(snapshot.docs
+        .map(item => this.toMessage(item))
+        .sort((first, second) => first.timestamp.toMillis() - second.timestamp.toMillis())),
+      error => console.error('Antworten konnten nicht geladen werden:', error),
+    );
+  }
+
   watchMessages(channelId: string, onChange: (messages: Message[]) => void): Unsubscribe {
     return onSnapshot(
       query(this.messagesRef(channelId), orderBy('timestamp')),

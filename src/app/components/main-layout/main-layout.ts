@@ -24,7 +24,7 @@ import { CreateChannelDialog, NewChannel } from '../create-channel-dialog/create
 import { NewMessage } from '../new-message/new-message';
 import { ProfileDialog, ProfileEdit } from '../profile-dialog/profile-dialog';
 import { ChannelInfoDialog } from '../channel-info-dialog/channel-info-dialog';
-import { AppUser, Channel } from '../../models';
+import { AppUser, Channel, Message } from '../../models';
 
 type SearchResult =
   | { kind: 'channel'; id: string; label: string; channel: Channel }
@@ -68,6 +68,8 @@ export class MainLayout {
   selfChatOpen = false;
   newMessageOpen = false;
   threadOpen = true;
+  /** The message whose thread is shown; without it no thread is open. */
+  threadParent: Message | null = null;
   selectedDirectUser: AppUser | null = null;
   selectedChannel = signal<Channel | null>(null);
   closeLabelHeight = signal(310);
@@ -411,12 +413,14 @@ export class MainLayout {
     this.selectedChannel.set(conversation.channel ?? null);
   }
 
-  openThread(): void {
+  openThread(message: Message): void {
+    this.threadParent = message;
     this.threadOpen = true;
   }
 
   closeThread(): void {
     this.threadOpen = false;
+    this.threadParent = null;
   }
 
   hideInitialThread(): void {

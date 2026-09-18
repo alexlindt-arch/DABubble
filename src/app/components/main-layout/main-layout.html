@@ -126,11 +126,15 @@
     (profileRequested)="openProfilePopup()" (addPeopleRequested)="openMemberDialog($event)"
     (messageRequested)="startDirectConversation($event)"
     (channelInfoRequested)="openChannelInfo($event)"
-    (membersRequested)="openMembersDialog($event)" (threadRequested)="openThread()"
+    (membersRequested)="openMembersDialog($event)" (threadRequested)="openThread($event)"
     (channelRequested)="openMentionedChannel($event)"></app-chat>
   }
-  @if (threadOpen && selectedChannel() && !selfChatOpen && !newMessageOpen) {
-  <app-thread [channelName]="selectedChannel()?.name ?? 'Entwicklerteam'" (closed)="closeThread()"></app-thread>
+  @if (threadOpen && threadParent && selectedChannel() && !selfChatOpen && !newMessageOpen) {
+  <app-thread [channelId]="selectedChannel()?.id ?? null" [parent]="threadParent"
+    [channelName]="selectedChannel()?.name ?? 'Entwicklerteam'" [users]="allUsers()" [channels]="allChannels()"
+    [userName]="userName" [userAvatarUrl]="userAvatarUrl"
+    (profileRequested)="openProfilePopup()" (messageRequested)="startDirectConversation($event)"
+    (channelRequested)="openMentionedChannel($event)" (closed)="closeThread()"></app-thread>
   }
 </section>
 

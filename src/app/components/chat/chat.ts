@@ -50,7 +50,7 @@ export class Chat {
   channelRequested = output<Channel>();
   addPeopleRequested = output<DOMRect>();
   membersRequested = output<DOMRect>();
-  threadRequested = output<void>();
+  threadRequested = output<Message>();
   messages = signal<Message[]>([]);
   directMessages = signal<Message[]>([]);
   reactionPickerFor = signal<string | null>(null);
@@ -103,7 +103,9 @@ export class Chat {
     const channelId = this.currentChannel()?.id;
     this.messages.set([]);
     if (!channelId) return;
-    const stop = this.messageService.watchMessages(channelId, messages => this.messages.set(messages));
+    // Replies carry a parentId and belong into their thread, not into the channel history.
+    const stop = this.messageService.watchMessages(channelId, messages =>
+      this.messages.set(messages.filter(message => !message.parentId)));
     onCleanup(() => stop());
   }
 

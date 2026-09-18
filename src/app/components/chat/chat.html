@@ -275,7 +275,7 @@
                     }
 
                     @if (message.threadCount > 0) {
-                    <button type="button" class="channel-message-replies" (click)="threadRequested.emit()">
+                    <button type="button" class="channel-message-replies" (click)="threadRequested.emit(message)">
                         {{ replyLabel(message.threadCount) }}
                     </button>
                     }
@@ -302,7 +302,7 @@
                         <img class="hover-control-icon" src="assets/img/icons/add_reaction.svg" alt="">
                     </button>
                     <button type="button" class="channel-hover-button thread-button" aria-label="Thread öffnen"
-                        (click)="threadRequested.emit()">
+                        (click)="threadRequested.emit(message)">
                         <img class="hover-control-icon" src="assets/img/icons/comment.svg" alt="">
                     </button>
                 </div>

@@ -1,0 +1,234 @@
+// Everything the thread shares with the main chat: clickable names, mentions, editing and tooltips.
+
+// Figma 50: hovering a row tints it and turns the incoming bubble white; own bubbles keep purple.
+.thread-message:hover,
+.thread-message:focus-within {
+    background: #eceefe;
+
+    .thread-bubble { background: white; }
+    &.own .thread-bubble { background: #797ef3; }
+}
+
+// Figma 50: the emoji inside a reaction pill is 24px, its counter stays at 16px.
+.thread-reaction {
+    font-size: 24px;
+    line-height: 24px;
+}
+
+.thread-avatar-button,
+.thread-author-button {
+    padding: 0;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.thread-avatar-button {
+    flex: none;
+    border-radius: 35px;
+    line-height: 0;
+}
+
+.thread-author-button {
+    font-size: 18px;
+    line-height: 25px;
+    font-weight: 700;
+    color: black;
+
+    &:hover { color: #535af1; }
+}
+
+.thread-hover-icon {
+    display: block;
+    width: 24px;
+    height: 24px;
+}
+
+.thread-hover-button span[aria-hidden='true']:not(.thread-icon) {
+    font-size: 20px;
+    line-height: 24px;
+}
+
+.thread-message-link {
+    padding: 0;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    font-weight: 700;
+    color: #535af1;
+    cursor: pointer;
+
+    &:hover { text-decoration: underline; }
+
+    .own & { color: white; }
+}
+
+.thread-message-edited {
+    font-size: 12px;
+    line-height: 16px;
+    color: #686868;
+}
+
+
+.thread-edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 15px;
+    background: white;
+    border: 1px solid #adb0d9;
+    border-radius: 20px;
+
+    textarea {
+        box-sizing: border-box;
+        width: 100%;
+        min-height: 60px;
+        border: none;
+        outline: none;
+        resize: none;
+        background: transparent;
+        font-family: inherit;
+        font-size: 18px;
+        line-height: 25px;
+        color: black;
+    }
+
+    div {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    button {
+        padding: 8px 20px;
+        border: 1px solid #797ef3;
+        border-radius: 25px;
+        background: white;
+        font-family: inherit;
+        font-size: 16px;
+        color: #444df2;
+        cursor: pointer;
+
+        &[type='submit'] {
+            border-color: #444df2;
+            background: #444df2;
+            color: white;
+        }
+
+        &:disabled { opacity: 0.4; cursor: not-allowed; }
+    }
+}
+
+
+.thread-edit-menu-anchor {
+    position: relative;
+}
+
+.thread-edit-menu {
+    position: absolute;
+    top: 44px;
+    right: 0;
+    z-index: 5;
+    padding: 10px;
+    background: white;
+    border: 1px solid #adb0d9;
+    border-radius: 20px 0 20px 20px;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+
+    .own & { right: auto; left: 0; border-radius: 0 20px 20px 20px; }
+
+    button {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 15px;
+        background: transparent;
+        font-family: inherit;
+        font-size: 16px;
+        white-space: nowrap;
+        color: #535af1;
+        cursor: pointer;
+
+        &:hover { background: #eceefe; }
+    }
+}
+
+
+.thread-mention-suggestions {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 8px);
+    z-index: 6;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    max-width: 100%;
+    margin: 0;
+    padding: 8px;
+    list-style: none;
+    background: white;
+    border: 1px solid #adb0d9;
+    border-radius: 20px;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+
+    button {
+        display: flex;
+        gap: 6px;
+        width: 100%;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 15px;
+        background: transparent;
+        font-family: inherit;
+        font-size: 16px;
+        text-align: left;
+        color: black;
+        cursor: pointer;
+
+        span { color: #535af1; }
+
+        &:hover,
+        &.active { background: #eceefe; }
+    }
+}
+
+
+.thread-reaction {
+    position: relative;
+
+    &:hover .thread-reaction-tooltip { opacity: 1; }
+}
+
+.thread-reaction-tooltip {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 8px);
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    box-sizing: border-box;
+    padding: 10px 15px;
+    background: #444df2;
+    border-radius: 25px 25px 0 25px;
+    font-size: 14px;
+    line-height: 19px;
+    white-space: nowrap;
+    color: white;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-50%);
+    transition: opacity 0.15s ease;
+
+    strong { font-weight: 700; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .thread-reaction-tooltip { transition: none; }
+}

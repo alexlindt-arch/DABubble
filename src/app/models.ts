@@ -32,6 +32,8 @@ export interface MessageProfile {
   reactions: Record<string, string[]>;
   threadCount: number;
   editedAt?: Timestamp;
+  /** Set on thread replies and holds the id of the message the thread belongs to. */
+  parentId?: string;
 }
 
 export interface Message extends MessageProfile {
