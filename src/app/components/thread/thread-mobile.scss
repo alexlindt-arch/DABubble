@@ -81,6 +81,27 @@
 // Desktop: a thread narrower than the 430px phone frame keeps its rounded card but uses the phone sizes.
 @container thread (max-width: 430px) {
     @include compact-thread;
+
+    // Antippen holt die Aktionsleiste unter die Nachricht: Smileys und, bei der eigenen
+    // letzten Antwort, das Menue zum Bearbeiten. Unten statt oben, damit sie nichts verdeckt.
+    .thread-message.actions-open {
+        padding-bottom: 56px;
+    }
+
+    .thread-message.actions-open .thread-hover-bar {
+        display: flex;
+        top: auto;
+        bottom: 6px;
+        right: 16px;
+        opacity: 1;
+        pointer-events: auto;
+        border-radius: 25px;
+    }
+
+    .own.thread-message.actions-open .thread-hover-bar {
+        right: auto;
+        left: 16px;
+    }
 }
 
 // Narrower still: the side gaps and the avatar give way, otherwise the bubbles break per word.
@@ -123,6 +144,8 @@
     // mouse it would otherwise sit on top of the name row.
     .thread-hover-bar { display: none; }
 
+    @include compact-thread;
+
     // Antippen holt die Aktionsleiste unter die Nachricht: Smileys und, bei der eigenen
     // letzten Antwort, das Menue zum Bearbeiten. Unten statt oben, damit sie nichts verdeckt.
     .thread-message.actions-open {
@@ -143,8 +166,6 @@
         right: auto;
         left: 16px;
     }
-
-    @include compact-thread;
 
     // Figma 08: 30px from the bottom edge of the phone frame.
     .thread-composer { margin: 0 16px 30px; padding: 20px; }
