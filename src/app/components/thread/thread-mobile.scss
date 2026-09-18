@@ -123,8 +123,8 @@
     // mouse it would otherwise sit on top of the name row.
     .thread-hover-bar { display: none; }
 
-    // Ohne Hover-Leiste ist dieser Knopf der einzige Weg, per Finger zu reagieren.
-    .thread-reactions.empty { display: flex; }
+    // Ohne Hover-Leiste ist Antippen der Weg zum Reagieren: erst dann erscheint der Knopf.
+    .thread-message.actions-open .thread-reactions.empty { display: flex; }
 
     @include compact-thread;
 

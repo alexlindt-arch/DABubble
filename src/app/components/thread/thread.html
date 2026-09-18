@@ -14,7 +14,8 @@
 
     <div #history class="thread-history" role="log" aria-label="Thread-Verlauf" aria-live="polite">
         @for (message of threadMessages(); track message.id; let i = $index) {
-        <article class="thread-message" [class.own]="isOwnMessage(message)">
+        <article class="thread-message" [class.own]="isOwnMessage(message)"
+            [class.actions-open]="actionsFor() === message.id" (click)="toggleActions(message, $event)">
             <button type="button" class="thread-avatar-button" (click)="openMessageProfile(message)"
                 [attr.aria-label]="'Profil von ' + authorName(message) + ' öffnen'">
                 <img class="thread-avatar" [src]="authorAvatar(message)" alt="">

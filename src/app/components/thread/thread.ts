@@ -54,6 +54,8 @@ export class Thread {
   readonly draft = signal('');
   readonly emojiPickerOpen = signal(false);
   readonly reactionPickerFor = signal<string | null>(null);
+  /** Auf dem Handy erscheinen die Aktionen erst, wenn die Nachricht angetippt wurde. */
+  readonly actionsFor = signal<string | null>(null);
   readonly editMenuFor = signal<string | null>(null);
   readonly editingMessageId = signal<string | null>(null);
   readonly editingText = signal('');
@@ -134,6 +136,12 @@ export class Thread {
     if (names.length === 3) return `${names[0]}, ${names[1]} und ${names[2]}`;
     return `${names[0]}, ${names[1]} und ${names.length - 2} weitere`;
   }
+
+  toggleActions(message: Message, event: MouseEvent): void {
+    if ((event.target as HTMLElement).closest('button, a, textarea')) return;
+    this.actionsFor.update(id => (id === message.id ? null : message.id));
+  }
+
 
   toggleReactionPicker(messageId: string): void {
     this.reactionPickerFor.update(openId => openId === messageId ? null : messageId);
