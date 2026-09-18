@@ -106,7 +106,7 @@
     div {
         display: flex;
         flex-direction: row;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         justify-content: flex-end;
         gap: 8px;
     }
@@ -114,6 +114,8 @@
     button {
         flex: 0 1 auto;
         min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
         min-height: 36px;
         padding: 6px 12px;
         border: 1px solid #535af1;
@@ -243,4 +245,13 @@
 
 @media (prefers-reduced-motion: reduce) {
     .thread-reaction-tooltip { transition: none; }
+}
+
+
+// Schmaler Thread: kleinere Buttons, damit Abbrechen und Speichern nebeneinander bleiben.
+@container thread (max-width: 430px) {
+    .thread-edit-form button {
+        padding: 6px 8px;
+        font-size: 14px;
+    }
 }
