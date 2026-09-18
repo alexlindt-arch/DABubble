@@ -254,6 +254,19 @@
 }
 
 
+// Sehr schmaler Thread: noch kompakter, damit beide Beschriftungen vollstaendig nebeneinander passen.
+@container thread (max-width: 340px) {
+    .thread-edit-form div {
+        gap: 4px;
+    }
+
+    .thread-edit-form button {
+        padding: 6px 6px;
+        font-size: 13px;
+    }
+}
+
+
 // Ohne Reaktionen bleibt die Zeile am Desktop unsichtbar; das Handy braucht sie als Tippziel.
 .thread-reactions.empty {
     display: none;
