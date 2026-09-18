@@ -48,7 +48,8 @@
                 @if (message.editedAt) { <span class="thread-message-edited">bearbeitet</span> }
                 }
 
-                <div class="thread-reactions" [class.empty]="!reactionsOf(message).length">
+                @if (reactionsOf(message).length) {
+                <div class="thread-reactions">
                     @for (reaction of reactionsOf(message); track reaction.emoji) {
                     <button type="button" class="thread-reaction" [class.active]="hasReacted(reaction.uids)"
                         [attr.aria-pressed]="hasReacted(reaction.uids)"
@@ -60,12 +61,8 @@
                             <span>{{ reactionTooltipText(reaction.uids) }}</span></span>
                     </button>
                     }
-                    <button type="button" class="thread-reaction-add" aria-label="Reaktion hinzufügen"
-                        [attr.aria-expanded]="reactionPickerFor() === message.id"
-                        (click)="toggleReactionPicker(message.id)">
-                        <span class="thread-icon reaction-icon" aria-hidden="true"></span>
-                    </button>
                 </div>
+                }
             </div>
 
             <div class="thread-hover-bar">

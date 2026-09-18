@@ -272,7 +272,7 @@ export class Thread {
   closePopupsOutside(event: MouseEvent): void {
     const target = event.target as HTMLElement;
     const selector = '.thread-emoji-picker, .thread-reaction-picker, .thread-edit-menu,'
-      + ' .thread-composer-button, .thread-hover-button, .thread-reaction-add';
+      + ' .thread-composer-button, .thread-hover-button';
     if (target.closest(selector)) return;
     this.emojiPickerOpen.set(false);
     this.reactionPickerFor.set(null);

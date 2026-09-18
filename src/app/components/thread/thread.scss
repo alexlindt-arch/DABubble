@@ -244,25 +244,6 @@
 }
 
 
-.thread-reaction-add {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    width: 34px;
-    height: 34px;
-    padding: 5px;
-    border: none;
-    border-radius: 20px;
-    background: white;
-    color: black;
-    cursor: pointer;
-    transition: color 0.2s ease;
-
-    &:hover { color: #444df2; }
-}
-
-
 .thread-hover-bar {
     position: absolute;
     top: -6px;
@@ -380,6 +361,5 @@
     .thread-hover-bar,
     .thread-composer,
     .thread-close,
-    .thread-reaction-add,
     .thread-composer-button { transition: none; }
 }

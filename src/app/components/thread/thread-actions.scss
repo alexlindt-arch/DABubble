@@ -265,9 +265,3 @@
         font-size: 13px;
     }
 }
-
-
-// Ohne Reaktionen bleibt die Zeile am Desktop unsichtbar; das Handy braucht sie als Tippziel.
-.thread-reactions.empty {
-    display: none;
-}
