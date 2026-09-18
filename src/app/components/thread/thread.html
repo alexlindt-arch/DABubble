@@ -47,8 +47,7 @@
                 @if (message.editedAt) { <span class="thread-message-edited">bearbeitet</span> }
                 }
 
-                @if (reactionsOf(message).length) {
-                <div class="thread-reactions">
+                <div class="thread-reactions" [class.empty]="!reactionsOf(message).length">
                     @for (reaction of reactionsOf(message); track reaction.emoji) {
                     <button type="button" class="thread-reaction" [class.active]="hasReacted(reaction.uids)"
                         [attr.aria-pressed]="hasReacted(reaction.uids)"
@@ -66,7 +65,6 @@
                         <span class="thread-icon reaction-icon" aria-hidden="true"></span>
                     </button>
                 </div>
-                }
             </div>
 
             <div class="thread-hover-bar">

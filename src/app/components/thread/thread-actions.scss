@@ -112,10 +112,7 @@
     }
 
     button {
-        flex: 0 1 auto;
-        min-width: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        flex: 0 0 auto;
         min-height: 36px;
         padding: 6px 12px;
         border: 1px solid #535af1;
@@ -254,4 +251,10 @@
         padding: 6px 8px;
         font-size: 14px;
     }
+}
+
+
+// Ohne Reaktionen bleibt die Zeile am Desktop unsichtbar; das Handy braucht sie als Tippziel.
+.thread-reactions.empty {
+    display: none;
 }
