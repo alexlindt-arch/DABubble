@@ -73,54 +73,66 @@
 }
 
 
+// Wie im Chat: der Rahmen umschliesst nur das Textfeld, die Aktionen stehen darunter.
 .thread-edit-form {
     display: flex;
     flex-direction: column;
     gap: 10px;
     box-sizing: border-box;
     width: 100%;
-    padding: 15px;
-    background: white;
-    border: 1px solid #adb0d9;
-    border-radius: 20px;
 
     textarea {
         box-sizing: border-box;
         width: 100%;
-        min-height: 60px;
-        border: none;
-        outline: none;
-        resize: none;
-        background: transparent;
+        min-width: 0;
+        min-height: 96px;
+        padding: 10px 12px;
+        border: 1px solid #cfd6f3;
+        border-radius: 14px;
+        outline: 0;
+        resize: vertical;
+        background: white;
         font-family: inherit;
         font-size: 18px;
         line-height: 25px;
         color: black;
+
+        &:focus {
+            border-color: #444df2;
+            box-shadow: 0 0 0 3px rgba(68, 77, 242, 0.12);
+        }
     }
 
     div {
         display: flex;
         flex-direction: row;
+        flex-wrap: wrap;
         justify-content: flex-end;
-        gap: 10px;
+        gap: 8px;
     }
 
     button {
-        padding: 8px 20px;
-        border: 1px solid #797ef3;
-        border-radius: 25px;
+        flex: 0 1 auto;
+        min-width: 0;
+        min-height: 36px;
+        padding: 6px 12px;
+        border: 1px solid #535af1;
+        border-radius: 18px;
         background: white;
         font-family: inherit;
         font-size: 16px;
-        color: #444df2;
+        white-space: nowrap;
+        color: #535af1;
         cursor: pointer;
+        transition: all 0.3s ease;
 
         &[type='submit'] {
-            border-color: #444df2;
             background: #444df2;
             color: white;
         }
 
+        &:not(:disabled):hover { background: #eceefe; }
+        &[type='submit']:not(:disabled):hover { background: #535af1; }
         &:disabled { opacity: 0.4; cursor: not-allowed; }
     }
 }
@@ -231,14 +243,4 @@
 
 @media (prefers-reduced-motion: reduce) {
     .thread-reaction-tooltip { transition: none; }
-}
-
-
-// Abbrechen und Speichern bleiben im Kasten, egal wie schmal der Thread wird.
-.thread-edit-form div { flex-wrap: wrap; }
-
-.thread-edit-form button {
-    flex: 0 1 auto;
-    min-width: 0;
-    white-space: nowrap;
 }
