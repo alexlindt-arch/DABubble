@@ -123,8 +123,26 @@
     // mouse it would otherwise sit on top of the name row.
     .thread-hover-bar { display: none; }
 
-    // Ohne Hover-Leiste ist Antippen der Weg zum Reagieren: erst dann erscheint der Knopf.
-    .thread-message.actions-open .thread-reactions.empty { display: flex; }
+    // Antippen holt die Aktionsleiste unter die Nachricht: Smileys und, bei der eigenen
+    // letzten Antwort, das Menue zum Bearbeiten. Unten statt oben, damit sie nichts verdeckt.
+    .thread-message.actions-open {
+        padding-bottom: 56px;
+    }
+
+    .thread-message.actions-open .thread-hover-bar {
+        display: flex;
+        top: auto;
+        bottom: 6px;
+        right: 16px;
+        opacity: 1;
+        pointer-events: auto;
+        border-radius: 25px;
+    }
+
+    .own.thread-message.actions-open .thread-hover-bar {
+        right: auto;
+        left: 16px;
+    }
 
     @include compact-thread;
 
