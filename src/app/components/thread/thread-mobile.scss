@@ -54,9 +54,6 @@
         line-height: 22px;
     }
 
-    .thread-hover-bar { right: 16px; }
-    .own .thread-hover-bar { left: 16px; }
-
     .thread-reaction-picker {
         right: 16px;
         max-width: calc(100% - 32px);
@@ -84,18 +81,14 @@
 
     // Antippen holt die Aktionsleiste unter die Nachricht: Smileys und, bei der eigenen
     // letzten Antwort, das Menue zum Bearbeiten. Unten statt oben, damit sie nichts verdeckt.
-    .thread-message.actions-open {
-        padding-bottom: 56px;
-    }
-
     .thread-message.actions-open .thread-hover-bar {
         display: flex;
-        top: auto;
-        bottom: 6px;
+        top: -14px;
+        bottom: auto;
         right: 16px;
         opacity: 1;
         pointer-events: auto;
-        border-radius: 25px;
+        border-radius: 24px 24px 0 24px;
     }
 
     .own.thread-message.actions-open .thread-hover-bar {
@@ -122,9 +115,6 @@
         gap: 8px;
     }
 
-    .thread-hover-bar { right: 12px; }
-    .own .thread-hover-bar { left: 12px; }
-
     .thread-reaction-picker {
         right: 12px;
         max-width: calc(100% - 24px);
@@ -135,6 +125,22 @@
     // The bottom gap stays at 40px so the box ends level with the chat composer.
     .thread-composer { margin: 0 12px 40px; padding: 12px; }
 }
+
+// Gleiche Stelle wie die Chat-Leiste: unter 1024px rueckt sie auf 16px und -14px.
+@media (max-width: 1023px) {
+    .thread-hover-bar {
+        top: -14px;
+        right: 16px;
+        border-radius: 24px 24px 0 24px;
+    }
+
+    .own .thread-hover-bar {
+        right: auto;
+        left: 16px;
+        border-radius: 24px 24px 0 24px;
+    }
+}
+
 
 // Phones last, so the phone frame wins over the container steps above.
 @media (max-width: 767px) {
@@ -148,18 +154,14 @@
 
     // Antippen holt die Aktionsleiste unter die Nachricht: Smileys und, bei der eigenen
     // letzten Antwort, das Menue zum Bearbeiten. Unten statt oben, damit sie nichts verdeckt.
-    .thread-message.actions-open {
-        padding-bottom: 56px;
-    }
-
     .thread-message.actions-open .thread-hover-bar {
         display: flex;
-        top: auto;
-        bottom: 6px;
+        top: -14px;
+        bottom: auto;
         right: 16px;
         opacity: 1;
         pointer-events: auto;
-        border-radius: 25px;
+        border-radius: 24px 24px 0 24px;
     }
 
     .own.thread-message.actions-open .thread-hover-bar {

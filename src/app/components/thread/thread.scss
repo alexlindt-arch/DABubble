@@ -246,7 +246,8 @@
 
 .thread-hover-bar {
     position: absolute;
-    top: -6px;
+    z-index: 3;
+    top: -20px;
     right: 40px;
     display: flex;
     flex-direction: row;
@@ -256,7 +257,7 @@
     padding: 3px 13px;
     background: white;
     border: 1px solid #adb0d9;
-    border-radius: 25px 25px 0 25px;
+    border-radius: 25px 25px 25px 0;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.15s ease;
@@ -264,7 +265,7 @@
     .own & {
         right: auto;
         left: 40px;
-        border-radius: 25px 25px 25px 0;
+        border-radius: 25px 25px 0 25px;
     }
 
     .thread-message:hover &,
