@@ -232,3 +232,13 @@
 @media (prefers-reduced-motion: reduce) {
     .thread-reaction-tooltip { transition: none; }
 }
+
+
+// Abbrechen und Speichern bleiben im Kasten, egal wie schmal der Thread wird.
+.thread-edit-form div { flex-wrap: wrap; }
+
+.thread-edit-form button {
+    flex: 0 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+}
