@@ -150,9 +150,10 @@ export class Thread {
       .catch(error => console.error('Reaktion konnte nicht gespeichert werden:', error));
   }
 
-  /** Only the own last reply can be edited, exactly like in the main chat. */
+  /** The own opening message and the own last reply can be edited, like in the main chat. */
   isEditable(message: Message): boolean {
-    if (!message.parentId || !this.isOwnMessage(message)) return false;
+    if (!this.isOwnMessage(message)) return false;
+    if (!message.parentId) return true;
     const ownReplies = this.replies().filter(item => this.isOwnMessage(item));
     return ownReplies.at(-1)?.id === message.id;
   }
