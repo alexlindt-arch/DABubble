@@ -12,17 +12,19 @@ export class GuestCleanupService {
   private readonly userService = inject(UserService);
 
   /** Jeder angemeldete Client räumt abgelaufene Gast-Sitzungen auf, nicht nur der Gast selbst. */
-  async sweepExpiredGuests(): Promise<void> {
+  async sweepExpiredGuests(ownUid: string): Promise<void> {
     const users = await this.userService.loadUsers();
-    for (const guest of users.filter(isExpiredGuest)) await this.removeGuestData(guest.uid);
+    const guestUids = users.filter(isExpiredGuest).map(guest => guest.uid);
+    await this.tryClear(() => this.messageService.deleteDirectChatsWith(ownUid, guestUids));
+    for (const uid of guestUids) await this.removeGuestData(uid);
   }
 
   /** Das Profil geht zuletzt: Es weist den Rules nach, dass die Daten gelöscht werden dürfen. */
   async removeGuestData(uid: string): Promise<void> {
     const channels = await this.channelService.loadChannels();
     const channelsCleared = await this.clearChannels(channels, uid);
-    const chatsCleared = await this.tryClear(() => this.messageService.deleteDirectChatsOf(uid));
-    if (channelsCleared && chatsCleared) await this.userService.deleteUserProfile(uid);
+    await this.tryClear(() => this.messageService.deleteDirectChatsOf(uid));
+    if (channelsCleared) await this.userService.deleteUserProfile(uid);
   }
 
   private async clearChannels(channels: Channel[], uid: string): Promise<boolean> {

@@ -24,7 +24,7 @@ export class GuestSessionService {
   private syncSession(user: AppUser | null): void {
     this.stopTimer();
     if (!user) return void (this.swept = false);
-    this.sweepOnce();
+    this.sweepOnce(user.uid);
     if (!user.guestUntil) return;
     const remaining = user.guestUntil.toMillis() - Date.now();
     if (remaining <= 0) return void this.endSession();
@@ -32,10 +32,10 @@ export class GuestSessionService {
   }
 
   /** Einmal pro Anmeldung: Reste von Gästen, deren Browser zu früh zu war. */
-  private sweepOnce(): void {
+  private sweepOnce(ownUid: string): void {
     if (this.swept) return;
     this.swept = true;
-    this.cleanup.sweepExpiredGuests().catch(error => this.reportFailure(error));
+    this.cleanup.sweepExpiredGuests(ownUid).catch(error => this.reportFailure(error));
   }
 
   private async endSession(): Promise<void> {

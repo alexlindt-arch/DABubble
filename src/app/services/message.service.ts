@@ -164,6 +164,14 @@ export class MessageService {
     await Promise.all(messages.docs.map(item => deleteDoc(item.ref)));
   }
 
+  /** Räumt die eigenen Direktchats mit abgelaufenen Gästen; fremde Chats sind nicht lesbar. */
+  async deleteDirectChatsWith(ownUid: string, guestUids: string[]): Promise<void> {
+    if (!guestUids.length) return;
+    const chats = await getDocs(query(this.directChatsRef(), where('members', 'array-contains', ownUid)));
+    const withGuests = chats.docs.filter(chat => hasMemberIn(chat, guestUids));
+    await Promise.all(withGuests.map(chat => this.deleteDirectChat(chat.ref)));
+  }
+
   async deleteDirectChatsOf(uid: string): Promise<void> {
     const chats = await getDocs(query(this.directChatsRef(), where('members', 'array-contains', uid)));
     await Promise.all(chats.docs.map(chat => this.deleteDirectChat(chat.ref)));
@@ -227,4 +235,9 @@ function withoutReactionsOf(reactions: Record<string, string[]>, uid: string): R
   if (!entries.some(([, uids]) => uids.includes(uid))) return null;
   const cleaned = entries.map(([emoji, uids]) => [emoji, uids.filter(item => item !== uid)] as const);
   return Object.fromEntries(cleaned.filter(([, uids]) => uids.length > 0));
+}
+
+function hasMemberIn(chat: QueryDocumentSnapshot, uids: string[]): boolean {
+  const members = (chat.data() as DirectConversationProfile).members;
+  return members.some(member => uids.includes(member));
 }
