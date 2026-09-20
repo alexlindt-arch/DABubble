@@ -15,6 +15,7 @@ export class GuestSessionService {
   private readonly router = inject(Router);
   private timer: ReturnType<typeof setTimeout> | null = null;
   private ending = false;
+  private swept = false;
 
   constructor() {
     effect(() => this.syncSession(this.authService.currentUser()));
@@ -22,10 +23,19 @@ export class GuestSessionService {
 
   private syncSession(user: AppUser | null): void {
     this.stopTimer();
-    if (!user?.guestUntil) return;
+    if (!user) return void (this.swept = false);
+    this.sweepOnce();
+    if (!user.guestUntil) return;
     const remaining = user.guestUntil.toMillis() - Date.now();
     if (remaining <= 0) return void this.endSession();
     this.timer = setTimeout(() => void this.endSession(), remaining);
+  }
+
+  /** Einmal pro Anmeldung: Reste von Gästen, deren Browser zu früh zu war. */
+  private sweepOnce(): void {
+    if (this.swept) return;
+    this.swept = true;
+    this.cleanup.sweepExpiredGuests().catch(error => this.reportFailure(error));
   }
 
   private async endSession(): Promise<void> {

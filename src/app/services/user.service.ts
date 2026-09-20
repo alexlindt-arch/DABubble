@@ -6,6 +6,7 @@ import {
   DocumentReference,
   Firestore,
   getDoc,
+  getDocs,
   getFirestore,
   onSnapshot,
   setDoc,
@@ -23,6 +24,11 @@ export class UserService {
     const snapshot = await getDoc(this.userRef(uid));
     if (!snapshot.exists()) return null;
     return { uid, ...(snapshot.data() as UserProfile) };
+  }
+
+  async loadUsers(): Promise<AppUser[]> {
+    const snapshot = await getDocs(collection(this.firestore, 'users'));
+    return snapshot.docs.map(user => ({ uid: user.id, ...(user.data() as UserProfile) }));
   }
 
   async saveUser(uid: string, profile: UserProfile): Promise<AppUser> {

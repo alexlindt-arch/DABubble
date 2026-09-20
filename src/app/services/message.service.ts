@@ -173,7 +173,9 @@ export class MessageService {
     const message = this.toMessage(snapshot);
     if (message.senderId === uid) return this.deleteWithThreadCount(channelId, message);
     const reactions = withoutReactionsOf(message.reactions, uid);
-    return reactions ? updateDoc(snapshot.ref, { reactions }) : Promise.resolve();
+    if (!reactions) return Promise.resolve();
+    // Reaktionen in fremden Channels darf nicht jeder anfassen; das blockiert den Rest nicht.
+    return updateDoc(snapshot.ref, { reactions }).catch(() => undefined);
   }
 
   /** Die gelöschte Antwort zählt im Elternteil nicht mehr mit; ist er selbst weg, ist nichts zu tun. */
