@@ -24,16 +24,20 @@
 }
 
 
+// 1:1 wie die Channel-Kopfzeile im Chat (chat.scss .chat-header): gleiche Polsterung,
+// gleicher Abstand, gleiche Trennlinie. Die Desktop-Stufe folgt weiter unten.
 .thread-header {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
     flex: none;
-    gap: 5px;
-    padding: 32px 40px;
+    gap: 24px;
+    padding: 12px 20px 8px;
+    box-sizing: border-box;
     background: white;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    border-bottom: 1px solid #eceefe;
     z-index: 2;
 }
 
@@ -45,8 +49,9 @@
 
     h2 {
         margin: 0;
+        // Wie .channel-title im Chat: 24px bei line-height 1.2.
         font-size: 24px;
-        line-height: 33px;
+        line-height: 1.2;
         font-weight: 700;
         color: black;
     }

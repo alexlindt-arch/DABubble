@@ -1,19 +1,20 @@
 // Figma "08-Secondary Chat mobile": the compact thread used on phones and whenever the
 // desktop thread gets squeezed below the phone frame width.
 @mixin compact-thread {
-    // Figma "Header": 60px, 10px/16px padding, 20px title, tag and channel name 5px apart.
+    // Wie .chat-header im Chat unter 768px: gleiche Polsterung und gleicher Abstand.
     .thread-header {
         box-sizing: border-box;
-        height: 60px;
-        padding: 10px 16px;
+        height: auto;
+        padding: 10px 14px 8px;
+        gap: 10px;
     }
 
     .thread-title {
         gap: 5px;
 
         h2 {
-            font-size: 20px;
-            line-height: 27px;
+            font-size: 24px;
+            line-height: 1.2;
         }
     }
 
@@ -199,5 +200,22 @@
 
     .thread-content {
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+    }
+}
+
+
+// Ab 1024px uebernimmt der Kopf die Masse der Channel-Kopfzeile (chat.scss, @media min-width 1024px):
+// 110px hoch, 20px/45px Polsterung, 15px Abstand, Schatten - und die Karte den 30px-Radius.
+@media (min-width: 1024px) {
+    .thread-header {
+        align-items: center;
+        gap: 15px;
+        min-height: 110px;
+        padding: 20px 45px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .thread-content {
+        border-radius: 30px;
     }
 }
