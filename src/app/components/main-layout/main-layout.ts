@@ -37,7 +37,7 @@ type SearchResult =
   selector: 'app-main-layout',
   imports: [Sidebar, Chat, Thread, CreateChannelDialog, AddPeopleDialog, MembersDialog, NewMessage, ProfileDialog, ChannelInfoDialog],
   templateUrl: './main-layout.html',
-  styleUrls: ['./main-layout.scss', './main-layout-mobile.scss'],
+  styleUrls: ['./main-layout.scss', './main-layout-mobile.scss', './main-layout-overlays.scss'],
 })
 export class MainLayout {
   private readonly authService = inject(AuthService);
@@ -233,7 +233,6 @@ export class MainLayout {
   }
 
   openCreateChannelDialog(): void {
-    // Never leave a previous member dialog mounted underneath the create form.
     this.closeAddPeopleDialog();
     this.createChannelDialogOpen = true;
   }
@@ -250,9 +249,6 @@ export class MainLayout {
       existing.name.trim().toLocaleLowerCase('de') === normalizedName,
     );
     if (alreadyExists) return;
-    // Close immediately after local validation. Firebase may update the
-    // channel list before the async create call resolves, which would make
-    // the just-created name look like a duplicate in the still-open form.
     this.closeCreateChannelDialog();
     this.persistChannel(channel.name, channel.description, uid);
   }
@@ -370,8 +366,6 @@ export class MainLayout {
 
     try {
       await this.channelService.addMembers(channel.id, uids);
-      // Update the local selection immediately. The realtime channel snapshot
-      // may arrive a moment later, especially directly after channel creation.
       const members = Array.from(new Set([...channel.members, ...uids]));
       this.memberDialogChannel.set({ ...channel, members });
       if (this.selectedChannel()?.id === channel.id) {

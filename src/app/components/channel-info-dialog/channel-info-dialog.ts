@@ -23,6 +23,7 @@ export class ChannelInfoDialog {
   descriptionDraft = signal('');
   private lastSaveVersion = 0;
 
+  /** Closes active editors after the parent confirms a successful save. */
   constructor() {
     effect(() => {
       const version = this.saveVersion();
@@ -33,35 +34,59 @@ export class ChannelInfoDialog {
     });
   }
 
+  /** Calculates the dialog's vertical position below its trigger. */
   get offsetTop(): string { return `${Math.round((this.anchor()?.bottom ?? 150) + 8)}px`; }
+
+  /** Calculates the dialog's horizontal position from its trigger. */
   get offsetLeft(): string { return `${Math.round(this.anchor()?.left ?? 24)}px`; }
+
+  /** Indicates whether the edited name is already used by another channel. */
   get duplicateName(): boolean {
     const draft = this.normalizeName(this.nameDraft());
     const current = this.normalizeName(this.channel().name);
     if (!draft || draft === current) return false;
     return this.existingChannels().some(name => this.normalizeName(name) === draft);
   }
+
+  /** Opens the channel name editor with the current name as its draft. */
   editName(): void { this.nameDraft.set(this.channel().name); this.editingName.set(true); }
+
+  /** Opens the description editor with the current description as its draft. */
   editDescription(): void { this.descriptionDraft.set(this.channel().description); this.editingDescription.set(true); }
+
+  /** Requests saving the edited channel name. */
   saveName(): void { this.save(this.nameDraft().trim(), this.channel().description); }
+
+  /** Requests saving the edited channel description. */
   saveDescription(): void { this.save(this.channel().name, this.descriptionDraft().trim()); }
+
+  /** Saves the channel name when Enter is pressed. */
   handleNameKeydown(event: KeyboardEvent): void {
     if (event.key !== 'Enter') return;
     event.preventDefault();
     this.saveName();
   }
+
+  /** Saves the description on Enter while preserving Shift+Enter for line breaks. */
   handleDescriptionKeydown(event: KeyboardEvent): void {
     if (event.key !== 'Enter' || event.shiftKey) return;
     event.preventDefault();
     this.saveDescription();
   }
+
+  /** Opens the channel creator's profile dialog. */
   openCreatorProfile(): void { this.creatorProfileOpen.set(true); }
+
+  /** Closes the channel creator's profile dialog. */
   closeCreatorProfile(): void { this.creatorProfileOpen.set(false); }
+
+  /** Emits valid channel changes unless a save is already in progress. */
   private save(name: string, description: string): void {
     if (!name || this.duplicateName || this.saving()) return;
     this.saved.emit({ name, description });
   }
 
+  /** Normalizes a channel name for case-insensitive duplicate comparisons. */
   private normalizeName(name: string): string {
     return name.trim().toLocaleLowerCase('de');
   }

@@ -1,7 +1,7 @@
 import { Component, HostListener, output } from '@angular/core';
 import { GUEST_SESSION_MINUTES } from '../../shared/guest-session';
 
-/** Klärt vor der Gast-Anmeldung, was der Gast darf und wie lange seine Daten bleiben. */
+/** Explains guest access permissions and the duration of guest data storage. */
 @Component({
   selector: 'app-guest-login-dialog',
   imports: [],
@@ -13,10 +13,12 @@ export class GuestLoginDialog {
   closed = output<void>();
   confirmed = output<void>();
 
+  /** Closes the dialog when the backdrop itself is clicked. */
   closeOnBackdrop(event: MouseEvent): void {
     if (event.target === event.currentTarget) this.closed.emit();
   }
 
+  /** Closes the dialog when the Escape key is pressed. */
   @HostListener('document:keydown.escape')
   closeWithEscape(): void {
     this.closed.emit();

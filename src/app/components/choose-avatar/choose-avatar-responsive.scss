@@ -1,0 +1,179 @@
+@media (max-width: 767px), (max-height: 809px) {
+  .avatar-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 64px;
+    padding: 87px 16px 24px;
+  }
+
+  .avatar-page__header {
+    position: static;
+    justify-content: center;
+    height: auto;
+  }
+
+  .avatar-page__logo {
+    height: 56px;
+  }
+
+  .avatar-card {
+    position: relative;
+    left: auto;
+    top: auto;
+    align-self: center;
+    width: 100%;
+    max-width: 398px;
+    height: auto;
+    padding: 26px 21px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .avatar-card__top {
+    position: relative;
+    left: auto;
+    right: auto;
+    top: auto;
+    height: auto;
+    display: block;
+  }
+
+  .back-button {
+    position: absolute;
+    left: 1px;
+    top: 0;
+  }
+
+  .avatar-card__title {
+    padding: 0 44px;
+    font-size: 32px;
+    line-height: 120%;
+    text-align: center;
+    white-space: normal;
+  }
+
+  .avatar-picker {
+    position: static;
+    width: auto;
+    height: auto;
+    gap: 24px;
+  }
+
+  .avatar-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 100px;
+  }
+
+  .avatar-details,
+  .avatar-details__text {
+    height: auto;
+  }
+
+  .avatar-details {
+    gap: 16px;
+  }
+
+  .avatar-details__text {
+    gap: 8px;
+  }
+
+  .avatar-card__name {
+    height: auto;
+    font-size: 32px;
+    line-height: 44px;
+  }
+
+  .avatar-card__hint {
+    height: auto;
+    font-size: 20px;
+    line-height: 27px;
+    text-align: left;
+  }
+
+  .avatar-list {
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-self: stretch;
+    width: auto;
+    height: auto;
+    gap: 4px;
+  }
+
+  .avatar-list__item {
+    flex: 1 1 0;
+    width: auto;
+    height: auto;
+    min-width: 0;
+    max-width: 56px;
+    aspect-ratio: 1;
+    padding: 2px;
+    border-width: 2px;
+    border-radius: 50%;
+
+    img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
+  }
+
+  .avatar-card__actions {
+    position: static;
+    justify-content: flex-end;
+    width: auto;
+    margin-top: 0;
+  }
+
+  .btn {
+    width: 107px;
+    height: 49px;
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-size: 18px;
+    line-height: 25px;
+  }
+
+  .avatar-page__footer {
+    position: static;
+    margin-top: auto;
+    gap: 16px;
+  }
+
+  .avatar-page__footer-link {
+    padding: 10px 15px;
+    font-size: 18px;
+    line-height: 120%;
+  }
+}
+
+@media (max-width: 400px) {
+  .avatar-page {
+    gap: 40px;
+    padding: 48px 16px 20px;
+  }
+
+  .avatar-card {
+    padding: 20px 16px;
+  }
+
+  .avatar-card__title {
+    padding: 0 40px;
+    font-size: 26px;
+  }
+
+  .back-button {
+    left: 0;
+  }
+
+  .avatar-card__name {
+    font-size: 26px;
+    line-height: 36px;
+  }
+
+  .avatar-card__hint {
+    font-size: 18px;
+  }
+}

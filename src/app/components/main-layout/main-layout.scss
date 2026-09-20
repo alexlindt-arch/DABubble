@@ -1,7 +1,6 @@
 main {
     display: flex;
     flex-direction: column;
-
     width: 100%;
     height: 100dvh;
     padding: 0 clamp(0px, 1.2vw, 16px);
@@ -13,14 +12,10 @@ main {
 
 main>header {
     display: grid;
-    // The brand column is as wide as the menu (366px menu + 16px chat margin - 16px padding - 16px gap),
-    // so the search bar starts exactly where the chat card starts and never reaches over the menu.
     grid-template-columns: 350px minmax(0, 1fr) auto;
     align-items: center;
     flex-shrink: 0;
     gap: 16px;
-    // Figma "14. Home-Workspaces", "Search bar" and "65. Profile menu" at most; below the 1920px
-    // Figma frame every size scales down with the window, so the bar grows only when there is room.
     height: clamp(64px, 6.25vw, 120px);
     padding: 0 16px;
     box-sizing: border-box;
@@ -48,7 +43,6 @@ main>header {
         justify-self: start;
         display: flex;
         align-items: center;
-        // Leaves Figma's 149px of air before the profile at 1920px, scaling down to 16px.
         width: calc(100% - clamp(16px, 7.76vw, 149px));
         max-width: 989px;
         min-width: 0;
@@ -292,8 +286,6 @@ main>header {
         transition: flex-basis 0.3s ease;
     }
 
-    // Figma 06: 989px chat next to a 485px thread. Both share the space in that ratio and the
-    // thread stops at 485px, so the chat always stays about twice as wide as the thread.
     >app-chat,
     >app-new-message {
         flex: 989 1 0;
@@ -317,7 +309,6 @@ main>header {
     z-index: 1000;
     background: transparent;
 }
-
 @media (prefers-reduced-motion: reduce) {
     .content>app-sidebar {
         transition: none;
@@ -353,270 +344,5 @@ main>header {
 
     .menu-icon {
         display: none;
-    }
-}
-
-// The own profile card hangs right under the avatar in the top bar on every screen size.
-.profile-dialog-backdrop {
-    position: fixed;
-    inset: 0;
-    z-index: 1100;
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-end;
-    padding: calc(clamp(64px, 6.25vw, 120px) + 8px) calc(clamp(0px, 1.2vw, 16px) + 16px) 16px;
-    box-sizing: border-box;
-    background: rgba(0, 0, 0, 0.6);
-}
-
-.profile-dialog {
-    display: flex;
-    flex-direction: column;
-    width: min(420px, 100%);
-    max-height: 100%;
-    padding: 32px;
-    box-sizing: border-box;
-    overflow-y: auto;
-    border-radius: 30px 0 30px 30px;
-    background: white;
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
-}
-
-.profile-dialog-header,
-.profile-name-row,
-.profile-email {
-    display: flex;
-    align-items: center;
-}
-
-.profile-dialog-header {
-    justify-content: space-between;
-
-    h2 {
-        margin: 0;
-        font-size: 24px;
-    }
-}
-
-.profile-dialog-avatar {
-    align-self: center;
-    width: 160px;
-    height: 160px;
-    margin: 28px 0 24px;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.profile-name-row {
-    justify-content: space-between;
-    gap: 20px;
-
-    h3 {
-        min-width: 0;
-        margin: 0;
-        overflow-wrap: anywhere;
-        font-size: 28px;
-    }
-}
-
-.edit-profile-button,
-.close-profile-button {
-    border: none;
-    background: transparent;
-    font-family: inherit;
-}
-
-.edit-profile-button {
-    padding: 8px;
-    color: #535af1;
-    font-size: 18px;
-    transition: all ease 0.2s;
-
-    &:hover,
-    &:focus-visible {
-        color: #444df2;
-        font-weight: 700;
-        cursor: pointer;
-        outline: none;
-    }
-
-    &:disabled {
-        cursor: not-allowed;
-        opacity: 1;
-    }
-}
-
-.close-profile-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    padding: 8px;
-    border-radius: 50%;
-    color: black;
-    cursor: pointer;
-    transition: color 0.3s ease, background-color 0.3s ease;
-
-    &:hover,
-    &:focus-visible {
-        color: #535af1;
-        background: #eceefe;
-    }
-}
-
-.dialog-icon {
-    display: block;
-    flex: 0 0 24px;
-    width: 24px;
-    height: 24px;
-    background: currentColor;
-    mask: var(--icon) center / contain no-repeat;
-}
-
-.close-icon {
-    --icon: url('../../../../public/assets/img/icons/close.svg');
-}
-
-.mail-icon {
-    --icon: url('../../../../public/assets/img/icons/mail.svg');
-}
-
-.profile-status {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin: 12px 0 28px;
-    color: #92c83e;
-    font-size: 18px;
-
-    span {
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        background: currentColor;
-    }
-
-    &.offline {
-        color: #686868;
-    }
-}
-
-.profile-email {
-    align-items: flex-start;
-    gap: 16px;
-
-    h4 {
-        margin: 0 0 8px;
-        font-size: 18px;
-    }
-
-    a {
-        color: #1381ff;
-        font-size: 16px;
-        text-decoration: none;
-        overflow-wrap: anywhere;
-    }
-
-    a:hover,
-    a:focus-visible {
-        text-decoration: underline;
-    }
-
-    p {
-        margin: 0;
-        color: #686868;
-    }
-}
-
-@media (max-width: 1023px) {
-    .profile-dialog-backdrop {
-        padding: 72px 24px 16px;
-    }
-}
-
-// Phones: the card sits under the 80px top bar with a small side margin.
-@media (max-width: 767px) {
-    .profile-dialog-backdrop {
-        padding: 88px 8px 8px;
-    }
-
-    .profile-dialog {
-        padding: 24px 20px;
-    }
-
-    .profile-dialog-header h2 {
-        font-size: 20px;
-    }
-
-    .profile-dialog-avatar {
-        width: 120px;
-        height: 120px;
-        margin: 16px 0;
-    }
-
-    .profile-name-row h3 {
-        font-size: 22px;
-    }
-
-    .edit-profile-button {
-        font-size: 16px;
-    }
-
-    .profile-status {
-        margin: 8px 0 20px;
-        font-size: 16px;
-    }
-
-    .profile-email h4 {
-        font-size: 16px;
-    }
-
-    .profile-email a {
-        font-size: 15px;
-    }
-}
-
-@media (max-height: 560px) {
-    .profile-dialog-avatar {
-        width: 96px;
-        height: 96px;
-        margin: 12px 0;
-    }
-}
-
-// Preserve the original generous profile menu on desktop. The compact menu stays in use on
-// tablet and phone layouts.
-@media (min-width: 1024px) {
-    .profile-menu {
-        top: 110px;
-        right: 30px;
-        align-items: center;
-        justify-content: center;
-        gap: 15px;
-        width: 222px;
-        padding: 30px;
-        border-radius: 30px 0 30px 30px;
-        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
-
-        button {
-            width: 222px;
-            height: 53px;
-            padding: 0;
-            border-radius: 100px;
-            background: transparent;
-            color: #000;
-            font-size: 24px;
-            font-weight: 600;
-            text-align: center;
-            transition: background-color 0.3s ease, color 0.3s ease;
-
-            &:hover,
-            &:focus-visible {
-                background: #eceefe;
-                color: #535af1;
-                outline: none;
-            }
-        }
     }
 }

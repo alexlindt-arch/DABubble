@@ -1,6 +1,4 @@
-// Figma "77. Hide/show navigation bar" at the 1920 x 1080 frame. Between 1200px and 1920px window
-// width every size scales together from the compact toggle (40px wide, 12px text) up to the Figma size.
-// Its bottom edge sits 152px above the frame bottom (14.07vh), so it grows upwards and never leaves the window.
+
 .sidebar-toggle {
   position: fixed;
   bottom: 14.07vh;
@@ -108,7 +106,6 @@ main > header .mobile-brand,
   display: none;
 }
 
-// Figma "Component 2": 25px arrow, 2px gap, 50px workspace logo, 10px gap, "Devspace".
 .mobile-brand {
   align-items: center;
   gap: 2px;
@@ -146,7 +143,6 @@ main > header .mobile-brand,
   width: 25px;
   height: 25px;
   background: currentColor;
-  // The Figma export of keyboard_arrow_down is already turned to point left, so it needs no rotation.
   mask: url('../../../../public/assets/img/icons/keyboard_arrow_down.svg') center / contain no-repeat;
 }
 
@@ -172,16 +168,13 @@ main > header .mobile-brand,
 
 @media (max-width: 1023px) {
   main { padding: 0 12px; }
-  // Brand column = 260px menu + 16px chat margin - 12px padding - 10px gap, so the search starts at the chat card.
   main > header { grid-template-columns: 254px minmax(0, 1fr) auto; padding: 0 12px; gap: 10px; }
   .content > app-sidebar { flex-basis: 260px; }
 }
 
-// Below 768px the workspace shows either the menu or the chat, like the reference app.
 @media (max-width: 767px) {
   main { position: relative; padding: 0; }
 
-  // Figma "Component 2": 80px bar on the light purple ground with 50px logo and avatar.
   main > header {
     grid-template-columns: minmax(0, 1fr) auto;
     height: 80px;
@@ -198,8 +191,6 @@ main > header .mobile-brand,
 
     .profile-picture-div,
     .profile-picture { width: 50px; height: 50px; }
-
-    // Figma mobile "Search bar": 48px high, 8px/24px padding, 1px #ADB0D9 border, 17px text, 32px icon.
     .input-wrapper {
       position: absolute;
       z-index: 5;
@@ -244,8 +235,6 @@ main > header .mobile-brand,
 
   main.sidebar-closed .content > app-sidebar { display: none; }
 
-  // The desktop cap of 485px must not apply here, otherwise the thread sticks to the left edge
-  // instead of covering the chat.
   .content > app-thread {
     position: fixed;
     inset: 80px 0 0;
@@ -254,11 +243,8 @@ main > header .mobile-brand,
   }
 
   main:not(.sidebar-closed) .fab-compose { display: flex; }
-  // Hidden without display: none, so its label keeps a measurable height and the toggle is sized
-  // correctly when the window grows past the phone breakpoint after loading narrow.
   .sidebar-toggle { visibility: hidden; pointer-events: none; }
 
-  // Figma 64b (handle on top, rounded top corners), laid over the top bar so it covers logo and avatar.
   .profile-menu {
     top: 0;
     right: 0;
