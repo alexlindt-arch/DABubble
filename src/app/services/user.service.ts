@@ -3,6 +3,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  DocumentData,
   DocumentReference,
   Firestore,
   getDoc,
@@ -23,12 +24,12 @@ export class UserService {
   async loadUser(uid: string): Promise<AppUser | null> {
     const snapshot = await getDoc(this.userRef(uid));
     if (!snapshot.exists()) return null;
-    return { uid, ...(snapshot.data() as UserProfile) };
+    return this.toAppUser(uid, snapshot.data());
   }
 
   async loadUsers(): Promise<AppUser[]> {
     const snapshot = await getDocs(collection(this.firestore, 'users'));
-    return snapshot.docs.map(user => ({ uid: user.id, ...(user.data() as UserProfile) }));
+    return snapshot.docs.map(user => this.toAppUser(user.id, user.data()));
   }
 
   async saveUser(uid: string, profile: UserProfile): Promise<AppUser> {
@@ -53,18 +54,33 @@ export class UserService {
   watchUser(uid: string, onChange: (user: AppUser | null) => void): Unsubscribe {
     return onSnapshot(this.userRef(uid), (snapshot) => {
       if (!snapshot.exists()) return onChange(null);
-      onChange({ uid, ...(snapshot.data() as UserProfile) });
+      onChange(this.toAppUser(uid, snapshot.data()));
     });
   }
 
   watchUsers(onChange: (users: AppUser[]) => void): Unsubscribe {
     return onSnapshot(collection(this.firestore, 'users'), (snapshot) => {
-      const users = snapshot.docs.map(user => ({ uid: user.id, ...(user.data() as UserProfile) }));
+      const users = snapshot.docs.map(user => this.toAppUser(user.id, user.data()));
       onChange(users);
     });
   }
 
   private userRef(uid: string): DocumentReference {
     return doc(this.firestore, 'users', uid);
+  }
+
+
+  /** Ergänzt fehlende Felder unvollständiger Dokumente, damit die UI nie auf undefined trifft. */
+  private toAppUser(uid: string, data: DocumentData | undefined): AppUser {
+    const profile = (data ?? {}) as Partial<UserProfile>;
+    const user: AppUser = {
+      uid,
+      name: profile.name ?? '',
+      email: profile.email ?? '',
+      avatar: profile.avatar ?? '',
+      status: profile.status ?? 'offline',
+    };
+    if (profile.guestUntil) user.guestUntil = profile.guestUntil;
+    return user;
   }
 }
