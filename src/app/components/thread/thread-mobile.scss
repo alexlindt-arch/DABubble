@@ -185,8 +185,10 @@
         left: calc(12px + 260px + 16px);
         z-index: 20;
         width: auto;
-        max-width: none;
-        // Das Layout setzt .content > app-thread { margin: 16px 0 } und ist spezifischer als :host.
+        // Das Layout setzt .content > app-thread { max-width: 485px; margin: 16px 0 } und ist
+        // spezifischer als :host. Ohne diese Ausnahmen bliebe rechts ein Streifen Chat sichtbar
+        // und der Thread saesse 16px zu tief.
+        max-width: none !important;
         margin: 0 !important;
     }
 
