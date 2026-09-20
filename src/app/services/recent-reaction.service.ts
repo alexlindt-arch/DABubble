@@ -4,9 +4,11 @@ const DEFAULT_REACTIONS = ['✅', '👍'];
 const STORAGE_KEY = 'dabubble-recent-reactions';
 
 @Injectable({ providedIn: 'root' })
+/** Provides recentreaction data and operations. */
 export class RecentReactionService {
   readonly reactions = signal<string[]>(this.load());
 
+  /** Handles record. */
   record(emoji: string): void {
     const next = [emoji, ...this.reactions().filter(item => item !== emoji)].slice(0, 2);
     for (const fallback of DEFAULT_REACTIONS) {
@@ -21,6 +23,7 @@ export class RecentReactionService {
     }
   }
 
+  /** Handles load. */
   private load(): string[] {
     try {
       const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]');

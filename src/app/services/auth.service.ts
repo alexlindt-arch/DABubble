@@ -25,18 +25,20 @@ import { UserService } from './user.service';
 const DEFAULT_AVATAR = 'Property 1=Frederik Beck.png';
 
 @Injectable({ providedIn: 'root' })
+/** Provides auth data and operations. */
 export class AuthService {
   private readonly auth: Auth = getAuth(firebaseApp);
   private readonly userService = inject(UserService);
   private readonly profile = signal<AppUser | null>(null);
   private profileWatcher: Unsubscribe | null = null;
-  /** Während einer laufenden Anmeldung darf kein alter Stand aus Firestore dazwischenfunken. */
+  /** Prevents stale Firestore data from overriding an ongoing login. */
   private activating = false;
   private markReady: () => void = () => {};
   private readonly ready = new Promise<void>((resolve) => (this.markReady = resolve));
 
   readonly currentUser = this.profile.asReadonly();
 
+  /** Handles constructor. */
   constructor() {
     onAuthStateChanged(this.auth, (user) => void this.syncProfile(user));
   }
@@ -53,20 +55,24 @@ export class AuthService {
     return this.auth.currentUser?.isAnonymous ?? false;
   }
 
+  /** Handles whenReady. */
   whenReady(): Promise<void> {
     return this.ready;
   }
 
+  /** Handles login. */
   async login(email: string, password: string): Promise<AppUser | null> {
     const credential = await signInWithEmailAndPassword(this.auth, email, password);
     return this.activateProfile(credential.user, nameFromEmail(email));
   }
 
+  /** Handles loginWithGoogle. */
   async loginWithGoogle(): Promise<AppUser | null> {
     const credential = await signInWithPopup(this.auth, new GoogleAuthProvider());
     return this.activateProfile(credential.user, 'Google-Nutzer');
   }
 
+  /** Handles loginAsGuest. */
   async loginAsGuest(): Promise<AppUser | null> {
     this.activating = true;
     try {
@@ -77,7 +83,8 @@ export class AuthService {
     }
   }
 
-  /** Jede Gast-Anmeldung startet mit einem frischen 15-Minuten-Fenster. */
+  /** Starts every guest login with a fresh 15-minute window. */
+  /** Handles activateGuest. */
   private async activateGuest(uid: string): Promise<AppUser | null> {
     try {
       const guest = await this.userService.saveUser(uid, buildGuestProfile());
@@ -94,22 +101,27 @@ export class AuthService {
    * Firebase-Konsole - eine Continue-URL im Code müsste zusätzlich freigegeben sein.
    * Firebase meldet keinen Fehler bei unbekannter Adresse.
    */
+  /** Handles sendResetMail. */
   sendResetMail(email: string): Promise<void> {
     return sendPasswordResetEmail(this.auth, email);
   }
 
+  /** Handles verifyResetCode. */
   verifyResetCode(oobCode: string): Promise<string> {
     return verifyPasswordResetCode(this.auth, oobCode);
   }
 
+  /** Handles confirmReset. */
   confirmReset(oobCode: string, newPassword: string): Promise<void> {
     return confirmPasswordReset(this.auth, oobCode, newPassword);
   }
 
+  /** Handles register. */
   register(email: string, password: string): Promise<UserCredential> {
     return createUserWithEmailAndPassword(this.auth, email, password);
   }
 
+  /** Handles saveUserProfile. */
   async saveUserProfile(name: string, email: string, avatar: string): Promise<void> {
     const uid = this.currentUserId;
     if (!uid) return Promise.reject(new Error('Kein angemeldeter Benutzer.'));
@@ -117,6 +129,7 @@ export class AuthService {
     this.setProfile(saved);
   }
 
+  /** Handles logout. */
   async logout(): Promise<void> {
     const uid = this.currentUserId;
     if (uid) await this.userService.updateStatus(uid, 'offline').catch(() => undefined);
@@ -124,12 +137,14 @@ export class AuthService {
     return signOut(this.auth);
   }
 
+  /** Handles deleteCurrentAccount. */
   async deleteCurrentAccount(): Promise<void> {
     await deleteUser(this.deletionUser());
     this.setProfile(null);
   }
 
-  /** Profil laden ist optional: Die Anmeldung gilt auch, wenn Firestore nicht antwortet. */
+  /** Keeps authentication valid even when loading the profile from Firestore fails. */
+  /** Handles activateProfile. */
   private async activateProfile(user: User, fallbackName: string): Promise<AppUser | null> {
     try {
       return await this.loadOrCreateProfile(user, fallbackName);
@@ -139,12 +154,14 @@ export class AuthService {
     }
   }
 
+  /** Handles deletionUser. */
   private deletionUser(): User {
     const user = this.auth.currentUser;
     if (!user) throw new Error('Kein angemeldeter Benutzer.');
     return user;
   }
 
+  /** Handles loadOrCreateProfile. */
   private async loadOrCreateProfile(user: User, fallbackName: string): Promise<AppUser> {
     const profile = await this.userService.ensureUser(user.uid, buildProfile(user, fallbackName));
     if (profile.status !== 'online') await this.userService.updateStatus(user.uid, 'online');
@@ -153,6 +170,7 @@ export class AuthService {
     return active;
   }
 
+  /** Handles syncProfile. */
   private async syncProfile(user: User | null): Promise<void> {
     if (this.activating) return this.markReady();
     if (!user) {
@@ -163,6 +181,7 @@ export class AuthService {
     this.markReady();
   }
 
+  /** Handles loadProfileSafely. */
   private async loadProfileSafely(uid: string): Promise<AppUser | null> {
     try {
       return await this.userService.loadUser(uid);
@@ -172,6 +191,7 @@ export class AuthService {
     }
   }
 
+  /** Handles setProfile. */
   private setProfile(user: AppUser | null): void {
     this.stopWatching();
     this.profile.set(user);
@@ -179,6 +199,7 @@ export class AuthService {
     this.profileWatcher = this.userService.watchUser(user.uid, (u) => this.profile.set(u));
   }
 
+  /** Handles stopWatching. */
   private stopWatching(): void {
     this.profileWatcher?.();
     this.profileWatcher = null;

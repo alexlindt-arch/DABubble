@@ -24,9 +24,11 @@ import { firebaseApp } from '../firebase';
 import { Channel, ChannelProfile } from '../models';
 
 @Injectable({ providedIn: 'root' })
+/** Provides channel data and operations. */
 export class ChannelService {
   private readonly firestore: Firestore = getFirestore(firebaseApp);
 
+  /** Handles createChannel. */
   async createChannel(name: string, description: string, creatorUid: string): Promise<Channel> {
     const profile: ChannelProfile = {
       name,
@@ -39,6 +41,7 @@ export class ChannelService {
     return { id: reference.id, ...profile };
   }
 
+  /** Handles watchChannels. */
   watchChannels(onChange: (channels: Channel[]) => void): Unsubscribe {
     return onSnapshot(
       this.channelsRef(),
@@ -47,31 +50,38 @@ export class ChannelService {
     );
   }
 
+  /** Handles toChannel. */
   private toChannel(document: QueryDocumentSnapshot): Channel {
     return { id: document.id, ...(document.data() as ChannelProfile) };
   }
 
+  /** Handles addMembers. */
   addMembers(channelId: string, uids: string[]): Promise<void> {
     return updateDoc(this.channelRef(channelId), { members: arrayUnion(...uids) });
   }
 
+  /** Handles updateChannel. */
   updateChannel(channelId: string, name: string, description: string): Promise<void> {
     return updateDoc(this.channelRef(channelId), { name, description });
   }
 
+  /** Handles leaveChannel. */
   leaveChannel(channelId: string, uid: string): Promise<void> {
     return this.removeMemberAndDeleteIfEmpty(channelId, uid);
   }
 
+  /** Handles loadChannels. */
   async loadChannels(): Promise<Channel[]> {
     const channels = await getDocs(this.channelsRef());
     return channels.docs.map(channel => this.toChannel(channel));
   }
 
+  /** Handles deleteChannel. */
   deleteChannel(channelId: string): Promise<void> {
     return deleteDoc(this.channelRef(channelId));
   }
 
+  /** Handles removeUserFromChannels. */
   async removeUserFromChannels(uid: string): Promise<void> {
     const channels = await getDocs(query(this.channelsRef(), where('members', 'array-contains', uid)));
     // Account deletion must not remove channels or their messages. Keep the
@@ -79,6 +89,7 @@ export class ChannelService {
     await Promise.all(channels.docs.map(channel => updateDoc(channel.ref, { members: arrayRemove(uid) })));
   }
 
+  /** Handles removeMemberAndDeleteIfEmpty. */
   private async removeMemberAndDeleteIfEmpty(channelId: string, uid: string): Promise<void> {
     const reference = this.channelRef(channelId);
     const snapshot = await getDoc(reference);
@@ -94,10 +105,12 @@ export class ChannelService {
     await updateDoc(reference, { members: arrayRemove(uid) });
   }
 
+  /** Handles channelsRef. */
   private channelsRef(): CollectionReference {
     return collection(this.firestore, 'channels');
   }
 
+  /** Handles channelRef. */
   private channelRef(channelId: string): DocumentReference {
     return doc(this.firestore, 'channels', channelId);
   }

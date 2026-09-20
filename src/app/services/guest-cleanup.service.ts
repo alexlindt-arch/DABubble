@@ -4,14 +4,16 @@ import { ChannelService } from './channel.service';
 import { MessageService } from './message.service';
 import { UserService } from './user.service';
 
-/** Räumt weg, was Gäste hinterlassen haben - beim eigenen Ablauf und bei fremden Altlasten. */
+/** Cleans up guest data when the own session expires and removes stale remnants. */
 @Injectable({ providedIn: 'root' })
+/** Provides guestcleanup data and operations. */
 export class GuestCleanupService {
   private readonly channelService = inject(ChannelService);
   private readonly messageService = inject(MessageService);
   private readonly userService = inject(UserService);
 
-  /** Jeder angemeldete Client räumt abgelaufene Gast-Sitzungen auf, nicht nur der Gast selbst. */
+  /** Allows every signed-in client to clean up expired guest sessions, not only the guest. */
+  /** Handles sweepExpiredGuests. */
   async sweepExpiredGuests(ownUid: string): Promise<void> {
     const users = await this.userService.loadUsers();
     const guestUids = users.filter(isExpiredGuest).map(guest => guest.uid);
@@ -19,24 +21,28 @@ export class GuestCleanupService {
     for (const uid of guestUids) await this.removeGuestData(uid);
   }
 
-  /** Die eigene Sitzung schliesst die Direktchats ein; fremde darf niemand abfragen. */
+  /** Includes direct chats for the own session; other users’ chats cannot be queried. */
+  /** Handles removeOwnGuestData. */
   async removeOwnGuestData(uid: string): Promise<void> {
     await this.tryClear(() => this.messageService.deleteDirectChatsOf(uid));
     await this.removeGuestData(uid);
   }
 
-  /** Das Profil geht zuletzt: Es weist den Rules nach, dass die Daten gelöscht werden dürfen. */
+  /** Deletes the profile last so Firestore rules can authorize the cleanup. */
+  /** Handles removeGuestData. */
   async removeGuestData(uid: string): Promise<void> {
     const channels = await this.channelService.loadChannels();
     const channelsCleared = await this.clearChannels(channels, uid);
     if (channelsCleared) await this.removeProfile(uid);
   }
 
-  /** War ein anderer Client schneller, ist das Profil schon weg - kein Grund zur Sorge. */
+  /** Treats an already-removed profile as a harmless race with another client. */
+  /** Handles removeProfile. */
   private removeProfile(uid: string): Promise<void> {
     return this.userService.deleteUserProfile(uid).catch(() => undefined);
   }
 
+  /** Handles clearChannels. */
   private async clearChannels(channels: Channel[], uid: string): Promise<boolean> {
     let cleared = true;
     for (const channel of channels) {
@@ -45,19 +51,22 @@ export class GuestCleanupService {
     return cleared;
   }
 
-  /** Eigene Channels verschwinden ganz, in fremden bleiben nur die Beiträge der anderen. */
+  /** Removes owned channels completely and keeps only other users’ posts in shared channels. */
+  /** Handles clearChannel. */
   private async clearChannel(channel: Channel, uid: string): Promise<void> {
     if (channel.createdBy === uid) return this.deleteChannel(channel.id);
     await this.messageService.purgeAuthor(channel.id, uid);
     if (channel.members.includes(uid)) await this.leaveQuietly(channel.id, uid);
   }
 
+  /** Handles deleteChannel. */
   private async deleteChannel(channelId: string): Promise<void> {
     await this.messageService.deleteAllMessages(channelId);
     await this.channelService.deleteChannel(channelId);
   }
 
-  /** Nur Mitglieder dürfen die Mitgliederliste ändern; sonst bleibt die tote UID stehen. */
+  /** Updates channel membership only when authorized, preventing stale user IDs. */
+  /** Handles leaveQuietly. */
   private leaveQuietly(channelId: string, uid: string): Promise<void> {
     return this.channelService.leaveChannel(channelId, uid).catch(() => undefined);
   }
@@ -66,6 +75,7 @@ export class GuestCleanupService {
    * Ein blockierter Schritt darf die übrigen nicht stoppen. Fehlende Rechte sind hier normal,
    * etwa wenn ein anderer Client parallel aufräumt - deshalb ohne Eintrag in der Konsole.
    */
+  /** Handles tryClear. */
   private async tryClear(task: () => Promise<void>): Promise<boolean> {
     try {
       await task();

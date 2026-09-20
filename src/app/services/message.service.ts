@@ -28,9 +28,11 @@ import { firebaseApp } from '../firebase';
 import { DirectConversation, DirectConversationProfile, Message, MessageProfile } from '../models';
 
 @Injectable({ providedIn: 'root' })
+/** Provides message data and operations. */
 export class MessageService {
   private readonly firestore: Firestore = getFirestore(firebaseApp);
 
+  /** Handles sendMessage. */
   async sendMessage(channelId: string, text: string, senderId: string): Promise<void> {
     const profile: MessageProfile = {
       text,
@@ -43,6 +45,7 @@ export class MessageService {
   }
 
   /** A reply lives in the same collection as the channel messages and points at its parent. */
+  /** Handles sendReply. */
   async sendReply(channelId: string, parentId: string, text: string, senderId: string): Promise<void> {
     const profile: MessageProfile = {
       text, senderId, timestamp: Timestamp.now(), reactions: {}, threadCount: 0, parentId,
@@ -53,6 +56,7 @@ export class MessageService {
     await batch.commit();
   }
 
+  /** Handles watchReplies. */
   watchReplies(channelId: string, parentId: string, onChange: (replies: Message[]) => void): Unsubscribe {
     return onSnapshot(
       query(this.messagesRef(channelId), where('parentId', '==', parentId)),
@@ -63,6 +67,7 @@ export class MessageService {
     );
   }
 
+  /** Handles watchMessages. */
   watchMessages(channelId: string, onChange: (messages: Message[]) => void): Unsubscribe {
     return onSnapshot(
       query(this.messagesRef(channelId), orderBy('timestamp')),
@@ -71,11 +76,13 @@ export class MessageService {
     );
   }
 
+  /** Handles loadChannelMessages. */
   async loadChannelMessages(channelId: string): Promise<Message[]> {
     const snapshot = await getDocs(query(this.messagesRef(channelId), orderBy('timestamp')));
     return snapshot.docs.map(item => this.toMessage(item));
   }
 
+  /** Handles toggleReaction. */
   toggleReaction(channelId: string, message: Message, emoji: string, uid: string): Promise<void> {
     const reacted = message.reactions?.[emoji]?.includes(uid) ?? false;
     return updateDoc(this.messageRef(channelId, message.id), {
@@ -83,15 +90,18 @@ export class MessageService {
     });
   }
 
+  /** Handles editMessage. */
   editMessage(channelId: string, messageId: string, text: string): Promise<void> {
     return updateDoc(this.messageRef(channelId, messageId), { text, editedAt: Timestamp.now() });
   }
 
-  /** Ein direkter Chat hat immer dieselbe ID – egal, wer ihn öffnet. */
+  /** Ensures a direct conversation has the same ID regardless of who opens it. */
+  /** Handles directConversationId. */
   directConversationId(firstUid: string, secondUid: string): string {
     return [firstUid, secondUid].sort().join('_');
   }
 
+  /** Handles sendDirectMessage. */
   async sendDirectMessage(senderId: string, recipientId: string, text: string): Promise<void> {
     const conversationId = this.directConversationId(senderId, recipientId);
     const timestamp = Timestamp.now();
@@ -102,6 +112,7 @@ export class MessageService {
     await batch.commit();
   }
 
+  /** Handles deleteDirectConversationsForUser. */
   async deleteDirectConversationsForUser(uid: string): Promise<void> {
     const conversations = await getDocs(query(this.directChatsRef(), where('members', 'array-contains', uid)));
     for (const conversation of conversations.docs) {
@@ -113,6 +124,7 @@ export class MessageService {
     }
   }
 
+  /** Handles watchDirectMessages. */
   watchDirectMessages(firstUid: string, secondUid: string, onChange: (messages: Message[]) => void): Unsubscribe {
     const conversationId = this.directConversationId(firstUid, secondUid);
     return onSnapshot(
@@ -126,12 +138,14 @@ export class MessageService {
     );
   }
 
+  /** Handles loadDirectMessages. */
   async loadDirectMessages(firstUid: string, secondUid: string): Promise<Message[]> {
     const conversationId = this.directConversationId(firstUid, secondUid);
     const snapshot = await getDocs(query(this.directMessagesRef(conversationId), orderBy('timestamp')));
     return snapshot.docs.map(item => this.toMessage(item));
   }
 
+  /** Handles watchDirectConversations. */
   watchDirectConversations(uid: string, onChange: (conversations: DirectConversation[]) => void): Unsubscribe {
     return onSnapshot(
       query(this.directChatsRef(), where('members', 'array-contains', uid)),
@@ -142,6 +156,7 @@ export class MessageService {
     );
   }
 
+  /** Handles toggleDirectReaction. */
   async toggleDirectReaction(firstUid: string, secondUid: string, message: Message, emoji: string, uid: string): Promise<void> {
     const reacted = message.reactions?.[emoji]?.includes(uid) ?? false;
     const conversationId = this.directConversationId(firstUid, secondUid);
@@ -151,6 +166,7 @@ export class MessageService {
     await batch.commit();
   }
 
+  /** Handles editDirectMessage. */
   editDirectMessage(firstUid: string, secondUid: string, messageId: string, text: string): Promise<void> {
     return updateDoc(this.directMessageRef(this.directConversationId(firstUid, secondUid), messageId), {
       text,
@@ -158,11 +174,13 @@ export class MessageService {
     });
   }
 
+  /** Handles markDirectConversationRead. */
   markDirectConversationRead(readerId: string, otherUserId: string): Promise<void> {
     const conversationId = this.directConversationId(readerId, otherUserId);
     return updateDoc(this.directConversationRef(conversationId), new FieldPath('lastReadAt', readerId), Timestamp.now());
   }
 
+  /** Handles stageConversation. */
   private stageConversation(batch: WriteBatch, conversationId: string, senderId: string, recipientId: string, text: string, timestamp: Timestamp, messageId: string): void {
     batch.set(this.directConversationRef(conversationId), {
       members: [senderId, recipientId].sort(), createdAt: timestamp, lastMessageAt: timestamp,
@@ -171,26 +189,31 @@ export class MessageService {
     }, { merge: true });
   }
 
+  /** Handles stageDirectMessage. */
   private stageDirectMessage(batch: WriteBatch, message: DocumentReference, senderId: string, text: string, timestamp: Timestamp): void {
     batch.set(message, { text, senderId, timestamp, reactions: {}, threadCount: 0 } satisfies MessageProfile);
   }
 
+  /** Handles stageReactionActivity. */
   private stageReactionActivity(batch: WriteBatch, conversationId: string, uid: string): void {
     batch.update(this.directConversationRef(conversationId), { lastActivityAt: Timestamp.now(), lastActivityBy: uid });
   }
 
-  /** Entfernt alle Spuren eines Kontos aus einem Channel: eigene Nachrichten und eigene Reaktionen. */
+  /** Removes all account traces from a channel, including messages and reactions. */
+  /** Handles purgeAuthor. */
   async purgeAuthor(channelId: string, uid: string): Promise<void> {
     const messages = await getDocs(this.messagesRef(channelId));
     await Promise.all(messages.docs.map(item => this.purgeMessage(channelId, item, uid)));
   }
 
+  /** Handles deleteAllMessages. */
   async deleteAllMessages(channelId: string): Promise<void> {
     const messages = await getDocs(this.messagesRef(channelId));
     await Promise.all(messages.docs.map(item => deleteDoc(item.ref)));
   }
 
-  /** Räumt die eigenen Direktchats mit abgelaufenen Gästen; fremde Chats sind nicht lesbar. */
+  /** Cleans up direct chats with expired guests while respecting access restrictions. */
+  /** Handles deleteDirectChatsWith. */
   async deleteDirectChatsWith(ownUid: string, guestUids: string[]): Promise<void> {
     if (!guestUids.length) return;
     const chats = await getDocs(query(this.directChatsRef(), where('members', 'array-contains', ownUid)));
@@ -198,11 +221,13 @@ export class MessageService {
     await Promise.all(withGuests.map(chat => this.deleteDirectChat(chat.ref)));
   }
 
+  /** Handles deleteDirectChatsOf. */
   async deleteDirectChatsOf(uid: string): Promise<void> {
     const chats = await getDocs(query(this.directChatsRef(), where('members', 'array-contains', uid)));
     await Promise.all(chats.docs.map(chat => this.deleteDirectChat(chat.ref)));
   }
 
+  /** Handles purgeMessage. */
   private purgeMessage(channelId: string, snapshot: QueryDocumentSnapshot, uid: string): Promise<void> {
     const message = this.toMessage(snapshot);
     if (message.senderId === uid) return this.deleteWithThreadCount(channelId, message);
@@ -212,7 +237,8 @@ export class MessageService {
     return updateDoc(snapshot.ref, { reactions }).catch(() => undefined);
   }
 
-  /** Die gelöschte Antwort zählt im Elternteil nicht mehr mit; ist er selbst weg, ist nichts zu tun. */
+  /** Removes a deleted reply from its parent count when the parent still exists. */
+  /** Handles deleteWithThreadCount. */
   private async deleteWithThreadCount(channelId: string, message: Message): Promise<void> {
     await deleteDoc(this.messageRef(channelId, message.id));
     if (!message.parentId) return;
@@ -220,42 +246,50 @@ export class MessageService {
     await updateDoc(parent, { threadCount: increment(-1) }).catch(() => undefined);
   }
 
+  /** Handles deleteDirectChat. */
   private async deleteDirectChat(chat: DocumentReference): Promise<void> {
     const messages = await getDocs(collection(chat, 'messages'));
     await Promise.all(messages.docs.map(message => deleteDoc(message.ref)));
     await deleteDoc(chat);
   }
 
+  /** Handles messageRef. */
   private messageRef(channelId: string, messageId: string): DocumentReference {
     return doc(this.firestore, 'channels', channelId, 'messages', messageId);
   }
 
+  /** Handles toMessage. */
   private toMessage(document: QueryDocumentSnapshot): Message {
     return { id: document.id, ...(document.data() as MessageProfile) };
   }
 
+  /** Handles messagesRef. */
   private messagesRef(channelId: string): CollectionReference {
     return collection(this.firestore, 'channels', channelId, 'messages');
   }
 
+  /** Handles directChatsRef. */
   private directChatsRef(): CollectionReference {
     return collection(this.firestore, 'directChats');
   }
 
+  /** Handles directConversationRef. */
   private directConversationRef(conversationId: string): DocumentReference {
     return doc(this.firestore, 'directChats', conversationId);
   }
 
+  /** Handles directMessagesRef. */
   private directMessagesRef(conversationId: string): CollectionReference {
     return collection(this.firestore, 'directChats', conversationId, 'messages');
   }
 
+  /** Handles directMessageRef. */
   private directMessageRef(conversationId: string, messageId: string): DocumentReference {
     return doc(this.firestore, 'directChats', conversationId, 'messages', messageId);
   }
 }
 
-/** Liefert die Reaktionen ohne das Konto - oder null, wenn es gar nicht reagiert hat. */
+/** Returns reactions without the account, or null when it has not reacted. */
 function withoutReactionsOf(reactions: Record<string, string[]>, uid: string): Record<string, string[]> | null {
   const entries = Object.entries(reactions ?? {});
   if (!entries.some(([, uids]) => uids.includes(uid))) return null;
