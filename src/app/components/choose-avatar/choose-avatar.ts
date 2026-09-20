@@ -2,9 +2,8 @@ import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { AVATAR_FILES, avatarLabel } from '../../shared/avatars';
+import { avatarUrl, PLACEHOLDER_AVATAR } from '../../shared/avatar-url';
 import { RouterLink } from '@angular/router';
-
-const PLACEHOLDER_AVATAR = 'assets/img/Profile.svg';
 
 @Component({
   imports: [ RouterLink ],
@@ -20,7 +19,7 @@ export class ChooseAvatar {
 
   readonly avatars = AVATAR_FILES.map((file) => ({
     label: avatarLabel(file),
-    url: `/assets/img/avatar/${encodeURIComponent(file)}`,
+    url: avatarUrl(file),
   }));
 
   readonly userName: string = history.state?.name ?? 'Gast';
