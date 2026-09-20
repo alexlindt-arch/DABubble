@@ -216,12 +216,15 @@
 // Der Thread liegt in JEDER Breite ueber dem Chat - ab 1024px mit den Desktop-Massen:
 // 16px Aussenrand, 366px Sidebar, 16px Spaltenabstand, Kopfzeile 106px hoch.
 @media (min-width: 1024px) {
+    // Die Kanten folgen denselben Formeln wie das Layout: main hat
+    // padding: 0 clamp(0px, 1.2vw, 16px), die Kopfzeile height: clamp(64px, 6.25vw, 120px),
+    // dazu 16px Spaltenabstand und 366px Sidebar. 2px Zugabe schlucken Rundungen.
     :host {
         position: fixed;
-        top: 106px;
-        right: 32px;
-        bottom: 16px;
-        left: calc(16px + 366px + 16px);
+        top: calc(clamp(64px, 6.25vw, 120px) + 14px);
+        right: calc(clamp(0px, 1.2vw, 16px) + 14px);
+        bottom: 14px;
+        left: calc(clamp(0px, 1.2vw, 16px) + 366px + 14px);
         z-index: 20;
         width: auto;
         max-width: none !important;
@@ -229,7 +232,7 @@
     }
 
     :host-context(main.sidebar-closed) {
-        left: 32px;
+        left: calc(clamp(0px, 1.2vw, 16px) + 14px);
     }
 
     .thread-content {
