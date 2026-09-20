@@ -367,7 +367,10 @@
     border: none;
     border-radius: 20px;
     background: transparent;
-    color: black;
+    // Dasselbe Grau wie im Chat-Composer (.composer-button in chat.scss), damit Smiley und
+    // @-Zeichen genauso aussehen wie im Channel. Der Sendepfeil behaelt sein Blau ueber
+    // .thread-send weiter unten.
+    color: #686a76;
     cursor: pointer;
     transition: background-color 0.2s ease;
 

@@ -72,7 +72,9 @@
         textarea { flex: none; height: 25px; }
     }
 
-    .thread-composer-button { color: #686868; }
+    // Der Chat faerbt seinen Composer nie responsiv um, er bleibt ueberall #686a76. Damit der
+    // schmale Thread dieselbe Farbe zeigt, gilt hier derselbe Wert statt eines eigenen Graus.
+    .thread-composer-button { color: #686a76; }
 
     // The arrow keeps the 24px of the chat composer so both send buttons look alike.
     .thread-send { color: #444df2; }
