@@ -254,6 +254,13 @@
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
     }
 
+    // Wie .channel-title ab 1024px (chat-channel.scss:694): engere Polsterung, damit der
+    // Titel an derselben Stelle beginnt wie im Channel.
+    .thread-title {
+        gap: 6px;
+        padding: 8px 12px;
+    }
+
     .thread-content {
         border-radius: 30px;
     }
