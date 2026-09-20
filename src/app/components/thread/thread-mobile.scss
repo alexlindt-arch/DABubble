@@ -257,8 +257,12 @@
     // Wie .channel-title ab 1024px (chat-channel.scss:694): engere Polsterung, damit der
     // Titel an derselben Stelle beginnt wie im Channel.
     .thread-title {
-        gap: 6px;
+        gap: 2px;
         padding: 8px 12px;
+    }
+
+    .thread-channel {
+        font-size: 24px;
     }
 
     .thread-content {

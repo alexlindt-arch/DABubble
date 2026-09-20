@@ -2,10 +2,7 @@
     <header class="thread-header">
         <div class="thread-title">
             <h2>Thread</h2>
-            <span class="thread-channel">
-                <span class="thread-icon tag-icon" aria-hidden="true"></span>
-                {{ channelName() }}
-            </span>
+            <span class="thread-channel"># {{ channelName() }}</span>
         </div>
         <button type="button" class="thread-close" aria-label="Thread schließen" (click)="closed.emit()">
             <span class="thread-icon close-icon" aria-hidden="true"></span>

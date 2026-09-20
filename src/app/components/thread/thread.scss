@@ -45,11 +45,12 @@
 
 .thread-title {
     display: flex;
-    flex-direction: row;
-    align-items: center;
+    // Der Kanalname steht unter der Ueberschrift, nicht daneben.
+    flex-direction: column;
+    align-items: flex-start;
     flex: 0 1 auto;
     min-width: 0;
-    gap: 10px;
+    gap: 2px;
     // Wie .channel-title im Chat: dieselbe Polsterung, damit der Kopf exakt gleich hoch wird
     // und der Text an derselben Stelle beginnt.
     padding: 8px 24px;
@@ -64,13 +65,17 @@
     }
 }
 
+// Wie .channel-name im Mainchat: gleiche Groesse, gleiche Farbe, gleiches Gewicht.
 .thread-channel {
     display: flex;
     align-items: center;
     gap: 3px;
-    font-size: 14px;
-    line-height: 19px;
-    color: #797ef3;
+    min-width: 0;
+    font-size: 22px;
+    line-height: 1.2;
+    font-weight: 700;
+    color: #2b2d42;
+    overflow-wrap: anywhere;
 }
 
 .thread-close {
