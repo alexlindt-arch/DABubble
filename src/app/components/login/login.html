@@ -21,6 +21,12 @@
       </p>
     }
 
+    @if (guestExpired) {
+      <p class="login-card__notice" role="status">
+        Deine Gast-Sitzung ist abgelaufen. Alle Daten des Gastes wurden gelöscht.
+      </p>
+    }
+
     <form class="login-form" [formGroup]="loginForm" (ngSubmit)="submitLogin()" novalidate>
       <div class="form-field">
         <label class="input-group">
@@ -90,13 +96,17 @@
           type="button"
           class="btn btn--secondary"
           [disabled]="isSubmitting"
-          (click)="loginAsGuest()"
+          (click)="openGuestDialog()"
         >
           Gäste-Login
         </button>
       </div>
     </form>
   </section>
+
+  @if (guestDialogOpen) {
+    <app-guest-login-dialog (closed)="closeGuestDialog()" (confirmed)="confirmGuestLogin()" />
+  }
 
   <footer class="login-page__footer">
     <a class="login-page__footer-link" routerLink="/imprint">Impressum</a>

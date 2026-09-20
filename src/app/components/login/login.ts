@@ -4,9 +4,10 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FirebaseError } from 'firebase/app';
 import { AppUser } from '../../models';
 import { AuthService } from '../../services/auth.service';
+import { GuestLoginDialog } from '../guest-login-dialog/guest-login-dialog';
 
 @Component({
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, GuestLoginDialog],
   selector: 'app-login',
   styleUrl: './login.scss',
   templateUrl: './login.html',
@@ -20,6 +21,9 @@ export class Login {
   /** Kommt der Nutzer frisch vom Passwort-Reset, bestätigt der Login den Wechsel. */
   readonly passwordReset = this.route.snapshot.queryParamMap.get('reset') === 'success';
 
+  /** Nach Ablauf der Gast-Sitzung landet der Gast mit diesem Hinweis wieder hier. */
+  readonly guestExpired = this.route.snapshot.queryParamMap.get('guest') === 'expired';
+
   readonly loginForm = this.formBuilder.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required]],
@@ -27,6 +31,7 @@ export class Login {
 
   isSubmitting = false;
   loginError = '';
+  guestDialogOpen = false;
 
   get emailErrorMessage(): string {
     const email = this.loginForm.controls.email;
@@ -59,14 +64,46 @@ export class Login {
       .finally(() => (this.isSubmitting = false));
   }
 
-  loginAsGuest(): void {
+  openGuestDialog(): void {
+    this.guestDialogOpen = true;
+  }
+
+  closeGuestDialog(): void {
+    this.guestDialogOpen = false;
+  }
+
+  confirmGuestLogin(): void {
+    this.guestDialogOpen = false;
+    this.loginAsGuest();
+  }
+
+  private loginAsGuest(): void {
     this.isSubmitting = true;
     this.loginError = '';
     this.authService
       .loginAsGuest()
-      .then((user) => this.goToMain(user))
-      .catch(() => (this.loginError = 'Die Gäste-Anmeldung ist fehlgeschlagen.'))
+      .then((user) => this.openGuestWorkspace(user))
+      .catch((error: unknown) => (this.loginError = this.mapGuestError(error)))
       .finally(() => (this.isSubmitting = false));
+  }
+
+  /** Ohne Gast-Profil fehlt das 15-Minuten-Fenster, darum führt kein Weg in die App. */
+  private openGuestWorkspace(guest: AppUser | null): void {
+    if (!guest) {
+      this.loginError = 'Das Gast-Profil konnte nicht angelegt werden. Bitte versuche es erneut.';
+      return;
+    }
+    this.router.navigateByUrl('/main');
+  }
+
+  private mapGuestError(error: unknown): string {
+    const code = error instanceof FirebaseError ? error.code : '';
+    console.error('Gäste-Login fehlgeschlagen:', error);
+    if (code === 'auth/admin-restricted-operation' || code === 'auth/operation-not-allowed') {
+      return 'Die anonyme Anmeldung ist im Firebase-Projekt nicht aktiviert.';
+    }
+    if (code === 'auth/network-request-failed') return 'Keine Verbindung zum Server.';
+    return 'Die Gäste-Anmeldung ist fehlgeschlagen.';
   }
 
   private performLogin(): void {

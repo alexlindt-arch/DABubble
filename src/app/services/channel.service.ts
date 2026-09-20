@@ -5,8 +5,8 @@ import {
   arrayUnion,
   collection,
   CollectionReference,
-  doc,
   deleteDoc,
+  doc,
   DocumentReference,
   Firestore,
   getFirestore,
@@ -61,6 +61,15 @@ export class ChannelService {
 
   leaveChannel(channelId: string, uid: string): Promise<void> {
     return this.removeMemberAndDeleteIfEmpty(channelId, uid);
+  }
+
+  async loadChannels(): Promise<Channel[]> {
+    const channels = await getDocs(this.channelsRef());
+    return channels.docs.map(channel => this.toChannel(channel));
+  }
+
+  deleteChannel(channelId: string): Promise<void> {
+    return deleteDoc(this.channelRef(channelId));
   }
 
   async removeUserFromChannels(uid: string): Promise<void> {
