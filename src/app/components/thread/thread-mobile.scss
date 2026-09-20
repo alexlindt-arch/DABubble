@@ -173,22 +173,26 @@
     .thread-composer { margin: 0 16px 30px; padding: 20px; }
 }
 
-// Zwischen Phone und breitem Desktop reicht der Platz nicht fuer Chat und Thread nebeneinander:
-// bei 782px blieben 312px Chat und 153px Thread. Der Thread legt sich deshalb ueber den Chat,
-// statt ihn zusammenzuquetschen. Ab 1400px passen beide in Figma-Breite nebeneinander.
-@media (min-width: 768px) and (max-width: 1399px) {
+// Bis zur Tablet-Grenze verdeckt der Thread den Chat vollstaendig - der Chat wird erst wieder
+// sichtbar, wenn der Thread geschlossen wird. Ab 1024px stehen beide nebeneinander.
+// Die Werte folgen dem Layout: 12px Aussenrand, 260px Sidebar, 16px Spaltenabstand.
+@media (min-width: 768px) and (max-width: 1023px) {
     :host {
         position: fixed;
         top: 80px;
-        right: 16px;
+        right: 28px;
         bottom: 16px;
-        left: auto;
+        left: calc(12px + 260px + 16px);
         z-index: 20;
-        width: min(485px, calc(100vw - 32px));
+        width: auto;
         max-width: none;
         // Das Layout setzt .content > app-thread { margin: 16px 0 } und ist spezifischer als :host.
-        // Ohne diese Ausnahme saesse der Thread 16px tiefer als der Chat, statt buendig darueber.
         margin: 0 !important;
+    }
+
+    // Bei eingeklappter Sidebar beginnt der Chat direkt am Aussenrand.
+    :host-context(main.sidebar-closed) {
+        left: 28px;
     }
 
     .thread-content {
