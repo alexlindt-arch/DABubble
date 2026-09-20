@@ -213,6 +213,31 @@
 }
 
 
+// Der Thread liegt in JEDER Breite ueber dem Chat - ab 1024px mit den Desktop-Massen:
+// 16px Aussenrand, 366px Sidebar, 16px Spaltenabstand, Kopfzeile 106px hoch.
+@media (min-width: 1024px) {
+    :host {
+        position: fixed;
+        top: 106px;
+        right: 32px;
+        bottom: 16px;
+        left: calc(16px + 366px + 16px);
+        z-index: 20;
+        width: auto;
+        max-width: none !important;
+        margin: 0 !important;
+    }
+
+    :host-context(main.sidebar-closed) {
+        left: 32px;
+    }
+
+    .thread-content {
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+    }
+}
+
+
 // Ab 1024px uebernimmt der Kopf die Masse der Channel-Kopfzeile (chat.scss, @media min-width 1024px):
 // 110px hoch, 20px/45px Polsterung, 15px Abstand, Schatten - und die Karte den 30px-Radius.
 @media (min-width: 1024px) {
