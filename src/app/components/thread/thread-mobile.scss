@@ -215,9 +215,14 @@
 }
 
 
-// Der Thread liegt in JEDER Breite ueber dem Chat - ab 1024px mit den Desktop-Massen:
-// 16px Aussenrand, 366px Sidebar, 16px Spaltenabstand, Kopfzeile 106px hoch.
-@media (min-width: 1024px) {
+// Unterhalb der Schwelle deckt der Thread den Chat weiter vollstaendig ab - mit den
+// Desktop-Massen: 16px Aussenrand, 366px Sidebar, 16px Spaltenabstand. Darueber ist Platz
+// fuer beide Spalten, dort uebernimmt der Block darunter.
+// Die Grenze endet auf .98, weil die CSS-Breite bei Zoom oder HiDPI gebrochen sein kann.
+// Mit "max-width: 1444px" hier und "min-width: 1445px" dort traf bei gemessenen 1444,x px
+// KEINE der beiden Regeln: Der Thread fiel auf die anteilige Verteilung zurueck und stand
+// mit 334px statt 485px neben dem Chat. Beide Bloecke teilen sich jetzt denselben Wert.
+@media (min-width: 1024px) and (max-width: 1444.98px) {
     // Die Kanten folgen denselben Formeln wie das Layout: main hat
     // padding: 0 clamp(0px, 1.2vw, 16px), die Kopfzeile height: clamp(64px, 6.25vw, 120px),
     // dazu 16px Spaltenabstand und 366px Sidebar. 2px Zugabe schlucken Rundungen.
@@ -239,6 +244,21 @@
 
     .thread-content {
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+    }
+}
+
+
+// Ab hier stehen Chat und Thread nebeneinander. Die Grenze ist ausgemessen, nicht geschaetzt:
+// 16px Aussenrand + 366px Sidebar + 16px Spaltenabstand = 430px Fixkosten, dazu der Thread mit
+// seinen 485px - es bleiben 530px fuer den Chat. Genau dort ist dessen Kopfzeile noch einzeilig
+// (110px hoch); ab 520px bricht sie auf 114px um. Darum faengt die Dreier-Ansicht hier an.
+// Derselbe .98-Wert wie oben, damit zwischen beiden Bloecken keine Luecke klafft.
+@media (min-width: 1444.98px) {
+    // Das Layout verteilt den Platz anteilig (.content > app-thread { flex: 485 1 0 }) und
+    // liesse dem Thread bei 1445px nur 334px. Seine Figma-Breite steht ihm aber fest zu, den
+    // Rest nimmt der Chat. Der Layout-Selektor ist spezifischer als :host, daher die Ausnahme.
+    :host {
+        flex: 0 0 485px !important;
     }
 }
 
