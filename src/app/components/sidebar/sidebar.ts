@@ -43,6 +43,8 @@ export class Sidebar implements OnDestroy {
 
   readonly channels = computed(() => this.visibleChannels());
   readonly users = computed(() => this.sortedAccountUsers());
+  /** Enthält auch aktive Gäste, damit ihre Beiträge korrekt zugeordnet werden können. */
+  readonly messageAuthors = computed(() => this.firestoreUsers());
   readonly directConversationUserIds = computed(() => this.directConversationPartners());
 
   constructor(userService: UserService, channelService: ChannelService, private readonly messageService: MessageService,

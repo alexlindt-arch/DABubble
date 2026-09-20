@@ -153,10 +153,10 @@
                         [attr.aria-expanded]="reactionPickerFor() === message.id" (click)="toggleReactionPicker(message.id, $event)">
                         <img class="hover-control-icon" src="assets/img/icons/add_reaction.svg" alt="">
                     </button>
-                    <button type="button" class="channel-hover-button quick-thumb" aria-label="Mit Daumen hoch reagieren"
-                        (click)="toggleDirectReaction(message, '👍')"><span aria-hidden="true">👍</span></button>
-                    <button type="button" class="channel-hover-button quick-check" aria-label="Mit Haken reagieren"
-                        (click)="toggleDirectReaction(message, '✅')"><span aria-hidden="true">✅</span></button>
+                    <button type="button" class="channel-hover-button quick-thumb" [attr.aria-label]="'Mit ' + recentReactions()[0] + ' reagieren'"
+                        (click)="toggleDirectReaction(message, recentReactions()[0])"><span aria-hidden="true">{{ recentReactions()[0] }}</span></button>
+                    <button type="button" class="channel-hover-button quick-check" [attr.aria-label]="'Mit ' + recentReactions()[1] + ' reagieren'"
+                        (click)="toggleDirectReaction(message, recentReactions()[1])"><span aria-hidden="true">{{ recentReactions()[1] }}</span></button>
                 </div>
                 @if (reactionPickerFor() === message.id) {
                 <div class="channel-reaction-picker" role="group" aria-label="Reaktion auswählen"
@@ -294,10 +294,10 @@
                         }
                     </div>
                     }
-                    <button type="button" class="channel-hover-button quick-check" aria-label="Mit Haken reagieren"
-                        (click)="toggleReaction(message, '✅')"><span aria-hidden="true">✅</span></button>
-                    <button type="button" class="channel-hover-button quick-thumb" aria-label="Mit Daumen hoch reagieren"
-                        (click)="toggleReaction(message, '👍')"><span aria-hidden="true">👍</span></button>
+                    <button type="button" class="channel-hover-button quick-check" [attr.aria-label]="'Mit ' + recentReactions()[0] + ' reagieren'"
+                        (click)="toggleReaction(message, recentReactions()[0])"><span aria-hidden="true">{{ recentReactions()[0] }}</span></button>
+                    <button type="button" class="channel-hover-button quick-thumb" [attr.aria-label]="'Mit ' + recentReactions()[1] + ' reagieren'"
+                        (click)="toggleReaction(message, recentReactions()[1])"><span aria-hidden="true">{{ recentReactions()[1] }}</span></button>
                     <button type="button" class="channel-hover-button reaction-picker-button" aria-label="Reaktion hinzufügen"
                         [attr.aria-expanded]="reactionPickerFor() === message.id"
                         (click)="toggleReactionPicker(message.id, $event)">

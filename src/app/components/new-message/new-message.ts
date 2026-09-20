@@ -1,5 +1,5 @@
 import { afterNextRender, Component, computed, ElementRef, HostListener, inject, input, output, signal, viewChild } from '@angular/core';
-import { AppUser } from '../../models';
+import { AppUser, Channel } from '../../models';
 import { AuthService } from '../../services/auth.service';
 import { MessageService } from '../../services/message.service';
 import { avatarUrl } from '../../shared/avatar-url';
@@ -13,9 +13,12 @@ import { EMOJIS } from '../../shared/emojis';
 })
 export class NewMessage {
   users = input<AppUser[]>([]);
+  channels = input<Channel[]>([]);
   existingConversationUserIds = input<string[]>([]);
   conversationStarted = output<AppUser>();
+  channelStarted = output<Channel>();
   recipient = signal<AppUser | null>(null);
+  channelRecipient = signal<Channel | null>(null);
   recipientQuery = signal('');
   draft = signal('');
   emojiPickerOpen = signal(false);
@@ -24,7 +27,8 @@ export class NewMessage {
   private readonly messageService = inject(MessageService);
   private readonly recipientInput = viewChild<ElementRef<HTMLInputElement>>('recipientInput');
   private readonly editor = viewChild<ElementRef<HTMLTextAreaElement>>('editor');
-  readonly suggestions = computed(() => this.matchingUsers());
+  readonly userSuggestions = computed(() => this.matchingUsers());
+  readonly channelSuggestions = computed(() => this.matchingChannels());
 
   constructor() {
     afterNextRender(() => this.recipientInput()?.nativeElement.focus());
@@ -33,6 +37,7 @@ export class NewMessage {
   updateRecipientQuery(value: string): void {
     this.recipientQuery.set(value);
     this.recipient.set(null);
+    this.channelRecipient.set(null);
   }
 
   selectRecipient(user: AppUser): void {
@@ -41,7 +46,15 @@ export class NewMessage {
       return;
     }
     this.recipient.set(user);
-    this.recipientQuery.set(user.name);
+    this.channelRecipient.set(null);
+    this.recipientQuery.set(`@${user.name}`);
+    this.editor()?.nativeElement.focus();
+  }
+
+  selectChannel(channel: Channel): void {
+    this.channelRecipient.set(channel);
+    this.recipient.set(null);
+    this.recipientQuery.set(`#${channel.name}`);
     this.editor()?.nativeElement.focus();
   }
 
@@ -60,11 +73,19 @@ export class NewMessage {
   async sendMessage(event: Event): Promise<void> {
     event.preventDefault();
     const recipient = this.recipient();
+    const channel = this.channelRecipient();
     const senderId = this.authService.currentUserId;
     const text = this.draft().trim();
-    if (!recipient || !senderId || !text) return;
-    await this.messageService.sendDirectMessage(senderId, recipient.uid, text);
-    this.conversationStarted.emit(recipient);
+    if (!senderId || !text || (!recipient && !channel)) return;
+    if (channel) {
+      await this.messageService.sendMessage(channel.id, text, senderId);
+      this.channelStarted.emit(channel);
+      return;
+    }
+    if (recipient) {
+      await this.messageService.sendDirectMessage(senderId, recipient.uid, text);
+      this.conversationStarted.emit(recipient);
+    }
   }
 
   @HostListener('document:click', ['$event'])
@@ -73,9 +94,18 @@ export class NewMessage {
   }
 
   private matchingUsers(): AppUser[] {
-    const query = this.recipientQuery().replace(/^@/, '').trim().toLocaleLowerCase('de');
-    if (this.recipient() || !query || !this.users().length) return [];
-    return this.users().filter(user => user.uid !== this.authService.currentUserId
-      && (user.name.toLocaleLowerCase('de').includes(query) || user.email.toLocaleLowerCase('de').includes(query)));
+    const raw = this.recipientQuery().trimStart();
+    if (raw.startsWith('#') || this.recipient() || this.channelRecipient()) return [];
+    const query = raw.replace(/^@/, '').trim().toLocaleLowerCase('de');
+    if (!raw.startsWith('@') && !query) return [];
+    return this.users().filter(user =>
+      user.name.toLocaleLowerCase('de').includes(query) || user.email.toLocaleLowerCase('de').includes(query));
+  }
+
+  private matchingChannels(): Channel[] {
+    const raw = this.recipientQuery().trimStart();
+    if (!raw.startsWith('#') || this.recipient() || this.channelRecipient()) return [];
+    const query = raw.slice(1).trim().toLocaleLowerCase('de');
+    return this.channels().filter(channel => channel.name.toLocaleLowerCase('de').includes(query));
   }
 }

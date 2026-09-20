@@ -15,6 +15,7 @@ import { AppUser, Channel, Message } from '../../models';
 import { avatarUrl } from '../../shared/avatar-url';
 import { AuthService } from '../../services/auth.service';
 import { MessageService } from '../../services/message.service';
+import { RecentReactionService } from '../../services/recent-reaction.service';
 import { ProfileDialog } from '../profile-dialog/profile-dialog';
 
 type MentionKind = 'user' | 'channel' | 'url';
@@ -44,6 +45,7 @@ export class Chat {
   directUser = input<AppUser | null>(null);
   channel = input<Channel | null>(null);
   users = input<AppUser[]>([]);
+  messageAuthors = input<AppUser[]>([]);
   channels = input<Channel[]>([]);
   profileRequested = output<void>();
   messageRequested = output<AppUser>();
@@ -78,9 +80,12 @@ export class Chat {
   ];
   private readonly authService = inject(AuthService);
   private readonly messageService = inject(MessageService);
+  private readonly recentReactionService = inject(RecentReactionService);
+  readonly recentReactions = this.recentReactionService.reactions;
   private editor = viewChild<ElementRef<HTMLTextAreaElement>>('editor');
   private history = viewChild<ElementRef<HTMLElement>>('history');
   private lastDraftContext = '';
+  private lastFocusedContext = '';
 
   requestAddPeople(event: MouseEvent): void {
     const button = event.currentTarget as HTMLElement;
@@ -104,7 +109,12 @@ export class Chat {
       this.closeMentionSuggestions();
     });
     afterRenderEffect(() => {
-      if (this.isSelfChat()) this.editor()?.nativeElement.focus();
+      const context = this.channel()?.id ?? this.directUser()?.uid ?? (this.isSelfChat() ? 'self' : '');
+      if (!context || context === this.lastFocusedContext) return;
+      const editor = this.editor()?.nativeElement;
+      if (!editor) return;
+      editor.focus();
+      this.lastFocusedContext = context;
     });
     afterRenderEffect(() => {
       this.notes();
@@ -439,6 +449,7 @@ export class Chat {
     const uid = this.authService.currentUserId;
     this.reactionPickerFor.set(null);
     if (!channelId || !uid) return;
+    this.recentReactionService.record(emoji);
     this.messageService
       .toggleReaction(channelId, message, emoji, uid)
       .catch(error => console.error('Reaktion konnte nicht gespeichert werden:', error));
@@ -449,6 +460,7 @@ export class Chat {
     const otherUid = this.directUser()?.uid;
     this.reactionPickerFor.set(null);
     if (!ownUid || !otherUid) return;
+    this.recentReactionService.record(emoji);
     this.messageService
       .toggleDirectReaction(ownUid, otherUid, message, emoji, ownUid)
       .catch(error => console.error('Reaktion konnte nicht gespeichert werden:', error));
@@ -554,7 +566,8 @@ export class Chat {
   }
 
   private userById(uid: string): AppUser | undefined {
-    return this.users().find(user => user.uid === uid);
+    return this.messageAuthors().find(user => user.uid === uid)
+      ?? this.users().find(user => user.uid === uid);
   }
 
   directUserAvatar(): string { return avatarUrl(this.directUser()?.avatar); }

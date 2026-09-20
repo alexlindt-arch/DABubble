@@ -29,7 +29,9 @@ import { AppUser, Channel, Message } from '../../models';
 
 type SearchResult =
   | { kind: 'channel'; id: string; label: string; channel: Channel }
-  | { kind: 'user'; id: string; label: string; user: AppUser };
+  | { kind: 'user'; id: string; label: string; user: AppUser }
+  | { kind: 'channel-message'; id: string; label: string; context: string; channel: Channel; message: Message; parent?: Message }
+  | { kind: 'direct-message'; id: string; label: string; context: string; user: AppUser; message: Message };
 
 @Component({
   selector: 'app-main-layout',
@@ -48,7 +50,9 @@ export class MainLayout {
   readonly searchQuery = signal('');
   readonly searchOpen = signal(false);
   readonly searchIndex = signal(0);
-  readonly searchResults = computed(() => this.matchSearchResults());
+  readonly messageSearchResults = signal<SearchResult[]>([]);
+  readonly searchLoading = signal(false);
+  readonly searchResults = computed(() => [...this.matchSearchResults(), ...this.messageSearchResults()].slice(0, 30));
 
   profileMenuOpen = false;
   profilePopupOpen = false;
@@ -60,6 +64,9 @@ export class MainLayout {
   addPeopleDialogOpen = false;
   membersDialogOpen = false;
   channelInfoOpen = false;
+  channelInfoSaveError = '';
+  channelInfoSaving = false;
+  channelInfoSaveVersion = 0;
   channelInfoAnchor = signal<DOMRect | null>(null);
   membersAnchor = signal<DOMRect | null>(null);
   addPeopleAnchor = signal<DOMRect | null>(null);
@@ -80,8 +87,13 @@ export class MainLayout {
   private openLabel = viewChild.required<ElementRef<HTMLElement>>('openLabel');
   private destroyRef = inject(DestroyRef);
   private sidebar = viewChild(Sidebar);
+  private searchTimer?: ReturnType<typeof setTimeout>;
+  private searchRequest = 0;
 
   constructor() {
+    this.destroyRef.onDestroy(() => {
+      if (this.searchTimer) clearTimeout(this.searchTimer);
+    });
     afterNextRender(() => {
       const observer = new ResizeObserver(() => this.updateToggleHeight());
       observer.observe(this.closeLabel().nativeElement);
@@ -144,6 +156,7 @@ export class MainLayout {
     this.searchQuery.set(value);
     this.searchIndex.set(0);
     this.searchOpen.set(true);
+    this.scheduleMessageSearch(value);
   }
 
   onSearchKeydown(event: KeyboardEvent): void {
@@ -157,7 +170,10 @@ export class MainLayout {
   }
 
   selectSearchResult(result: SearchResult): void {
-    result.kind === 'channel' ? this.openMentionedChannel(result.channel) : this.openSearchedUser(result.user);
+    if (result.kind === 'channel') this.openMentionedChannel(result.channel);
+    else if (result.kind === 'user') this.openSearchedUser(result.user);
+    else if (result.kind === 'channel-message') this.openChannelMessageResult(result);
+    else this.openSearchedUser(result.user);
     this.showChatOnMobile();
     this.clearSearch();
   }
@@ -169,6 +185,9 @@ export class MainLayout {
 
   private clearSearch(): void {
     this.searchQuery.set('');
+    this.messageSearchResults.set([]);
+    this.searchLoading.set(false);
+    this.searchRequest++;
     this.closeSearch();
   }
 
@@ -288,6 +307,8 @@ export class MainLayout {
 
   openChannelInfo(anchor: DOMRect): void {
     this.channelInfoAnchor.set(anchor);
+    this.channelInfoSaveError = '';
+    this.channelInfoSaving = false;
     this.channelInfoOpen = true;
   }
 
@@ -299,11 +320,17 @@ export class MainLayout {
   async saveChannelInfo(change: { name: string; description: string }): Promise<void> {
     const channel = this.selectedChannel();
     if (!channel) return;
+    this.channelInfoSaveError = '';
+    this.channelInfoSaving = true;
     try {
       await this.channelService.updateChannel(channel.id, change.name, change.description);
       this.selectedChannel.set({ ...channel, ...change });
+      this.channelInfoSaveVersion++;
     } catch (error) {
       console.error('Channel-Informationen konnten nicht gespeichert werden:', error);
+      this.channelInfoSaveError = 'Die Änderungen konnten nicht gespeichert werden. Bitte versuche es erneut.';
+    } finally {
+      this.channelInfoSaving = false;
     }
   }
 
@@ -358,6 +385,7 @@ export class MainLayout {
   }
 
   readonly allUsers = computed(() => this.sidebar()?.users() ?? []);
+  readonly allMessageAuthors = computed(() => this.sidebar()?.messageAuthors() ?? []);
   readonly allChannels = computed(() => this.sidebar()?.channels() ?? []);
   readonly directConversationUserIds = computed(() => this.sidebar()?.directConversationUserIds() ?? []);
   readonly channelMembers = computed(() => this.membersOfSelectedChannel());
@@ -372,6 +400,96 @@ export class MainLayout {
     const users = kind !== 'channel' ? this.allUsers().filter(item => this.matchesSearch(item.name, query)) : [];
     return [...channels.map(channel => ({ kind: 'channel' as const, id: `channel-${channel.id}`, label: channel.name, channel })),
       ...users.map(user => ({ kind: 'user' as const, id: `user-${user.uid}`, label: user.name, user }))];
+  }
+
+  private scheduleMessageSearch(value: string): void {
+    if (this.searchTimer) clearTimeout(this.searchTimer);
+    const raw = value.trim();
+    const request = ++this.searchRequest;
+    this.messageSearchResults.set([]);
+    this.searchLoading.set(false);
+    if (!raw || raw.startsWith('#') || raw.startsWith('@')) return;
+    this.searchLoading.set(true);
+    this.searchTimer = setTimeout(() => void this.searchMessages(raw, request), 250);
+  }
+
+  private async searchMessages(term: string, request: number): Promise<void> {
+    const uid = this.authService.currentUserId;
+    if (!uid) return this.finishMessageSearch(request, []);
+    const query = term.toLocaleLowerCase('de');
+    const channels = this.allChannels();
+    const usersById = new Map(this.allMessageAuthors().map(user => [user.uid, user]));
+    const directUsers = this.directConversationUserIds()
+      .map(userId => usersById.get(userId))
+      .filter((user): user is AppUser => !!user);
+    const [channelLoads, directLoads] = await Promise.all([
+      Promise.allSettled(channels.map(async channel => ({ channel, messages: await this.messageService.loadChannelMessages(channel.id) }))),
+      Promise.allSettled(directUsers.map(async user => ({ user, messages: await this.messageService.loadDirectMessages(uid, user.uid) }))),
+    ]);
+    const results = [
+      ...this.channelMessageResults(channelLoads, query, usersById, uid),
+      ...this.directMessageResults(directLoads, query, uid),
+    ].sort((a, b) => b.message.timestamp.toMillis() - a.message.timestamp.toMillis());
+    this.finishMessageSearch(request, results);
+  }
+
+  private channelMessageResults(
+    loads: PromiseSettledResult<{ channel: Channel; messages: Message[] }>[],
+    query: string,
+    usersById: Map<string, AppUser>,
+    ownUid: string,
+  ): Extract<SearchResult, { kind: 'channel-message' }>[] {
+    return loads.flatMap(load => {
+      if (load.status === 'rejected') return [];
+      const { channel, messages } = load.value;
+      const byId = new Map(messages.map(message => [message.id, message]));
+      return messages.filter(message => this.matchesSearch(message.text, query)).map(message => ({
+        kind: 'channel-message' as const,
+        id: `channel-message-${channel.id}-${message.id}`,
+        label: `#${channel.name} · ${message.senderId === ownUid ? 'Du' : usersById.get(message.senderId)?.name ?? 'Gelöschtes Profil'}`,
+        context: this.searchContext(message.text, query),
+        channel,
+        message,
+        parent: message.parentId ? byId.get(message.parentId) : undefined,
+      }));
+    });
+  }
+
+  private directMessageResults(
+    loads: PromiseSettledResult<{ user: AppUser; messages: Message[] }>[],
+    query: string,
+    ownUid: string,
+  ): Extract<SearchResult, { kind: 'direct-message' }>[] {
+    return loads.flatMap(load => {
+      if (load.status === 'rejected') return [];
+      const { user, messages } = load.value;
+      return messages.filter(message => this.matchesSearch(message.text, query)).map(message => ({
+        kind: 'direct-message' as const,
+        id: `direct-message-${user.uid}-${message.id}`,
+        label: `@${user.name} · ${message.senderId === ownUid ? 'Du' : user.name}`,
+        context: this.searchContext(message.text, query),
+        user,
+        message,
+      }));
+    });
+  }
+
+  private finishMessageSearch(request: number, results: SearchResult[]): void {
+    if (request !== this.searchRequest) return;
+    this.messageSearchResults.set(results);
+    this.searchLoading.set(false);
+  }
+
+  private searchContext(text: string, query: string): string {
+    const position = text.toLocaleLowerCase('de').indexOf(query);
+    const start = Math.max(0, position - 38);
+    const end = Math.min(text.length, position + query.length + 58);
+    return `${start > 0 ? '…' : ''}${text.slice(start, end)}${end < text.length ? '…' : ''}`;
+  }
+
+  private openChannelMessageResult(result: Extract<SearchResult, { kind: 'channel-message' }>): void {
+    this.openMentionedChannel(result.channel);
+    if (result.parent) this.openThread(result.parent);
   }
 
   private matchesSearch(value: string, query: string): boolean {

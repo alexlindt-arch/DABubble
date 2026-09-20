@@ -16,6 +16,7 @@ import { avatarUrl } from '../../shared/avatar-url';
 import { EMOJIS } from '../../shared/emojis';
 import { AuthService } from '../../services/auth.service';
 import { MessageService } from '../../services/message.service';
+import { RecentReactionService } from '../../services/recent-reaction.service';
 import { ProfileDialog } from '../profile-dialog/profile-dialog';
 
 type MentionKind = 'user' | 'channel';
@@ -42,6 +43,7 @@ export class Thread {
   parent = input<Message | null>(null);
   channelName = input('Entwicklerteam');
   users = input<AppUser[]>([]);
+  messageAuthors = input<AppUser[]>([]);
   channels = input<Channel[]>([]);
   userName = input('Gast');
   userAvatarUrl = input('assets/img/avatar/Property 1=Frederik Beck.png');
@@ -71,6 +73,8 @@ export class Thread {
 
   private readonly authService = inject(AuthService);
   private readonly messageService = inject(MessageService);
+  private readonly recentReactionService = inject(RecentReactionService);
+  readonly recentReactions = this.recentReactionService.reactions;
   private editor = viewChild<ElementRef<HTMLTextAreaElement>>('editor');
   private history = viewChild<ElementRef<HTMLElement>>('history');
 
@@ -153,6 +157,7 @@ export class Thread {
     const uid = this.authService.currentUserId;
     this.reactionPickerFor.set(null);
     if (!channelId || !uid) return;
+    this.recentReactionService.record(emoji);
     this.messageService
       .toggleReaction(channelId, message, emoji, uid)
       .catch(error => console.error('Reaktion konnte nicht gespeichert werden:', error));
@@ -380,6 +385,7 @@ export class Thread {
   }
 
   private userById(uid: string): AppUser | undefined {
-    return this.users().find(user => user.uid === uid);
+    return this.messageAuthors().find(user => user.uid === uid)
+      ?? this.users().find(user => user.uid === uid);
   }
 }

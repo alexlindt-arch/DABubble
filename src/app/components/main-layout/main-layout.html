@@ -23,10 +23,21 @@
                 <li><button type="button" [id]="'search-result-' + index" role="option"
                     [attr.aria-selected]="index === searchIndex()" [class.active]="index === searchIndex()"
                     (mousedown)="$event.preventDefault()" (click)="selectSearchResult(result)">
-                    <span aria-hidden="true">{{ result.kind === 'channel' ? '#' : '@' }}</span>{{ result.label }}
+                    @if (result.kind === 'channel' || result.kind === 'user') {
+                    <span class="search-result-symbol" aria-hidden="true">{{ result.kind === 'channel' ? '#' : '@' }}</span>
+                    <span class="search-result-label">{{ result.label }}</span>
+                    } @else {
+                    <span class="search-result-label search-result-message-label">{{ result.label }}</span>
+                    <span class="search-result-context">{{ result.context }}</span>
+                    }
                 </button></li>
                 }
             </ul>
+            }
+            @if (searchOpen() && searchLoading() && searchQuery().trim() && !searchResults().length) {
+            <p class="search-status" role="status">Nachrichten werden durchsucht …</p>
+            } @else if (searchOpen() && searchQuery().trim() && !searchResults().length) {
+            <p class="search-status">Keine Treffer gefunden.</p>
             }
             <div class="search-icon">
                 <img class="icon-default" src="./assets/img/icons/search-default.svg" alt="Suchen">
@@ -118,11 +129,11 @@
     </button>
 
   @if (newMessageOpen) {
-  <app-new-message [users]="allUsers()" [existingConversationUserIds]="directConversationUserIds()"
-    (conversationStarted)="startDirectConversation($event)"></app-new-message>
+  <app-new-message [users]="allUsers()" [channels]="allChannels()" [existingConversationUserIds]="directConversationUserIds()"
+    (conversationStarted)="startDirectConversation($event)" (channelStarted)="openMentionedChannel($event)"></app-new-message>
   } @else {
   <app-chat [isSelfChat]="selfChatOpen" [userName]="userName" [userAvatarUrl]="userAvatarUrl"
-    [directUser]="selectedDirectUser" [channel]="selectedChannel()" [users]="allUsers()" [channels]="allChannels()"
+    [directUser]="selectedDirectUser" [channel]="selectedChannel()" [users]="allUsers()" [messageAuthors]="allMessageAuthors()" [channels]="allChannels()"
     (profileRequested)="openProfilePopup()" (addPeopleRequested)="openMemberDialog($event)"
     (messageRequested)="startDirectConversation($event)"
     (channelInfoRequested)="openChannelInfo($event)"
@@ -131,7 +142,7 @@
   }
   @if (threadOpen && threadParent && selectedChannel() && !selfChatOpen && !newMessageOpen) {
   <app-thread [channelId]="selectedChannel()?.id ?? null" [parent]="threadParent"
-    [channelName]="selectedChannel()?.name ?? 'Entwicklerteam'" [users]="allUsers()" [channels]="allChannels()"
+    [channelName]="selectedChannel()?.name ?? 'Entwicklerteam'" [users]="allUsers()" [messageAuthors]="allMessageAuthors()" [channels]="allChannels()"
     [userName]="userName" [userAvatarUrl]="userAvatarUrl"
     (profileRequested)="openProfilePopup()" (messageRequested)="startDirectConversation($event)"
     (channelRequested)="openMentionedChannel($event)" (closed)="closeThread()"></app-thread>
@@ -203,6 +214,7 @@
 
 @if (channelInfoOpen && selectedChannel(); as channel) {
   <app-channel-info-dialog [channel]="channel" [creator]="selectedChannelCreator()" [currentUserId]="currentUserId" [anchor]="channelInfoAnchor()"
+    [existingChannels]="channelNames" [saveError]="channelInfoSaveError" [saving]="channelInfoSaving" [saveVersion]="channelInfoSaveVersion"
     (closed)="closeChannelInfo()" (saved)="saveChannelInfo($event)" (left)="leaveSelectedChannel()"
     (messageRequested)="startDirectConversationFromChannelInfo($event)" />
 }

@@ -3,12 +3,19 @@
         <h2>Neue Nachricht</h2>
         <label class="recipient-field">
             <span class="visually-hidden">Empfänger</span>
-            <input #recipientInput type="text" placeholder="An: @jemand oder E-Mail-Adresse" autocomplete="off"
+            <input #recipientInput type="text" placeholder="An: @Person, E-Mail-Adresse oder #Channel" autocomplete="off"
                 [value]="recipientQuery()" (input)="updateRecipientQuery(recipientInput.value)">
-            @if (suggestions().length) {
-            <ul class="recipient-suggestions" role="listbox" aria-label="Person auswählen">
-                @for (user of suggestions(); track user.uid) {
+            @if (userSuggestions().length) {
+            <ul class="recipient-suggestions" role="listbox" aria-label="Mitglied auswählen">
+                @for (user of userSuggestions(); track user.uid) {
                 <li><button type="button" (click)="selectRecipient(user)"><img [src]="avatar(user)" alt=""><span>{{ user.name }}</span></button></li>
+                }
+            </ul>
+            }
+            @if (channelSuggestions().length) {
+            <ul class="recipient-suggestions" role="listbox" aria-label="Channel auswählen">
+                @for (channel of channelSuggestions(); track channel.id) {
+                <li><button type="button" (click)="selectChannel(channel)"><span class="channel-suggestion-icon" aria-hidden="true">#</span><span>{{ channel.name }}</span></button></li>
                 }
             </ul>
             }
@@ -25,7 +32,7 @@
                     <span class="composer-icon emoji-icon" aria-hidden="true"></span>
                 </button>
                 <button type="submit" class="composer-button send-button" aria-label="Nachricht senden"
-                    [disabled]="!recipient() || !draft().trim()">
+                    [disabled]="(!recipient() && !channelRecipient()) || !draft().trim()">
                     <span class="composer-icon send-icon" aria-hidden="true"></span>
                 </button>
             </div>

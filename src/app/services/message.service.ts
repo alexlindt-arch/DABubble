@@ -71,6 +71,11 @@ export class MessageService {
     );
   }
 
+  async loadChannelMessages(channelId: string): Promise<Message[]> {
+    const snapshot = await getDocs(query(this.messagesRef(channelId), orderBy('timestamp')));
+    return snapshot.docs.map(item => this.toMessage(item));
+  }
+
   toggleReaction(channelId: string, message: Message, emoji: string, uid: string): Promise<void> {
     const reacted = message.reactions?.[emoji]?.includes(uid) ?? false;
     return updateDoc(this.messageRef(channelId, message.id), {
@@ -119,6 +124,12 @@ export class MessageService {
         onChange([]);
       },
     );
+  }
+
+  async loadDirectMessages(firstUid: string, secondUid: string): Promise<Message[]> {
+    const conversationId = this.directConversationId(firstUid, secondUid);
+    const snapshot = await getDocs(query(this.directMessagesRef(conversationId), orderBy('timestamp')));
+    return snapshot.docs.map(item => this.toMessage(item));
   }
 
   watchDirectConversations(uid: string, onChange: (conversations: DirectConversation[]) => void): Unsubscribe {

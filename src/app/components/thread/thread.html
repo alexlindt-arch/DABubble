@@ -79,10 +79,10 @@
                     }
                 </div>
                 }
-                <button type="button" class="thread-hover-button" aria-label="Mit Haken reagieren"
-                    (click)="toggleReaction(message, '✅')"><span aria-hidden="true">✅</span></button>
-                <button type="button" class="thread-hover-button" aria-label="Mit Daumen hoch reagieren"
-                    (click)="toggleReaction(message, '👍')"><span aria-hidden="true">👍</span></button>
+                <button type="button" class="thread-hover-button" [attr.aria-label]="'Mit ' + recentReactions()[0] + ' reagieren'"
+                    (click)="toggleReaction(message, recentReactions()[0])"><span aria-hidden="true">{{ recentReactions()[0] }}</span></button>
+                <button type="button" class="thread-hover-button" [attr.aria-label]="'Mit ' + recentReactions()[1] + ' reagieren'"
+                    (click)="toggleReaction(message, recentReactions()[1])"><span aria-hidden="true">{{ recentReactions()[1] }}</span></button>
                 <button type="button" class="thread-hover-button" aria-label="Reaktion hinzufügen"
                     [attr.aria-expanded]="reactionPickerFor() === message.id"
                     (click)="toggleReactionPicker(message.id)">
