@@ -50,6 +50,9 @@
     flex: 0 1 auto;
     min-width: 0;
     gap: 10px;
+    // Wie .channel-title im Chat: dieselbe Polsterung, damit der Kopf exakt gleich hoch wird
+    // und der Text an derselben Stelle beginnt.
+    padding: 8px 24px;
 
     h2 {
         margin: 0;

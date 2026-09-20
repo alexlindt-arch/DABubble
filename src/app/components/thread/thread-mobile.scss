@@ -10,7 +10,9 @@
     }
 
     .thread-title {
-        gap: 5px;
+        // Wie .channel-title unter 768px.
+        gap: 6px;
+        padding: 8px 12px;
 
         h2 {
             font-size: 24px;
