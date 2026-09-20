@@ -204,6 +204,15 @@
 }
 
 
+// Unter 1024px ist der Channel-Titel 22px gross (.channel-title in der 1023er-Stufe).
+@media (max-width: 1023px) {
+    .thread-title h2 {
+        font-size: 22px;
+        line-height: 1.2;
+    }
+}
+
+
 // Ab 1024px uebernimmt der Kopf die Masse der Channel-Kopfzeile (chat.scss, @media min-width 1024px):
 // 110px hoch, 20px/45px Polsterung, 15px Abstand, Schatten - und die Karte den 30px-Radius.
 @media (min-width: 1024px) {

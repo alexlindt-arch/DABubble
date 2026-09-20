@@ -31,7 +31,9 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: flex-start;
-    flex-wrap: wrap;
+    // Wie .channel-chat-header: kein Umbruch, sonst rutscht der Schliessen-Knopf in eine
+    // zweite Zeile und der Kopf wird hoeher als der des Channels.
+    flex-wrap: nowrap;
     flex: none;
     gap: 24px;
     padding: 12px 20px 8px;
@@ -45,6 +47,8 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    flex: 0 1 auto;
+    min-width: 0;
     gap: 10px;
 
     h2 {
