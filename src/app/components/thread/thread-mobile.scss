@@ -172,3 +172,24 @@
     // Figma 08: 30px from the bottom edge of the phone frame.
     .thread-composer { margin: 0 16px 30px; padding: 20px; }
 }
+
+// Zwischen Phone und breitem Desktop reicht der Platz nicht fuer Chat und Thread nebeneinander:
+// bei 782px blieben 312px Chat und 153px Thread. Der Thread legt sich deshalb ueber den Chat,
+// statt ihn zusammenzuquetschen. Ab 1400px passen beide in Figma-Breite nebeneinander.
+@media (min-width: 768px) and (max-width: 1399px) {
+    :host {
+        position: fixed;
+        top: 80px;
+        right: 16px;
+        bottom: 16px;
+        left: auto;
+        z-index: 20;
+        width: min(485px, calc(100vw - 32px));
+        max-width: none;
+        margin: 0;
+    }
+
+    .thread-content {
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+    }
+}
