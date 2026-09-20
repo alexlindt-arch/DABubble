@@ -62,6 +62,10 @@
         <div class="overlay" (click)="closeProfileMenu()">
 
             <div class="profile-menu" (click)="$event.stopPropagation()">
+                <button type="button" class="profile-menu-close" aria-label="Menü schließen"
+                    (click)="closeProfileMenu()">
+                    <span class="dialog-icon close-icon" aria-hidden="true"></span>
+                </button>
                 <button type="button" (click)="openProfilePopup()">
                     <span class="menu-icon account-icon" aria-hidden="true"></span>Profil
                 </button>

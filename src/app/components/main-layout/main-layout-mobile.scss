@@ -283,6 +283,24 @@ main > header .mobile-brand,
       &:hover { background: #eceefe; color: #535af1; }
     }
 
+    .profile-menu-close {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      border-radius: 50%;
+      color: black;
+
+      &:hover,
+      &:focus-visible,
+      &:active { color: #535af1; }
+    }
+
     .menu-icon {
       display: block;
       flex: 0 0 30px;
