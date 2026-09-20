@@ -36,7 +36,10 @@
     flex-wrap: nowrap;
     flex: none;
     gap: 24px;
-    padding: 12px 20px 8px;
+    // Die Chat-Karte polstert ihren Kopf mit 12px von oben (.chat-content padding 12px 12px 20px),
+    // die Thread-Karte hat kein Polster. Damit die Nav im Kaestchen gleich hoch wirkt, traegt der
+    // Kopf die 12px selbst: 18 + 42 (Titelblock) + 14 + 1 (Linie) = 75px, wie im Chat.
+    padding: 18px 20px 14px;
     box-sizing: border-box;
     background: white;
     border-bottom: 1px solid #eceefe;
