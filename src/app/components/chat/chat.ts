@@ -35,9 +35,10 @@ interface MessagePart extends MentionSuggestion {
 @Component({
   imports: [ProfileDialog],
   selector: 'app-chat',
-  styleUrls: ['./chat.scss', './chat-channel.scss'],
+  styleUrls: ['./chat.scss', './chat-channel.scss', './chat-channel-reactions.scss', './chat-channel-responsive.scss'],
   templateUrl: './chat.html',
 })
+/** Manages channel and direct-message chat interactions. */
 export class Chat {
   isSelfChat = input(false);
   userName = input('Gast');
@@ -87,6 +88,7 @@ export class Chat {
   private lastDraftContext = '';
   private lastFocusedContext = '';
 
+  /** Requests the appropriate member dialog for the current viewport. */
   requestAddPeople(event: MouseEvent): void {
     const button = event.currentTarget as HTMLElement;
     const anchor = button.getBoundingClientRect();
@@ -99,35 +101,51 @@ export class Chat {
     this.addPeopleRequested.emit(anchor);
   }
 
+  /** Initializes chat watchers, draft handling, focus, and scroll behavior. */
   constructor() {
-    effect(() => {
-      const context = this.channel()?.id ?? this.directUser()?.uid ?? (this.isSelfChat() ? 'self' : '');
-      if (context === this.lastDraftContext) return;
-      this.lastDraftContext = context;
-      this.draft.set('');
-      this.emojiPickerOpen.set(false);
-      this.closeMentionSuggestions();
-    });
-    afterRenderEffect(() => {
-      const context = this.channel()?.id ?? this.directUser()?.uid ?? (this.isSelfChat() ? 'self' : '');
-      if (!context || context === this.lastFocusedContext) return;
-      const editor = this.editor()?.nativeElement;
-      if (!editor) return;
-      editor.focus();
-      this.lastFocusedContext = context;
-    });
-    afterRenderEffect(() => {
-      this.notes();
-      this.messages();
-      this.directMessages();
-      this.editingMessageId();
-      const history = this.history()?.nativeElement;
-      if (history) history.scrollTop = history.scrollHeight;
-    });
+    effect(() => this.resetDraftOnContextChange());
+    afterRenderEffect(() => this.focusEditorForContext());
+    afterRenderEffect(() => this.scrollHistoryToBottom());
     effect(onCleanup => this.watchChannelMessages(onCleanup));
     effect(onCleanup => this.watchDirectMessages(onCleanup));
   }
 
+  /** Clears draft-related state when the active conversation changes. */
+  private resetDraftOnContextChange(): void {
+    const context = this.chatContext();
+    if (context === this.lastDraftContext) return;
+    this.lastDraftContext = context;
+    this.draft.set('');
+    this.emojiPickerOpen.set(false);
+    this.closeMentionSuggestions();
+  }
+
+  /** Focuses the editor when a new conversation becomes active. */
+  private focusEditorForContext(): void {
+    const context = this.chatContext();
+    if (!context || context === this.lastFocusedContext) return;
+    const editor = this.editor()?.nativeElement;
+    if (!editor) return;
+    editor.focus();
+    this.lastFocusedContext = context;
+  }
+
+  /** Keeps the visible message history scrolled to the newest content. */
+  private scrollHistoryToBottom(): void {
+    this.notes();
+    this.messages();
+    this.directMessages();
+    this.editingMessageId();
+    const history = this.history()?.nativeElement;
+    if (history) history.scrollTop = history.scrollHeight;
+  }
+
+  /** Returns a stable identifier for the active chat context. */
+  private chatContext(): string {
+    return this.channel()?.id ?? this.directUser()?.uid ?? (this.isSelfChat() ? 'self' : '');
+  }
+
+  /** Watches channel messages and excludes thread replies from the main history. */
   private watchChannelMessages(onCleanup: (cleanup: () => void) => void): void {
     const channelId = this.currentChannel()?.id;
     this.messages.set([]);
@@ -138,16 +156,19 @@ export class Chat {
     onCleanup(() => stop());
   }
 
+  /** Checks whether the current user belongs to the selected channel. */
   isChannelMember(): boolean {
     const uid = this.authService.currentUserId;
     return !!uid && !!this.currentChannel()?.members.includes(uid);
   }
 
+  /** Returns the current channel instance from the available channels. */
   private currentChannel(): Channel | null {
     const selected = this.channel();
     return this.channels().find(channel => channel.id === selected?.id) ?? selected;
   }
 
+  /** Watches direct messages and marks the conversation as read. */
   private watchDirectMessages(onCleanup: (cleanup: () => void) => void): void {
     const ownUid = this.authService.currentUserId;
     const otherUid = this.directUser()?.uid;
@@ -163,6 +184,7 @@ export class Chat {
     onCleanup(() => stop());
   }
 
+  /** Adds a local note to the self-chat preview. */
   sendNote(event: Event): void {
     event.preventDefault();
     const text = this.draft().trim();
@@ -174,6 +196,7 @@ export class Chat {
     this.editor()?.nativeElement.focus();
   }
 
+  /** Handles keyboard shortcuts in the self-chat editor. */
   onEditorKeydown(event: KeyboardEvent): void {
     if (this.handleMentionKeydown(event)) return;
     if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
@@ -181,6 +204,7 @@ export class Chat {
     }
   }
 
+  /** Inserts text at the current editor selection. */
   insertText(text: string): void {
     const editor = this.editor()?.nativeElement;
     if (!editor) return;
@@ -193,11 +217,13 @@ export class Chat {
     this.emojiPickerOpen.set(false);
   }
 
+  /** Updates the draft and mention context from editor input. */
   onDraftInput(editor: HTMLTextAreaElement): void {
     this.draft.set(editor.value);
     this.updateMentionContext(editor);
   }
 
+  /** Sends a message to the selected channel. */
   sendChannelMessage(event: Event): void {
     event.preventDefault();
     const text = this.draft().trim();
@@ -211,6 +237,7 @@ export class Chat {
     this.emojiPickerOpen.set(false);
   }
 
+  /** Sends a direct message to the selected user. */
   sendDirectMessage(event: Event): void {
     event.preventDefault();
     const text = this.draft().trim();
@@ -224,6 +251,7 @@ export class Chat {
     this.emojiPickerOpen.set(false);
   }
 
+  /** Handles keyboard shortcuts in the channel editor. */
   onChannelKeydown(event: KeyboardEvent): void {
     if (this.handleMentionKeydown(event)) return;
     if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
@@ -231,6 +259,7 @@ export class Chat {
     }
   }
 
+  /** Handles keyboard shortcuts in the direct-message editor. */
   onDirectKeydown(event: KeyboardEvent): void {
     if (this.handleMentionKeydown(event)) return;
     if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
@@ -238,12 +267,14 @@ export class Chat {
     }
   }
 
+  /** Returns the display name for a message author. */
   authorName(message: Message): string {
     return this.isOwnMessage(message)
       ? `${this.userName()} (Du)`
       : this.userById(message.senderId)?.name ?? 'Gelöschtes Profil';
   }
 
+  /** Inserts a selected mention into the draft. */
   selectMention(suggestion: MentionSuggestion): void {
     const editor = this.editor()?.nativeElement;
     if (!editor) return;
@@ -257,21 +288,25 @@ export class Chat {
     this.closeMentionSuggestions();
   }
 
+  /** Splits message text into renderable parts. */
   messageParts(message: Message): MessagePart[] {
     return this.createMessageParts(message.text);
   }
 
+  /** Checks whether a date divider is needed in channel history. */
   showDateDivider(index: number): boolean {
     if (index === 0) return true;
     return this.messageDay(this.messages()[index]) !== this.messageDay(this.messages()[index - 1]);
   }
 
+  /** Checks whether a date divider is needed in direct history. */
   showDirectDateDivider(index: number): boolean {
     if (index === 0) return true;
     const messages = this.directMessages();
     return this.messageDay(messages[index]) !== this.messageDay(messages[index - 1]);
   }
 
+  /** Formats a message date for display. */
   dateLabel(message: Message): string {
     const date = message.timestamp?.toDate?.();
     if (!date) return '';
@@ -279,24 +314,29 @@ export class Chat {
     return date.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
   }
 
+  /** Returns the calendar day for a message. */
   private messageDay(message: Message): string {
     return message.timestamp?.toDate?.()?.toDateString() ?? '';
   }
 
+  /** Returns mention suggestions matching the query. */
   private filteredMentionSuggestions(): MentionSuggestion[] {
     const query = this.mentionQuery().toLocaleLowerCase('de');
     const source = this.mentionKind() === 'user' ? this.userSuggestions() : this.channelSuggestions();
     return source.filter(item => item.label.toLocaleLowerCase('de').includes(query)).slice(0, 6);
   }
 
+  /** Builds mention suggestions from users. */
   private userSuggestions(): MentionSuggestion[] {
     return this.users().map(user => ({ kind: 'user', label: user.name, user }));
   }
 
+  /** Builds mention suggestions from channels. */
   private channelSuggestions(): MentionSuggestion[] {
     return this.channels().map(channel => ({ kind: 'channel', label: channel.name, channel }));
   }
 
+  /** Updates mention state from the editor caret position. */
   private updateMentionContext(editor: HTMLTextAreaElement): void {
     const before = editor.value.slice(0, editor.selectionStart);
     const match = before.match(/(^|\s)([@#])([^\s@#]*)$/);
@@ -308,6 +348,7 @@ export class Chat {
     this.mentionOpen.set(true);
   }
 
+  /** Handles keyboard navigation for mention suggestions. */
   private handleMentionKeydown(event: KeyboardEvent): boolean {
     const suggestions = this.mentionSuggestions();
     if (!this.mentionOpen() || !suggestions.length) return false;
@@ -320,6 +361,7 @@ export class Chat {
     return true;
   }
 
+  /** Moves the active mention selection. */
   private moveMentionSelection(event: KeyboardEvent, step: number): boolean {
     event.preventDefault();
     const length = this.mentionSuggestions().length;
@@ -327,27 +369,26 @@ export class Chat {
     return true;
   }
 
+  /** Closes mention suggestions from the keyboard. */
   private closeMentionFromKeyboard(event: KeyboardEvent): boolean {
     event.preventDefault();
     this.closeMentionSuggestions();
     return true;
   }
 
+  /** Closes and resets mention suggestions. */
   private closeMentionSuggestions(): void {
     this.mentionOpen.set(false);
     this.mentionIndex.set(0);
   }
 
+  /** Creates renderable parts from message text. */
   private createMessageParts(text: string): MessagePart[] {
     const parts: MessagePart[] = [];
+    const urls = this.extractUrls(text);
     let cursor = 0;
-    const urls = [...text.matchAll(/https?:\/\/[^\s<]+/gi)].map(match => ({ index: match.index ?? 0, text: match[0].replace(/[),.!?;:]+$/, '') }));
     while (cursor < text.length) {
-      const mention = this.findNextMention(text, cursor);
-      const url = urls.find(item => item.index >= cursor);
-      const next = mention && (!url || mention.index <= url.index)
-        ? { index: mention.index, text: `${mention.kind === 'user' ? '@' : '#'}${mention.label}`, part: { ...mention, text: `${mention.kind === 'user' ? '@' : '#'}${mention.label}` } }
-        : url ? { index: url.index, text: url.text, part: { kind: 'url' as const, label: url.text, text: url.text, url: url.text } } : undefined;
+      const next = this.nextMessagePart(text, cursor, urls);
       if (!next) break;
       if (next.index > cursor) parts.push({ kind: 'user', label: '', text: text.slice(cursor, next.index) });
       parts.push(next.part);
@@ -357,75 +398,108 @@ export class Chat {
     return parts;
   }
 
+  /** Extracts URLs from message text. */
+  private extractUrls(text: string): { index: number; text: string }[] {
+    return [...text.matchAll(/https?:\/\/[^\s<]+/gi)]
+      .map(match => ({ index: match.index ?? 0, text: match[0].replace(/[),.!?;:]+$/, '') }));
+  }
+
+  /** Finds the next mention or URL in message text. */
+  private nextMessagePart(text: string, cursor: number, urls: { index: number; text: string }[]) {
+    const mention = this.findNextMention(text, cursor);
+    const url = urls.find(item => item.index >= cursor);
+    if (mention && (!url || mention.index <= url.index)) {
+      const value = `${mention.kind === 'user' ? '@' : '#'}${mention.label}`;
+      return { index: mention.index, text: value, part: { ...mention, text: value } };
+    }
+    if (url) return { index: url.index, text: url.text, part: { kind: 'url' as const, label: url.text, text: url.text, url: url.text } };
+    return undefined;
+  }
+
+  /** Finds the next known mention in message text. */
   private findNextMention(text: string, from: number): (MessagePart & { index: number }) | undefined {
     return this.allMentionTargets().map(target => ({ ...target, index: text.indexOf(target.text, from) }))
       .filter(target => target.index >= 0).sort((a, b) => a.index - b.index)[0];
   }
 
+  /** Returns all known user and channel mention targets. */
   private allMentionTargets(): MessagePart[] {
     return [...this.userSuggestions(), ...this.channelSuggestions()]
       .map(item => ({ ...item, text: `${item.kind === 'user' ? '@' : '#'}${item.label}` }))
       .sort((a, b) => b.text.length - a.text.length);
   }
 
+  /** Returns the avatar URL for a message author. */
   authorAvatar(message: Message): string {
     return this.isOwnMessage(message)
       ? this.userAvatarUrl()
       : avatarUrl(this.userById(message.senderId)?.avatar);
   }
 
+  /** Checks whether a message was sent by the current user. */
   isOwnMessage(message: Message): boolean {
     return message.senderId === this.authService.currentUserId;
   }
 
+  /** Formats a message timestamp for display. */
   messageTime(message: Message): string {
     const date = message.timestamp?.toDate?.();
     if (!date) return '';
     return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')} Uhr`;
   }
 
+  /** Requests the channel members dialog. */
   openMembers(event: MouseEvent): void {
     const button = event.currentTarget as HTMLElement;
     this.membersRequested.emit(button.getBoundingClientRect());
   }
 
+  /** Requests the channel information dialog. */
   openChannelInfo(event: MouseEvent): void {
     const button = event.currentTarget as HTMLElement;
     this.channelInfoRequested.emit(button.getBoundingClientRect());
   }
 
+  /** Returns the avatar URL for a channel member. */
   memberAvatar(member: AppUser): string {
     return avatarUrl(member.avatar);
   }
 
+  /** Returns the number of members in the selected channel. */
   memberCount(): number {
     return this.channel()?.members.length ?? 0;
   }
 
+  /** Returns the first visible members for the channel header. */
   visibleMembers(): AppUser[] {
     const members = this.channel()?.members ?? [];
     return this.users().filter(user => members.includes(user.uid)).slice(0, 3);
   }
 
+  /** Returns the non-empty reactions attached to a message. */
   reactionsOf(message: Message): { emoji: string; uids: string[] }[] {
     return Object.entries(message.reactions ?? {})
       .filter(([, uids]) => uids.length > 0)
       .map(([emoji, uids]) => ({ emoji, uids }));
   }
 
+  /** Checks whether the current user reacted with a reaction. */
   hasReacted(uids: string[]): boolean {
     const uid = this.authService.currentUserId;
     return !!uid && uids.includes(uid);
   }
 
+  /** Returns the names shown in a reaction title. */
   reactionTitle(uids: string[]): string {
     return uids.map(uid => this.reactionName(uid)).join(', ');
   }
 
+  /** Returns the reaction tooltip text for a number of users. */
   reactionTooltipText(uids: string[]): string {
     return uids.length === 1 ? 'hat reagiert' : 'haben reagiert';
   }
 
+  /** Returns the names shown in a reaction tooltip. */
   reactionTooltipNames(uids: string[]): string {
     if (uids.length === 1) return this.reactionName(uids[0]);
     const names = uids.map(uid => this.shortReactionName(uid));
@@ -434,16 +508,19 @@ export class Chat {
     return `${names[0]}, ${names[1]} und ${names.length - 2} weitere`;
   }
 
+  /** Returns a compact name for a reaction user. */
   private shortReactionName(uid: string): string {
     if (uid === this.authService.currentUserId) return 'Ich';
     return this.userById(uid)?.name.split(' ')[0] ?? uid;
   }
 
+  /** Returns a display name for a reaction user. */
   private reactionName(uid: string): string {
     if (uid === this.authService.currentUserId) return 'Ich';
     return this.userById(uid)?.name ?? uid;
   }
 
+  /** Adds or removes a reaction from a channel message. */
   toggleReaction(message: Message, emoji: string): void {
     const channelId = this.channel()?.id;
     const uid = this.authService.currentUserId;
@@ -455,6 +532,7 @@ export class Chat {
       .catch(error => console.error('Reaktion konnte nicht gespeichert werden:', error));
   }
 
+  /** Adds or removes a reaction from a direct message. */
   toggleDirectReaction(message: Message, emoji: string): void {
     const ownUid = this.authService.currentUserId;
     const otherUid = this.directUser()?.uid;
@@ -466,12 +544,14 @@ export class Chat {
       .catch(error => console.error('Reaktion konnte nicht gespeichert werden:', error));
   }
 
+  /** Toggles the reaction picker and positions it. */
   toggleReactionPicker(messageId: string, event: MouseEvent): void {
     if (this.reactionPickerFor() === messageId) return this.reactionPickerFor.set(null);
     this.reactionPickerFor.set(messageId);
     this.setReactionPickerPosition(event.currentTarget as HTMLElement);
   }
 
+  /** Positions the reaction picker near its trigger. */
   private setReactionPickerPosition(button: HTMLElement): void {
     const rect = button.getBoundingClientRect();
     const opensFromRight = button.closest('.channel-message')?.classList.contains('own') ?? false;
@@ -485,22 +565,26 @@ export class Chat {
     this.reactionPickerPosition.set({ top: rect.bottom + 8, left });
   }
 
+  /** Returns the localized reply count label. */
   replyLabel(count: number): string {
     return `${count} ${count === 1 ? 'Antwort' : 'Antworten'}`;
   }
 
+  /** Checks whether a direct message is the last own message. */
   isLastOwnDirectMessage(message: Message): boolean {
     const ownUid = this.authService.currentUserId;
     if (!ownUid || message.senderId !== ownUid) return false;
     return this.directMessages().at(-1)?.id === message.id;
   }
 
+  /** Checks whether a channel message is the last own message. */
   isLastOwnChannelMessage(message: Message): boolean {
     const ownUid = this.authService.currentUserId;
     if (!ownUid || message.senderId !== ownUid) return false;
     return this.messages().at(-1)?.id === message.id;
   }
 
+  /** Starts editing an eligible direct message. */
   startEditingDirectMessage(message: Message): void {
     if (!this.isLastOwnDirectMessage(message)) return;
     this.editingMessageId.set(message.id);
@@ -509,6 +593,7 @@ export class Chat {
     this.reactionPickerFor.set(null);
   }
 
+  /** Starts editing an eligible channel message. */
   startEditingChannelMessage(message: Message): void {
     if (!this.isLastOwnChannelMessage(message)) return;
     this.editingMessageId.set(message.id);
@@ -516,15 +601,18 @@ export class Chat {
     this.editMenuFor.set(null);
   }
 
+  /** Toggles the edit menu for a message. */
   toggleEditMenu(messageId: string): void {
     this.editMenuFor.update(openId => openId === messageId ? null : messageId);
   }
 
+  /** Cancels the active direct-message edit. */
   cancelEditingDirectMessage(): void {
     this.editingMessageId.set(null);
     this.editingText.set('');
   }
 
+  /** Saves an edited message when Enter is pressed. */
   saveEditedMessageOnEnter(event: KeyboardEvent, message: Message, channelMessage: boolean): void {
     if (event.key !== 'Enter' || event.shiftKey || event.isComposing) return;
     event.preventDefault();
@@ -532,6 +620,7 @@ export class Chat {
     else void this.saveDirectMessage(message);
   }
 
+  /** Persists an edited direct message. */
   async saveDirectMessage(message: Message): Promise<void> {
     const ownUid = this.authService.currentUserId;
     const otherUid = this.directUser()?.uid;
@@ -547,6 +636,7 @@ export class Chat {
     this.cancelEditingDirectMessage();
   }
 
+  /** Persists an edited channel message. */
   async saveChannelMessage(message: Message): Promise<void> {
     const channelId = this.channel()?.id;
     const text = this.editingText().trim();
@@ -561,38 +651,48 @@ export class Chat {
     this.cancelEditingDirectMessage();
   }
 
+  /** Replaces one message in a message collection. */
   private replaceMessageText(messages: Message[], messageId: string, text: string): Message[] {
     return messages.map(message => message.id === messageId ? { ...message, text } : message);
   }
 
+  /** Finds a user by ID in the available user collections. */
   private userById(uid: string): AppUser | undefined {
     return this.messageAuthors().find(user => user.uid === uid)
       ?? this.users().find(user => user.uid === uid);
   }
 
+  /** Returns the selected direct user avatar URL. */
   directUserAvatar(): string { return avatarUrl(this.directUser()?.avatar); }
+  /** Opens the selected direct user profile. */
   openDirectProfile(): void { this.selectedProfile.set(this.directUser()); }
+  /** Closes the selected direct user profile. */
   closeDirectProfile(): void { this.selectedProfile.set(null); }
 
+  /** Requests a direct conversation with a profile user. */
   startDirectMessage(profile: AppUser): void {
     this.messageRequested.emit(profile);
     this.closeDirectProfile();
   }
 
+  /** Opens the profile associated with a message. */
   openMessageProfile(message: Message): void {
     if (this.isOwnMessage(message)) return this.profileRequested.emit();
     this.selectedProfile.set(this.userById(message.senderId) ?? null);
   }
 
+  /** Opens the profile associated with a mention. */
   openMentionProfile(user: AppUser): void {
     if (user.uid === this.authService.currentUserId) return this.profileRequested.emit();
     this.selectedProfile.set(user);
   }
 
   @HostListener('document:keydown.escape')
+  /** Closes the profile dialog when Escape is pressed. */
   closeProfileWithEscape(): void { this.closeDirectProfile(); }
 
   @HostListener('document:click', ['$event'])
+  /** Closes chat popups when clicking outside them. */
   closeEmojiPickersOutside(event: MouseEvent): void {
     const target = event.target as HTMLElement;
     const selector = '.emoji-picker, .channel-reaction-picker, .edit-message-menu, .composer-button, .channel-hover-button, .reaction-add-button';

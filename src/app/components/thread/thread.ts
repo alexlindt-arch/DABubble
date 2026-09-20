@@ -38,6 +38,7 @@ interface MessagePart extends MentionSuggestion {
   styleUrls: ['./thread.scss', './thread-actions.scss', './thread-pickers.scss', './thread-mobile.scss'],
   templateUrl: './thread.html',
 })
+/** Manages thread replies, reactions, editing, and mentions. */
 export class Thread {
   channelId = input<string | null>(null);
   parent = input<Message | null>(null);
@@ -78,6 +79,7 @@ export class Thread {
   private editor = viewChild<ElementRef<HTMLTextAreaElement>>('editor');
   private history = viewChild<ElementRef<HTMLElement>>('history');
 
+  /** Initializes reply watching and keeps the thread scrolled to the latest message. */
   constructor() {
     afterRenderEffect(() => {
       this.replies();
@@ -92,47 +94,56 @@ export class Thread {
     return `${count} ${count === 1 ? 'Antwort' : 'Antworten'}`;
   }
 
+  /** Returns the display name for a message author. */
   authorName(message: Message): string {
     return this.isOwnMessage(message)
       ? `${this.userName()} (Du)`
       : this.userById(message.senderId)?.name ?? 'Gelöschtes Profil';
   }
 
+  /** Returns the avatar URL for a message author. */
   authorAvatar(message: Message): string {
     return this.isOwnMessage(message)
       ? this.userAvatarUrl()
       : avatarUrl(this.userById(message.senderId)?.avatar);
   }
 
+  /** Checks whether a message was sent by the current user. */
   isOwnMessage(message: Message): boolean {
     return message.senderId === this.authService.currentUserId;
   }
 
+  /** Formats a message timestamp for display. */
   messageTime(message: Message): string {
     const date = message.timestamp?.toDate?.();
     if (!date) return '';
     return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')} Uhr`;
   }
 
+  /** Splits message text into plain text and mention parts. */
   messageParts(message: Message): MessagePart[] {
     return this.createMessageParts(message.text);
   }
 
+  /** Returns the non-empty reactions attached to a message. */
   reactionsOf(message: Message): { emoji: string; uids: string[] }[] {
     return Object.entries(message.reactions ?? {})
       .filter(([, uids]) => uids.length > 0)
       .map(([emoji, uids]) => ({ emoji, uids }));
   }
 
+  /** Checks whether the current user reacted with a reaction. */
   hasReacted(uids: string[]): boolean {
     const uid = this.authService.currentUserId;
     return !!uid && uids.includes(uid);
   }
 
+  /** Returns the reaction tooltip text for a number of users. */
   reactionTooltipText(uids: string[]): string {
     return uids.length === 1 ? 'hat reagiert' : 'haben reagiert';
   }
 
+  /** Returns the names shown in a reaction tooltip. */
   reactionTooltipNames(uids: string[]): string {
     if (uids.length === 1) return this.userById(uids[0])?.name ?? uids[0];
     const names = uids.map(uid => this.shortReactionName(uid));
@@ -141,17 +152,20 @@ export class Thread {
     return `${names[0]}, ${names[1]} und ${names.length - 2} weitere`;
   }
 
+  /** Toggles the action bar for a message. */
   toggleActions(message: Message, event: MouseEvent): void {
     if ((event.target as HTMLElement).closest('button, a, textarea')) return;
     this.actionsFor.update(id => (id === message.id ? null : message.id));
   }
 
 
+  /** Toggles the reaction picker for a message. */
   toggleReactionPicker(messageId: string): void {
     this.reactionPickerFor.update(openId => openId === messageId ? null : messageId);
     this.editMenuFor.set(null);
   }
 
+  /** Adds or removes a reaction from a message. */
   toggleReaction(message: Message, emoji: string): void {
     const channelId = this.channelId();
     const uid = this.authService.currentUserId;
@@ -164,6 +178,7 @@ export class Thread {
   }
 
   /** The own opening message and the own last reply can be edited, like in the main chat. */
+  /** Checks whether a message can be edited by the current user. */
   isEditable(message: Message): boolean {
     if (!this.isOwnMessage(message)) return false;
     if (!message.parentId) return true;
@@ -171,11 +186,13 @@ export class Thread {
     return ownReplies.at(-1)?.id === message.id;
   }
 
+  /** Toggles the edit menu for a message. */
   toggleEditMenu(messageId: string): void {
     this.editMenuFor.update(openId => openId === messageId ? null : messageId);
     this.reactionPickerFor.set(null);
   }
 
+  /** Starts editing an eligible message. */
   startEditing(message: Message): void {
     if (!this.isEditable(message)) return;
     this.editingMessageId.set(message.id);
@@ -183,11 +200,13 @@ export class Thread {
     this.editMenuFor.set(null);
   }
 
+  /** Cancels the active message edit. */
   cancelEditing(): void {
     this.editingMessageId.set(null);
     this.editingText.set('');
   }
 
+  /** Persists the edited message text. */
   saveEditing(message: Message): void {
     const channelId = this.channelId();
     const text = this.editingText().trim();
@@ -198,6 +217,7 @@ export class Thread {
     this.cancelEditing();
   }
 
+  /** Sends a reply to the current thread. */
   sendReply(event: Event): void {
     event.preventDefault();
     const text = this.draft().trim();
@@ -212,6 +232,7 @@ export class Thread {
     this.emojiPickerOpen.set(false);
   }
 
+  /** Handles keyboard shortcuts in the reply editor. */
   onEditorKeydown(event: KeyboardEvent): void {
     if (this.handleMentionKeydown(event)) return;
     if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
@@ -219,11 +240,13 @@ export class Thread {
     }
   }
 
+  /** Updates the draft and mention context from editor input. */
   onDraftInput(editor: HTMLTextAreaElement): void {
     this.draft.set(editor.value);
     this.updateMentionContext(editor);
   }
 
+  /** Inserts text at the current editor selection. */
   insertText(text: string): void {
     const editor = this.editor()?.nativeElement;
     if (!editor) return;
@@ -236,6 +259,7 @@ export class Thread {
     this.emojiPickerOpen.set(false);
   }
 
+  /** Inserts a selected mention into the draft. */
   selectMention(suggestion: MentionSuggestion): void {
     const editor = this.editor()?.nativeElement;
     if (!editor) return;
@@ -249,31 +273,37 @@ export class Thread {
     this.closeMentionSuggestions();
   }
 
+  /** Opens the profile associated with a message. */
   openMessageProfile(message: Message): void {
     if (this.isOwnMessage(message)) return this.profileRequested.emit();
     this.selectedProfile.set(this.userById(message.senderId) ?? null);
   }
 
+  /** Opens the profile associated with a mention. */
   openMentionProfile(user: AppUser): void {
     if (user.uid === this.authService.currentUserId) return this.profileRequested.emit();
     this.selectedProfile.set(user);
   }
 
+  /** Closes the selected profile dialog. */
   closeProfile(): void {
     this.selectedProfile.set(null);
   }
 
+  /** Starts a direct conversation with a profile user. */
   startDirectMessage(profile: AppUser): void {
     this.messageRequested.emit(profile);
     this.closeProfile();
   }
 
   @HostListener('document:keydown.escape')
+  /** Closes the profile dialog when Escape is pressed. */
   closeProfileWithEscape(): void {
     this.closeProfile();
   }
 
   @HostListener('document:click', ['$event'])
+  /** Closes thread popups when clicking outside them. */
   closePopupsOutside(event: MouseEvent): void {
     const target = event.target as HTMLElement;
     const selector = '.thread-emoji-picker, .thread-reaction-picker, .thread-edit-menu,'
@@ -284,11 +314,13 @@ export class Thread {
     this.editMenuFor.set(null);
   }
 
+  /** Returns the parent message followed by its replies. */
   private collectThreadMessages(): Message[] {
     const parent = this.parent();
     return parent ? [parent, ...this.replies()] : this.replies();
   }
 
+  /** Watches replies for the current thread. */
   private watchReplies(onCleanup: (cleanup: () => void) => void): void {
     const channelId = this.channelId();
     const parentId = this.parent()?.id;
@@ -299,25 +331,30 @@ export class Thread {
     onCleanup(() => stop());
   }
 
+  /** Returns a compact name for a reaction user. */
   private shortReactionName(uid: string): string {
     if (uid === this.authService.currentUserId) return 'Du';
     return this.userById(uid)?.name.split(' ')[0] ?? uid;
   }
 
+  /** Returns mention suggestions matching the query. */
   private filteredMentionSuggestions(): MentionSuggestion[] {
     const query = this.mentionQuery().toLocaleLowerCase('de');
     const source = this.mentionKind() === 'user' ? this.userSuggestions() : this.channelSuggestions();
     return source.filter(item => item.label.toLocaleLowerCase('de').includes(query)).slice(0, 6);
   }
 
+  /** Builds mention suggestions from users. */
   private userSuggestions(): MentionSuggestion[] {
     return this.users().map(user => ({ kind: 'user', label: user.name, user }));
   }
 
+  /** Builds mention suggestions from channels. */
   private channelSuggestions(): MentionSuggestion[] {
     return this.channels().map(channel => ({ kind: 'channel', label: channel.name, channel }));
   }
 
+  /** Updates mention state from the editor caret position. */
   private updateMentionContext(editor: HTMLTextAreaElement): void {
     const before = editor.value.slice(0, editor.selectionStart);
     const match = before.match(/(^|\s)([@#])([^\s@#]*)$/);
@@ -329,6 +366,7 @@ export class Thread {
     this.mentionOpen.set(true);
   }
 
+  /** Handles keyboard navigation for mention suggestions. */
   private handleMentionKeydown(event: KeyboardEvent): boolean {
     const suggestions = this.mentionSuggestions();
     if (!this.mentionOpen() || !suggestions.length) return false;
@@ -341,6 +379,7 @@ export class Thread {
     return true;
   }
 
+  /** Moves the active mention selection. */
   private moveMentionSelection(event: KeyboardEvent, step: number): boolean {
     event.preventDefault();
     const length = this.mentionSuggestions().length;
@@ -348,17 +387,20 @@ export class Thread {
     return true;
   }
 
+  /** Closes mention suggestions from the keyboard. */
   private closeMentionFromKeyboard(event: KeyboardEvent): boolean {
     event.preventDefault();
     this.closeMentionSuggestions();
     return true;
   }
 
+  /** Closes and resets mention suggestions. */
   private closeMentionSuggestions(): void {
     this.mentionOpen.set(false);
     this.mentionIndex.set(0);
   }
 
+  /** Creates renderable parts from message text. */
   private createMessageParts(text: string): MessagePart[] {
     const parts: MessagePart[] = [];
     let cursor = 0;
@@ -373,17 +415,20 @@ export class Thread {
     return parts;
   }
 
+  /** Finds the next known mention in a message. */
   private findNextMention(text: string, from: number): (MessagePart & { index: number }) | undefined {
     return this.allMentionTargets().map(target => ({ ...target, index: text.indexOf(target.text, from) }))
       .filter(target => target.index >= 0).sort((a, b) => a.index - b.index)[0];
   }
 
+  /** Returns all known user and channel mention targets. */
   private allMentionTargets(): MessagePart[] {
     return [...this.userSuggestions(), ...this.channelSuggestions()]
       .map(item => ({ ...item, text: `${item.kind === 'user' ? '@' : '#'}${item.label}` }))
       .sort((a, b) => b.text.length - a.text.length);
   }
 
+  /** Finds a user by ID in the available user collections. */
   private userById(uid: string): AppUser | undefined {
     return this.messageAuthors().find(user => user.uid === uid)
       ?? this.users().find(user => user.uid === uid);

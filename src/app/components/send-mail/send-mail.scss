@@ -26,7 +26,6 @@ $color-disabled-bg: rgba(215, 216, 250, 1);
   height: 60px;
 }
 
-
 .send-mail-card {
   align-self: center;
   box-sizing: border-box;
@@ -138,7 +137,6 @@ $color-disabled-bg: rgba(215, 216, 250, 1);
   color: rgba(224, 34, 34, 1);
 }
 
-
 .send-mail-form__hint {
   margin: 0;
   font-size: 16px;
@@ -151,13 +149,11 @@ $color-disabled-bg: rgba(215, 216, 250, 1);
   color: rgba(224, 34, 34, 1);
 }
 
-
 .send-mail-form__actions {
   display: flex;
   flex-direction: row;
   justify-content: center;
 }
-
 
 .send-mail-toast {
   position: fixed;
@@ -211,7 +207,6 @@ $color-disabled-bg: rgba(215, 216, 250, 1);
   }
 }
 
-
 .send-mail-page__footer {
   display: flex;
   flex-direction: row;
@@ -236,14 +231,7 @@ $color-disabled-bg: rgba(215, 216, 250, 1);
   }
 }
 
-
-// ---------------------------------------------------------------------------
-// Mobil (Figma 04-Send email, 430x932). Karte 398 breit mit 40/20 Innenabstand,
-// Titel zweizeilig, Pfeil oben links, Knopf rechtsbuendig, Fusszeile am Rand.
-// ---------------------------------------------------------------------------
 @media (max-width: 600px) {
-  // Der Entwurf setzt den Inhalt bei 199px auf 932px Hoehe an - anteilig
-  // gerechnet, damit kurze Geraete den Knopf nicht aus dem Bild schieben.
   .send-mail-page {
     justify-content: flex-start;
     gap: 32px;
@@ -267,7 +255,6 @@ $color-disabled-bg: rgba(215, 216, 250, 1);
     padding: 40px 20px;
   }
 
-  // Der Pfeil haengt an der Karte, damit der Titel mittig bleibt.
   .send-mail-card__top {
     position: static;
     margin: 0;
@@ -292,7 +279,6 @@ $color-disabled-bg: rgba(215, 216, 250, 1);
     line-height: 120%;
   }
 
-  // 12px Kartenabstand plus 13px ergeben die 25px des Entwurfs.
   .send-mail-form {
     margin-top: 13px;
     gap: 40px;
@@ -352,7 +338,6 @@ $color-disabled-bg: rgba(215, 216, 250, 1);
     line-height: 120%;
   }
 }
-
 
 @media (max-width: 400px) {
   .send-mail-card {

@@ -5,7 +5,6 @@
     width: 366px;
     min-width: 0;
     min-height: 0;
-    // A little more white below the list than on the other sides, so the last row never sits on the edge.
     padding: 16px 16px 24px;
     box-sizing: border-box;
     overflow: hidden;
@@ -22,7 +21,6 @@
     overflow-y: auto;
     overflow-x: hidden;
     overscroll-behavior-y: contain;
-    // Julia's thin scrollbar; it only shows when the channels and direct messages need more room.
     scrollbar-width: thin;
     scrollbar-color: #c4c6eb transparent;
 
@@ -158,9 +156,6 @@
 
         ul {
             padding-right: 4px;
-
-            // Keep the extra breathing room only when the list actually has
-            // multiple channels. A single channel should not create a large gap.
             &:has(li:nth-child(2)) { min-height: 100px; }
         }
     }
@@ -219,7 +214,6 @@
         }
     }
 
-    // Keep the list mounted so its height can animate in both directions.
     .collapsible-list {
         display: grid;
         grid-template-rows: 1fr;
@@ -306,8 +300,6 @@
         }
     }
 
-    // The online dot follows the name at a fixed gap, so it never drifts under the new-message button.
-    // The slight shift moves it from the line box centre to the optical centre of the lowercase-heavy name.
     .status-dot {
         flex: 0 0 10px;
         width: 10px;
@@ -332,9 +324,6 @@
 
 @media (max-width: 1023px) {
     .sidebar-content { width: 260px; }
-
-    // The 260px menu leaves only 104px next to a 60px logo, too little for "Devspace" at 28px.
-    // A smaller logo and 24px text let the full name fit instead of cutting it to "Devsp…".
     .sidebar-header .logo { width: 40px; height: 40px; }
     .sidebar-header p { font-size: 24px; }
 
@@ -344,11 +333,9 @@
     }
 }
 
-// The 48px search field from the top bar sits over the first 74px of the menu on phones (12 + 48 + 14).
+
 @media (max-width: 767px) {
-    // The list runs to the bottom edge and ends with the last row, without empty space to scroll into.
     .sidebar-content { width: 100%; padding: 74px 8px 0; border-radius: 0; }
-    // Phones follow Figma: the menu view shows only "DABubble" in the top bar, "Devspace" belongs to the chat view.
     .sidebar-header { display: none; }
 
     .sidebar-navigation {

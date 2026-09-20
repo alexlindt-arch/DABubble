@@ -1,6 +1,4 @@
-// Everything the thread shares with the main chat: clickable names, mentions, editing and tooltips.
 
-// Figma 50: hovering a row tints it and turns the incoming bubble white; own bubbles keep purple.
 .thread-message:hover,
 .thread-message:focus-within {
     background: #eceefe;
@@ -9,7 +7,6 @@
     &.own .thread-bubble { background: #797ef3; }
 }
 
-// Figma 50: the emoji inside a reaction pill is 24px, its counter stays at 16px.
 .thread-reaction {
     font-size: 24px;
     line-height: 24px;
@@ -73,7 +70,6 @@
 }
 
 
-// Wie im Chat: der Rahmen umschliesst nur das Textfeld, die Aktionen stehen darunter.
 .thread-edit-form {
     display: flex;
     flex-direction: column;
@@ -244,8 +240,6 @@
     .thread-reaction-tooltip { transition: none; }
 }
 
-
-// Schmaler Thread: kleinere Buttons, damit Abbrechen und Speichern nebeneinander bleiben.
 @container thread (max-width: 430px) {
     .thread-edit-form button {
         padding: 6px 8px;
@@ -253,8 +247,6 @@
     }
 }
 
-
-// Sehr schmaler Thread: noch kompakter, damit beide Beschriftungen vollstaendig nebeneinander passen.
 @container thread (max-width: 340px) {
     .thread-edit-form div {
         gap: 4px;

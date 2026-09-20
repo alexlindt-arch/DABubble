@@ -1,4 +1,4 @@
-// Lets thread-mobile.scss switch to the compact layout whenever the thread itself gets narrow.
+
 :host { container: thread / inline-size; }
 
 .thread-content {
@@ -13,9 +13,6 @@
     padding: 32px 30px;
 }
 
-// Ab hier der Thread-Inhalt. Julias Kasten-Regel oben bleibt unveraendert; der Kopf
-// braucht die volle Kartenbreite fuer seinen Schatten, deshalb wandert der
-// Innenabstand aus dem Kasten in die einzelnen Bereiche.
 .thread-content {
     display: flex;
     flex-direction: column;
@@ -23,22 +20,15 @@
     overflow: hidden;
 }
 
-
-// 1:1 wie die Channel-Kopfzeile im Chat (chat.scss .chat-header): gleiche Polsterung,
-// gleicher Abstand, gleiche Trennlinie. Die Desktop-Stufe folgt weiter unten.
 .thread-header {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: flex-start;
-    // Wie .channel-chat-header: kein Umbruch, sonst rutscht der Schliessen-Knopf in eine
-    // zweite Zeile und der Kopf wird hoeher als der des Channels.
+
     flex-wrap: nowrap;
     flex: none;
     gap: 24px;
-    // Die Chat-Karte polstert ihren Kopf mit 12px von oben (.chat-content padding 12px 12px 20px),
-    // die Thread-Karte hat kein Polster. Damit die Nav im Kaestchen gleich hoch wirkt, traegt der
-    // Kopf die 12px selbst: 18 + 42 (Titelblock) + 14 + 1 (Linie) = 75px, wie im Chat.
     padding: 18px 20px 14px;
     box-sizing: border-box;
     background: white;
@@ -48,30 +38,26 @@
 
 .thread-title {
     display: flex;
-    // Der Kanalname steht unter der Ueberschrift, nicht daneben.
+
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
     flex: 0 1 auto;
     min-width: 0;
     gap: 0;
-    // Der Channel-Titel ist 42px hoch und ergibt damit die 63px Kopfhoehe. Beide Zeilen des
-    // Threads laufen in derselben Hoehe, das seitliche Polster haelt den Texteinzug bei 44px.
+
     height: 42px;
     padding: 0 24px;
 
     h2 {
         margin: 0;
         font-size: 24px;
-        // Enger als 1.2, damit Ueberschrift und Kanalname zusammen in die 42px passen.
         line-height: 1.1;
         font-weight: 700;
-        // Wie der Mainchat-Titel, nicht reines Schwarz.
         color: #2b2d42;
     }
 }
 
-// Wie .channel-name im Mainchat: gleiche Groesse, gleiche Farbe, gleiches Gewicht.
 .thread-channel {
     display: flex;
     align-items: center;
@@ -266,7 +252,6 @@
     color: black;
 }
 
-
 .thread-hover-bar {
     position: absolute;
     z-index: 3;
@@ -315,8 +300,6 @@
     &:hover { background: #eceefe; }
 }
 
-
-// Figma 63: 145px high like the chat composer, with the icon row pinned to the bottom edge.
 .thread-composer {
     position: relative;
     display: flex;
@@ -382,7 +365,6 @@
     margin-left: auto;
     color: #444df2;
 }
-
 
 @media (prefers-reduced-motion: reduce) {
     .thread-hover-bar,

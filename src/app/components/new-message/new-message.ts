@@ -11,6 +11,7 @@ import { EMOJIS } from '../../shared/emojis';
   styleUrl: './new-message.scss',
   templateUrl: './new-message.html',
 })
+/** Provides the composer for starting channel and direct conversations. */
 export class NewMessage {
   users = input<AppUser[]>([]);
   channels = input<Channel[]>([]);
@@ -30,16 +31,19 @@ export class NewMessage {
   readonly userSuggestions = computed(() => this.matchingUsers());
   readonly channelSuggestions = computed(() => this.matchingChannels());
 
+  /** Focuses the recipient field after the composer has rendered. */
   constructor() {
     afterNextRender(() => this.recipientInput()?.nativeElement.focus());
   }
 
+  /** Updates the recipient search query and clears the current selection. */
   updateRecipientQuery(value: string): void {
     this.recipientQuery.set(value);
     this.recipient.set(null);
     this.channelRecipient.set(null);
   }
 
+  /** Selects a direct-message recipient or opens an existing conversation. */
   selectRecipient(user: AppUser): void {
     if (this.existingConversationUserIds().includes(user.uid)) {
       this.conversationStarted.emit(user);
@@ -51,6 +55,7 @@ export class NewMessage {
     this.editor()?.nativeElement.focus();
   }
 
+  /** Selects a channel recipient for the new message. */
   selectChannel(channel: Channel): void {
     this.channelRecipient.set(channel);
     this.recipient.set(null);
@@ -58,10 +63,12 @@ export class NewMessage {
     this.editor()?.nativeElement.focus();
   }
 
+  /** Returns the avatar URL for a suggested user. */
   avatar(user: AppUser): string {
     return avatarUrl(user.avatar);
   }
 
+  /** Appends an emoji to the draft and restores editor focus. */
   insertEmoji(emoji: string): void {
     const editor = this.editor()?.nativeElement;
     if (!editor) return;
@@ -70,6 +77,7 @@ export class NewMessage {
     editor.focus();
   }
 
+  /** Validates and sends the draft to the selected channel or user. */
   async sendMessage(event: Event): Promise<void> {
     event.preventDefault();
     const recipient = this.recipient();
@@ -77,22 +85,29 @@ export class NewMessage {
     const senderId = this.authService.currentUserId;
     const text = this.draft().trim();
     if (!senderId || !text || (!recipient && !channel)) return;
-    if (channel) {
-      await this.messageService.sendMessage(channel.id, text, senderId);
-      this.channelStarted.emit(channel);
-      return;
-    }
-    if (recipient) {
-      await this.messageService.sendDirectMessage(senderId, recipient.uid, text);
-      this.conversationStarted.emit(recipient);
-    }
+    if (channel) return this.sendToChannel(channel, text, senderId);
+    if (recipient) await this.sendToRecipient(recipient, text, senderId);
+  }
+
+  /** Sends a message to a channel and emits the conversation event. */
+  private async sendToChannel(channel: Channel, text: string, senderId: string): Promise<void> {
+    await this.messageService.sendMessage(channel.id, text, senderId);
+    this.channelStarted.emit(channel);
+  }
+
+  /** Sends a direct message and emits the conversation event. */
+  private async sendToRecipient(recipient: AppUser, text: string, senderId: string): Promise<void> {
+    await this.messageService.sendDirectMessage(senderId, recipient.uid, text);
+    this.conversationStarted.emit(recipient);
   }
 
   @HostListener('document:click', ['$event'])
+  /** Closes the emoji picker when a click occurs outside it. */
   closeEmojiPickerOutside(event: MouseEvent): void {
     if (!(event.target as HTMLElement).closest('.emoji-picker, .composer-button')) this.emojiPickerOpen.set(false);
   }
 
+  /** Returns users matching the current recipient query. */
   private matchingUsers(): AppUser[] {
     const raw = this.recipientQuery().trimStart();
     if (raw.startsWith('#') || this.recipient() || this.channelRecipient()) return [];
@@ -102,6 +117,7 @@ export class NewMessage {
       user.name.toLocaleLowerCase('de').includes(query) || user.email.toLocaleLowerCase('de').includes(query));
   }
 
+  /** Returns channels matching the current recipient query. */
   private matchingChannels(): Channel[] {
     const raw = this.recipientQuery().trimStart();
     if (!raw.startsWith('#') || this.recipient() || this.channelRecipient()) return [];

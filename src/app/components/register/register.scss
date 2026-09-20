@@ -16,7 +16,6 @@ $color-disabled-bg: rgba(215, 216, 250, 1);
   overflow-x: hidden;
 }
 
-
 .register-page__header {
   display: flex;
   flex-direction: row;
@@ -26,7 +25,6 @@ $color-disabled-bg: rgba(215, 216, 250, 1);
 .register-page__logo {
   height: 60px;
 }
-
 
 .register-card {
   align-self: center;
@@ -86,7 +84,6 @@ $color-disabled-bg: rgba(215, 216, 250, 1);
   color: rgba(0, 0, 0, 1);
 }
 
-
 .register-form {
   display: flex;
   flex-direction: column;
@@ -99,7 +96,6 @@ $color-disabled-bg: rgba(215, 216, 250, 1);
   gap: 6px;
   text-align: left;
 }
-
 
 .input-group {
   display: flex;
@@ -139,7 +135,6 @@ $color-disabled-bg: rgba(215, 216, 250, 1);
   font-size: 13px;
   color: rgba(224, 34, 34, 1);
 }
-
 
 .checkbox-group {
   position: relative;
@@ -191,13 +186,11 @@ $color-disabled-bg: rgba(215, 216, 250, 1);
   &:hover, &:focus-visible { font-weight: 700; text-decoration: underline; }
 }
 
-
 .register-form__error {
   margin: 0;
   font-size: 14px;
   color: rgba(224, 34, 34, 1);
 }
-
 
 .register-form__actions {
   display: flex;
@@ -233,7 +226,6 @@ $color-disabled-bg: rgba(215, 216, 250, 1);
   }
 }
 
-
 .register-page__footer {
   display: flex;
   flex-direction: row;
@@ -258,12 +250,6 @@ $color-disabled-bg: rgba(215, 216, 250, 1);
   }
 }
 
-
-// ---------------------------------------------------------------------------
-// Mobil (Figma 02-Sign In, 430x932). Logo und Karte sitzen mittig, die
-// Fusszeile am unteren Rand - die beiden auto-Abstaende teilen den freien
-// Platz und fallen auf null, sobald der Inhalt laenger wird als der Schirm.
-// ---------------------------------------------------------------------------
 @media (max-width: 600px) {
   .register-page {
     justify-content: flex-start;
@@ -357,7 +343,6 @@ $color-disabled-bg: rgba(215, 216, 250, 1);
     color: rgba(121, 126, 243, 1);
   }
 
-  // Der Knopf steht rechts, nicht ueber die volle Breite.
   .register-form__actions {
     justify-content: flex-end;
   }
@@ -386,7 +371,6 @@ $color-disabled-bg: rgba(215, 216, 250, 1);
   }
 }
 
-
 @media (max-width: 400px) {
   .register-page {
     padding: 32px 16px 20px;
@@ -396,7 +380,6 @@ $color-disabled-bg: rgba(215, 216, 250, 1);
     padding: 20px 16px;
   }
 
-  // Der Pfeil braucht Platz - Titel bleibt eingerueckt und wird kleiner.
   .register-card__title {
     padding: 0 40px;
     font-size: 22px;

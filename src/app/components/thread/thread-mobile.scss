@@ -1,7 +1,6 @@
-// Figma "08-Secondary Chat mobile": the compact thread used on phones and whenever the
-// desktop thread gets squeezed below the phone frame width.
+
 @mixin compact-thread {
-    // Wie .chat-header im Chat unter 768px: gleiche Polsterung und gleicher Abstand.
+   
     .thread-header {
         box-sizing: border-box;
         height: auto;
@@ -10,7 +9,6 @@
     }
 
     .thread-title {
-        // Wie .channel-title unter 768px.
         gap: 0;
         padding: 0 12px;
 
@@ -22,10 +20,8 @@
 
     .thread-history { padding: 0 0 10px; }
 
-    // Figma "Separator 1": 388px row centered in the 430px frame.
     .thread-divider { padding: 10px 21px; }
 
-    // Figma "50. Direct messages": 50px avatar, 16px gap, 50px free on the side away from the avatar.
     .thread-message {
         gap: 16px;
         padding: 10px 50px 10px 16px;
@@ -33,12 +29,10 @@
         &.own { padding: 10px 16px 10px 50px; }
     }
 
-    // The avatar keeps the 70px of the main chat, only the own one gets the Figma shadow.
     .thread-avatar {
         .own & { box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
     }
 
-    // Other people's bubbles fill the row; own bubbles hug their text on the right.
     .thread-bubble-column {
         flex: 1 1 auto;
 
@@ -51,7 +45,6 @@
         }
     }
 
-    // Figma "Reaction indicator": 34px high pill next to the 34px add button.
     .thread-reaction {
         height: 34px;
         line-height: 22px;
@@ -64,8 +57,6 @@
 
     .own .thread-reaction-picker { left: 16px; }
 
-    // Figma "63. Write text box aux": 398 x 145, 16px from the sides, one line of text and the
-    // 40px icon row at the bottom edge.
     .thread-composer {
         margin: 0 16px 40px;
 
@@ -76,16 +67,12 @@
     // schmale Thread dieselbe Farbe zeigt, gilt hier derselbe Wert statt eines eigenen Graus.
     .thread-composer-button { color: #686a76; }
 
-    // The arrow keeps the 24px of the chat composer so both send buttons look alike.
     .thread-send { color: #444df2; }
 }
 
-// Desktop: a thread narrower than the 430px phone frame keeps its rounded card but uses the phone sizes.
 @container thread (max-width: 430px) {
     @include compact-thread;
 
-    // Antippen holt die Aktionsleiste unter die Nachricht: Smileys und, bei der eigenen
-    // letzten Antwort, das Menue zum Bearbeiten. Unten statt oben, damit sie nichts verdeckt.
     .thread-message.actions-open .thread-hover-bar {
         display: flex;
         top: -14px;
@@ -102,7 +89,6 @@
     }
 }
 
-// Narrower still: the side gaps and the avatar give way, otherwise the bubbles break per word.
 @container thread (max-width: 340px) {
     .thread-header { padding: 10px 12px; }
 
@@ -127,11 +113,9 @@
 
     .own .thread-reaction-picker { left: 12px; }
 
-    // The bottom gap stays at 40px so the box ends level with the chat composer.
     .thread-composer { margin: 0 12px 40px; padding: 12px; }
 }
 
-// Gleiche Stelle wie die Chat-Leiste: unter 1024px rueckt sie auf 16px und -14px.
 @media (max-width: 1023px) {
     .thread-hover-bar {
         top: -14px;
@@ -146,19 +130,13 @@
     }
 }
 
-
-// Phones last, so the phone frame wins over the container steps above.
 @media (max-width: 767px) {
     .thread-content { border-radius: 0; }
 
-    // Figma 08 keeps the floating reaction bar invisible here: a finger cannot hover, and with a
-    // mouse it would otherwise sit on top of the name row.
     .thread-hover-bar { display: none; }
 
     @include compact-thread;
 
-    // Antippen holt die Aktionsleiste unter die Nachricht: Smileys und, bei der eigenen
-    // letzten Antwort, das Menue zum Bearbeiten. Unten statt oben, damit sie nichts verdeckt.
     .thread-message.actions-open .thread-hover-bar {
         display: flex;
         top: -14px;
@@ -174,13 +152,9 @@
         left: 16px;
     }
 
-    // Figma 08: 30px from the bottom edge of the phone frame.
     .thread-composer { margin: 0 16px 30px; padding: 20px; }
 }
 
-// Bis zur Tablet-Grenze verdeckt der Thread den Chat vollstaendig - der Chat wird erst wieder
-// sichtbar, wenn der Thread geschlossen wird. Ab 1024px stehen beide nebeneinander.
-// Die Werte folgen dem Layout: 12px Aussenrand, 260px Sidebar, 16px Spaltenabstand.
 @media (min-width: 768px) and (max-width: 1023px) {
     :host {
         position: fixed;
@@ -190,14 +164,10 @@
         left: calc(12px + 260px + 16px);
         z-index: 20;
         width: auto;
-        // Das Layout setzt .content > app-thread { max-width: 485px; margin: 16px 0 } und ist
-        // spezifischer als :host. Ohne diese Ausnahmen bliebe rechts ein Streifen Chat sichtbar
-        // und der Thread saesse 16px zu tief.
         max-width: none !important;
         margin: 0 !important;
     }
 
-    // Bei eingeklappter Sidebar beginnt der Chat direkt am Aussenrand.
     :host-context(main.sidebar-closed) {
         left: 28px;
     }
@@ -207,8 +177,6 @@
     }
 }
 
-
-// Unter 1024px ist der Channel-Titel 22px gross (.channel-title in der 1023er-Stufe).
 @media (max-width: 1023px) {
     .thread-title h2 {
         font-size: 22px;
@@ -216,18 +184,7 @@
     }
 }
 
-
-// Unterhalb der Schwelle deckt der Thread den Chat weiter vollstaendig ab - mit den
-// Desktop-Massen: 16px Aussenrand, 366px Sidebar, 16px Spaltenabstand. Darueber ist Platz
-// fuer beide Spalten, dort uebernimmt der Block darunter.
-// Die Grenze endet auf .98, weil die CSS-Breite bei Zoom oder HiDPI gebrochen sein kann.
-// Mit "max-width: 1444px" hier und "min-width: 1445px" dort traf bei gemessenen 1444,x px
-// KEINE der beiden Regeln: Der Thread fiel auf die anteilige Verteilung zurueck und stand
-// mit 334px statt 485px neben dem Chat. Beide Bloecke teilen sich jetzt denselben Wert.
 @media (min-width: 1024px) and (max-width: 1444.98px) {
-    // Die Kanten folgen denselben Formeln wie das Layout: main hat
-    // padding: 0 clamp(0px, 1.2vw, 16px), die Kopfzeile height: clamp(64px, 6.25vw, 120px),
-    // dazu 16px Spaltenabstand und 366px Sidebar. 2px Zugabe schlucken Rundungen.
     :host {
         position: fixed;
         top: calc(clamp(64px, 6.25vw, 120px) + 14px);
@@ -249,24 +206,12 @@
     }
 }
 
-
-// Ab hier stehen Chat und Thread nebeneinander. Die Grenze ist ausgemessen, nicht geschaetzt:
-// 16px Aussenrand + 366px Sidebar + 16px Spaltenabstand = 430px Fixkosten, dazu der Thread mit
-// seinen 485px - es bleiben 530px fuer den Chat. Genau dort ist dessen Kopfzeile noch einzeilig
-// (110px hoch); ab 520px bricht sie auf 114px um. Darum faengt die Dreier-Ansicht hier an.
-// Derselbe .98-Wert wie oben, damit zwischen beiden Bloecken keine Luecke klafft.
 @media (min-width: 1444.98px) {
-    // Das Layout verteilt den Platz anteilig (.content > app-thread { flex: 485 1 0 }) und
-    // liesse dem Thread bei 1445px nur 334px. Seine Figma-Breite steht ihm aber fest zu, den
-    // Rest nimmt der Chat. Der Layout-Selektor ist spezifischer als :host, daher die Ausnahme.
     :host {
         flex: 0 0 485px !important;
     }
 }
 
-
-// Ab 1024px uebernimmt der Kopf die Masse der Channel-Kopfzeile (chat.scss, @media min-width 1024px):
-// 110px hoch, 20px/45px Polsterung, 15px Abstand, Schatten - und die Karte den 30px-Radius.
 @media (min-width: 1024px) {
     .thread-header {
         align-items: center;
@@ -276,9 +221,6 @@
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
     }
 
-    // Wie .channel-title ab 1024px (chat-channel.scss:694): engere Polsterung, damit der
-    // Titel an derselben Stelle beginnt wie im Channel.
-    // Ab 1024px traegt der Kopf seine 110px ueber min-height, die Zeilen duerfen atmen.
     .thread-title {
         gap: 2px;
         height: auto;

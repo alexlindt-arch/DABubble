@@ -98,7 +98,6 @@ $error: #ed1e79;
   .profile-edit-backdrop { padding: 72px 24px 16px; }
 }
 
-// Phones: the own edit card sits under the 80px top bar with a small margin, other profiles stay centered.
 @media (max-width: 767px) {
   .profile-backdrop { padding: 16px 8px; }
   .profile-dialog { padding: 24px 20px; }

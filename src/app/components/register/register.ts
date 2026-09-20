@@ -11,6 +11,7 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './register.scss',
   templateUrl: './register.html',
 })
+/** Handles account registration and navigation to avatar selection. */
 export class Register {
   private readonly formBuilder = inject(FormBuilder);
   private readonly authService = inject(AuthService);
@@ -26,6 +27,7 @@ export class Register {
   isSubmitting = false;
   registerError = '';
 
+  /** Returns the validation message for the name field. */
   get nameErrorMessage(): string {
     const name = this.registerForm.controls.name;
     if (name.hasError('required')) return 'Bitte gib deinen Namen ein.';
@@ -33,6 +35,7 @@ export class Register {
     return '';
   }
 
+  /** Returns the validation message for the email field. */
   get emailErrorMessage(): string {
     const email = this.registerForm.controls.email;
     if (email.hasError('required')) return 'Bitte gib deine E-Mail-Adresse ein.';
@@ -40,6 +43,7 @@ export class Register {
     return '';
   }
 
+  /** Returns the validation message for the password field. */
   get passwordErrorMessage(): string {
     const password = this.registerForm.controls.password;
     if (password.hasError('required')) return 'Bitte gib ein Passwort ein.';
@@ -47,16 +51,19 @@ export class Register {
     return '';
   }
 
+  /** Returns the validation message for the privacy-consent field. */
   get privacyErrorMessage(): string {
     const acceptPrivacy = this.registerForm.controls.acceptPrivacy;
     if (acceptPrivacy.hasError('required')) return 'Bitte stimme der Datenschutzerklärung zu.';
     return '';
   }
 
+  /** Navigates back to the login page. */
   goBack(): void {
     this.router.navigateByUrl('/login');
   }
 
+  /** Validates the form and starts the registration flow. */
   submitRegister(): void {
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
@@ -65,6 +72,7 @@ export class Register {
     this.performRegister();
   }
 
+  /** Sends the submitted credentials to the authentication service. */
   private performRegister(): void {
     const { name, email, password } = this.registerForm.getRawValue();
     this.isSubmitting = true;
@@ -76,10 +84,12 @@ export class Register {
       .finally(() => (this.isSubmitting = false));
   }
 
+  /** Opens avatar selection for the newly registered user. */
   private goToAvatarSelection(name: string, email: string): void {
     this.router.navigate(['/choose-avatar'], { state: { name, email } });
   }
 
+  /** Maps registration failures to user-facing messages. */
   private mapRegisterError(error: unknown): string {
     const code = error instanceof FirebaseError ? error.code : '';
     if (code === 'auth/email-already-in-use') return 'Diese E-Mail-Adresse wird bereits verwendet.';

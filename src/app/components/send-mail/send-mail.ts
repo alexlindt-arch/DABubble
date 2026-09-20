@@ -10,6 +10,7 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './send-mail.scss',
   templateUrl: './send-mail.html',
 })
+/** Handles password-reset email requests. */
 export class SendMail {
   private readonly formBuilder = inject(FormBuilder);
   private readonly authService = inject(AuthService);
@@ -23,6 +24,7 @@ export class SendMail {
   sendError = '';
   mailSent = false;
 
+  /** Returns the validation message for the email field. */
   get emailErrorMessage(): string {
     const email = this.sendMailForm.controls.email;
     if (email.hasError('required')) return 'Bitte gib deine E-Mail-Adresse ein.';
@@ -30,10 +32,12 @@ export class SendMail {
     return '';
   }
 
+  /** Navigates back to the login page. */
   goBack(): void {
     this.router.navigateByUrl('/login');
   }
 
+  /** Validates the form and starts the password-reset request. */
   submitSendMail(): void {
     if (this.sendMailForm.invalid) {
       this.sendMailForm.markAllAsTouched();
@@ -42,7 +46,7 @@ export class SendMail {
     this.requestResetMail();
   }
 
-  /** Erfolgsmeldung erscheint auch bei unbekannter Adresse - alles andere verriete Konten. */
+  /** Requests a reset email without revealing whether an address exists. */
   private requestResetMail(): void {
     const email = this.sendMailForm.controls.email.value ?? '';
     this.isSubmitting = true;
@@ -54,12 +58,14 @@ export class SendMail {
       .finally(() => (this.isSubmitting = false));
   }
 
+  /** Shows confirmation and returns to the login page after a short delay. */
   private confirmAndLeave(): void {
     this.mailSent = true;
     setTimeout(() => this.router.navigateByUrl('/login'), 2000);
   }
 }
 
+/** Maps password-reset failures to user-facing messages. */
 function mapSendError(error: unknown): string {
   const code = error instanceof FirebaseError ? error.code : '';
   if (code === 'auth/invalid-email') return 'Diese E-Mail-Adresse ist leider ungültig.';

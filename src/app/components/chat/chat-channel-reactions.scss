@@ -1,0 +1,274 @@
+.channel-reactions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+}
+
+.reaction-add-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: white;
+    cursor: pointer;
+
+    .reaction-add-icon {
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        transition: opacity 0.2s ease;
+    }
+
+    .reaction-add-icon--hover { opacity: 0; }
+
+    &:hover,
+    &:focus-visible {
+        outline: none;
+
+        .reaction-add-icon:not(.reaction-add-icon--hover) { opacity: 0; }
+        .reaction-add-icon--hover { opacity: 1; }
+    }
+}
+
+.channel-message:not(.own) .reaction-add-button { order: -1; }
+
+.channel-reaction {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-width: 52px;
+    height: 28px;
+    padding: 0 6px;
+    box-sizing: border-box;
+    border: 1px solid #adb0d9;
+    border-radius: 999px;
+    background: white;
+    font-family: inherit;
+    font-size: 12px;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &.active {
+        border-color: #444df2;
+    }
+}
+
+.reaction-tooltip {
+    position: absolute;
+    z-index: 30;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    box-sizing: border-box;
+    min-width: 160px;
+    max-width: 240px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: #2b2d42;
+    color: #eceefe;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+    font-size: 13px;
+    line-height: 1.35;
+    white-space: normal;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateX(-50%) translateY(6px);
+    transition: opacity 140ms ease, transform 140ms ease, visibility 140ms ease;
+
+    strong { color: #fff; overflow-wrap: anywhere; }
+}
+
+.channel-reaction:hover .reaction-tooltip,
+.channel-reaction:focus-visible .reaction-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.channel-message.own .reaction-tooltip {
+    right: 0;
+    left: auto;
+    transform: translateY(6px);
+}
+
+.channel-message.own .channel-reaction:hover .reaction-tooltip,
+.channel-message.own .channel-reaction:focus-visible .reaction-tooltip {
+    transform: translateY(0);
+}
+
+.channel-reaction-count {
+    color: #000;
+}
+
+.channel-hover-bar {
+    position: absolute;
+    z-index: 3;
+    top: -14px;
+    right: 16px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-sizing: border-box;
+    padding: 6px 12px;
+    border: 1px solid #d8ddef;
+    border-radius: 24px 24px 0 24px;
+    background: white;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(6px);
+    transition: opacity 180ms ease, visibility 180ms ease, transform 180ms ease;
+
+    .channel-message:hover &,
+    .channel-message:focus-within & {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transform: translateY(0);
+    }
+}
+
+.channel-message.own .channel-hover-bar {
+    right: auto;
+    left: 16px;
+}
+
+.channel-hover-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: black;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color 120ms ease, transform 120ms ease;
+
+    &:hover,
+    &:focus-visible {
+        background: #f1f3fb;
+        outline: none;
+    }
+
+    &:active { transform: scale(0.96); }
+}
+
+.hover-control-icon {
+    display: block !important;
+    flex: 0 0 20px;
+    width: 20px !important;
+    height: 20px !important;
+    max-width: none;
+    object-fit: contain;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.quick-check { order: 1; }
+.quick-thumb { order: 2; }
+.reaction-picker-button { order: 3; }
+.thread-button { order: 4; }
+
+.channel-message.own .direct-edit-button,
+.channel-message.own .thread-button { order: 1; }
+
+.channel-message.own .reaction-picker-button { order: 2; }
+.channel-message.own .quick-thumb { order: 3; }
+.channel-message.own .quick-check { order: 4; }
+
+.direct-edit-button {
+    order: 4;
+}
+
+.edit-menu-anchor {
+    position: relative;
+    display: flex;
+    order: 4;
+}
+
+.channel-message.own .edit-menu-anchor { order: 1; }
+
+.edit-message-menu {
+    position: absolute;
+    z-index: 25;
+    top: calc(100% + 8px);
+    left: 0;
+    min-width: 180px;
+    padding: 8px 0;
+    box-sizing: border-box;
+    border-radius: 12px;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+    button {
+        width: 100%;
+        padding: 12px 16px;
+        border: 0;
+        background: transparent;
+        font: inherit;
+        font-size: 14px;
+        text-align: left;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+
+        &:hover, &:focus-visible { background: #f5f5f5; outline: none; }
+    }
+}
+
+.channel-reaction-picker {
+    position: fixed;
+    z-index: 1300;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    width: 232px;
+    padding: 10px;
+    border: 1px solid #d8ddef;
+    border-radius: 16px;
+    background: white;
+
+    button {
+        padding: 4px 6px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        font-size: 20px;
+        cursor: pointer;
+
+        &:hover {
+            background: #eceefe;
+        }
+    }
+}
+
+.channel-title { flex: 0 1 auto; min-width: 0; }
+
+// Never shortened with an ellipsis; only a name wider than the whole header breaks inside the title.
+.channel-name {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.channel-arrow { flex-shrink: 0; }
+
+// Up to 1279px the avatars and member count use a compact size, so they still fit next to the
+// full channel name, also right after 1024px where the menu grows to 366px.
