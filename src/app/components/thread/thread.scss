@@ -48,20 +48,23 @@
     // Der Kanalname steht unter der Ueberschrift, nicht daneben.
     flex-direction: column;
     align-items: flex-start;
+    justify-content: center;
     flex: 0 1 auto;
     min-width: 0;
-    gap: 2px;
-    // Wie .channel-title im Chat: dieselbe Polsterung, damit der Kopf exakt gleich hoch wird
-    // und der Text an derselben Stelle beginnt.
-    padding: 8px 24px;
+    gap: 0;
+    // Der Channel-Titel ist 42px hoch und ergibt damit die 63px Kopfhoehe. Beide Zeilen des
+    // Threads laufen in derselben Hoehe, das seitliche Polster haelt den Texteinzug bei 44px.
+    height: 42px;
+    padding: 0 24px;
 
     h2 {
         margin: 0;
-        // Wie .channel-title im Chat: 24px bei line-height 1.2.
         font-size: 24px;
-        line-height: 1.2;
+        // Enger als 1.2, damit Ueberschrift und Kanalname zusammen in die 42px passen.
+        line-height: 1.1;
         font-weight: 700;
-        color: black;
+        // Wie der Mainchat-Titel, nicht reines Schwarz.
+        color: #2b2d42;
     }
 }
 
@@ -71,7 +74,7 @@
     align-items: center;
     gap: 3px;
     min-width: 0;
-    font-size: 22px;
+    font-size: 14px;
     line-height: 1.2;
     font-weight: 700;
     color: #2b2d42;

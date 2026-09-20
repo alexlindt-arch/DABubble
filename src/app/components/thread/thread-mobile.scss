@@ -11,8 +11,8 @@
 
     .thread-title {
         // Wie .channel-title unter 768px.
-        gap: 6px;
-        padding: 8px 12px;
+        gap: 0;
+        padding: 0 12px;
 
         h2 {
             font-size: 24px;
@@ -256,13 +256,15 @@
 
     // Wie .channel-title ab 1024px (chat-channel.scss:694): engere Polsterung, damit der
     // Titel an derselben Stelle beginnt wie im Channel.
+    // Ab 1024px traegt der Kopf seine 110px ueber min-height, die Zeilen duerfen atmen.
     .thread-title {
         gap: 2px;
+        height: auto;
         padding: 8px 12px;
     }
 
     .thread-channel {
-        font-size: 24px;
+        font-size: 16px;
     }
 
     .thread-content {
