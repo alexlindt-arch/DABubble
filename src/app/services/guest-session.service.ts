@@ -35,27 +35,26 @@ export class GuestSessionService {
   private sweepOnce(ownUid: string): void {
     if (this.swept) return;
     this.swept = true;
-    this.cleanup.sweepExpiredGuests(ownUid).catch(error => this.reportFailure(error));
+    this.cleanup.sweepExpiredGuests(ownUid).catch(() => undefined);
   }
 
   private async endSession(): Promise<void> {
     const uid = this.authService.currentUserId;
     if (this.ending || !uid) return;
     this.ending = true;
-    await this.cleanup.removeGuestData(uid).catch(error => this.reportFailure(error));
+    await this.cleanup.removeOwnGuestData(uid).catch(error => this.reportFailure(error));
     await this.closeAccount();
     await this.router.navigate(['/login'], { queryParams: { guest: 'expired' } });
     this.ending = false;
   }
 
-  /** Das anonyme Konto selbst gehört mit weg; klappt das nicht, bleibt zumindest die Abmeldung. */
+  /**
+   * Das anonyme Konto gehört mit weg. Nach 15 Minuten gilt die Anmeldung dafür oft als zu alt;
+   * dann bleibt ein leeres Konto zurück, dessen Daten aber längst gelöscht sind.
+   */
   private async closeAccount(): Promise<void> {
-    try {
-      await this.authService.deleteCurrentAccount();
-    } catch (error) {
-      this.reportFailure(error);
-    }
-    await this.authService.logout().catch(error => this.reportFailure(error));
+    await this.authService.deleteCurrentAccount().catch(() => undefined);
+    await this.authService.logout().catch(() => undefined);
   }
 
   private reportFailure(error: unknown): void {

@@ -19,12 +19,22 @@ export class GuestCleanupService {
     for (const uid of guestUids) await this.removeGuestData(uid);
   }
 
+  /** Die eigene Sitzung schliesst die Direktchats ein; fremde darf niemand abfragen. */
+  async removeOwnGuestData(uid: string): Promise<void> {
+    await this.tryClear(() => this.messageService.deleteDirectChatsOf(uid));
+    await this.removeGuestData(uid);
+  }
+
   /** Das Profil geht zuletzt: Es weist den Rules nach, dass die Daten gelöscht werden dürfen. */
   async removeGuestData(uid: string): Promise<void> {
     const channels = await this.channelService.loadChannels();
     const channelsCleared = await this.clearChannels(channels, uid);
-    await this.tryClear(() => this.messageService.deleteDirectChatsOf(uid));
-    if (channelsCleared) await this.userService.deleteUserProfile(uid);
+    if (channelsCleared) await this.removeProfile(uid);
+  }
+
+  /** War ein anderer Client schneller, ist das Profil schon weg - kein Grund zur Sorge. */
+  private removeProfile(uid: string): Promise<void> {
+    return this.userService.deleteUserProfile(uid).catch(() => undefined);
   }
 
   private async clearChannels(channels: Channel[], uid: string): Promise<boolean> {
@@ -52,13 +62,15 @@ export class GuestCleanupService {
     return this.channelService.leaveChannel(channelId, uid).catch(() => undefined);
   }
 
-  /** Ein blockierter Schritt darf die übrigen nicht stoppen, sonst bleibt alles liegen. */
+  /**
+   * Ein blockierter Schritt darf die übrigen nicht stoppen. Fehlende Rechte sind hier normal,
+   * etwa wenn ein anderer Client parallel aufräumt - deshalb ohne Eintrag in der Konsole.
+   */
   private async tryClear(task: () => Promise<void>): Promise<boolean> {
     try {
       await task();
       return true;
-    } catch (error) {
-      console.error('Gast-Daten konnten nicht gelöscht werden:', error);
+    } catch {
       return false;
     }
   }
