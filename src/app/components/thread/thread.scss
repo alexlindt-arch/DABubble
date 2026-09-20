@@ -302,42 +302,50 @@
 
 .thread-composer {
     position: relative;
-    display: flex;
-    flex-direction: column;
+    flex-shrink: 0;
     flex: none;
+    min-width: 0;
     height: 145px;
     box-sizing: border-box;
-    margin: 0 20px 40px;
-    padding: 20px;
-    border: 1px solid #adb0d9;
-    border-radius: 20px;
-    transition: border-color 0.3s ease;
-
-    &:focus-within { border-color: #444df2; }
+    // Tablet stage: the chat pads its card with 12px 12px 20px, so the box keeps those gaps.
+    margin: 0 12px 20px;
+    border: 1px solid #cfd4f6;
+    border-radius: 30px;
+    background: #fff;
 
     textarea {
         display: block;
-        box-sizing: border-box;
         width: 100%;
+        height: 100%;
+        padding: 22px 88px 56px 22px;
+        box-sizing: border-box;
         border: none;
         outline: none;
         resize: none;
         background: transparent;
-        font-family: inherit;
-        font-size: 18px;
-        line-height: 25px;
-        color: black;
+        font: inherit;
+        font-size: 20px;
+        line-height: 1.45;
+        color: #000;
 
-        &::placeholder { color: #686868; }
+        &::placeholder { color: #686a76; opacity: 1; }
     }
 }
 
+// Like .composer-actions in the chat: pinned to the bottom edge, not flowing in a column.
 .thread-composer-actions {
+    position: absolute;
+    right: 18px;
+    bottom: 0;
+    left: 18px;
     display: flex;
-    flex-direction: row;
     align-items: center;
-    gap: 5px;
-    margin-top: auto;
+    gap: 18px;
+    min-height: 58px;
+    padding: 8px 0 10px;
+    box-sizing: border-box;
+    background: #fff;
+    z-index: 1;
 }
 
 .thread-composer-button {
@@ -350,9 +358,7 @@
     border: none;
     border-radius: 20px;
     background: transparent;
-    // Dasselbe Grau wie im Chat-Composer (.composer-button in chat.scss), damit Smiley und
-    // @-Zeichen genauso aussehen wie im Channel. Der Sendepfeil behaelt sein Blau ueber
-    // .thread-send weiter unten.
+    // Same grey as .composer-button in the chat; .thread-send keeps the arrow blue.
     color: #686a76;
     cursor: pointer;
     transition: background-color 0.2s ease;
