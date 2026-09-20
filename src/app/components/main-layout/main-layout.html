@@ -204,7 +204,7 @@
 @if (channelInfoOpen && selectedChannel(); as channel) {
   <app-channel-info-dialog [channel]="channel" [creator]="selectedChannelCreator()" [currentUserId]="currentUserId" [anchor]="channelInfoAnchor()"
     (closed)="closeChannelInfo()" (saved)="saveChannelInfo($event)" (left)="leaveSelectedChannel()"
-    (messageRequested)="startDirectConversation($event)" />
+    (messageRequested)="startDirectConversationFromChannelInfo($event)" />
 }
 </main>
 

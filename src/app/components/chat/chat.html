@@ -77,7 +77,7 @@
     <div class="chat-body direct-chat-body">
         <div #history class="chat-history" role="log" [attr.aria-label]="'Direktnachrichten mit ' + user.name"
             aria-live="polite">
-        @if (directMessages().length === 0) {
+        @if (directMessagesLoaded() && directMessages().length === 0) {
         <div class="direct-introduction">
             <button type="button" class="introduction-profile" (click)="openDirectProfile()">
                 <img [src]="directUserAvatar()" alt=""><h2>{{ user.name }}</h2>
@@ -102,15 +102,16 @@
                         <span class="channel-message-time">{{ messageTime(message) }}</span>
                     </div>
                     @if (editingMessageId() === message.id) {
-                    <form class="direct-edit-form" (submit)="saveDirectMessage(message)">
+                    <form class="direct-edit-form" (submit)="$event.preventDefault(); saveDirectMessage(message)">
                         <textarea aria-label="Nachricht bearbeiten" [value]="editingText()"
-                            (input)="editingText.set($any($event.target).value)" (keydown.escape)="cancelEditingDirectMessage()"></textarea>
-                        <div><button type="button" (click)="cancelEditingDirectMessage()">Abbrechen</button><button type="submit" [disabled]="!editingText().trim()">Speichern</button></div>
+                            (input)="editingText.set($any($event.target).value)" (keydown)="saveEditedMessageOnEnter($event, message, false)" (keydown.escape)="cancelEditingDirectMessage()"></textarea>
+                        <div><button type="button" (click)="cancelEditingDirectMessage()">Abbrechen</button><button type="button" (click)="saveDirectMessage(message)" [disabled]="!editingText().trim()">Speichern</button></div>
                     </form>
                     } @else {
                     <p class="channel-message-bubble">@for (part of messageParts(message); track $index) {
                         @if (part.user; as user) { <button type="button" class="message-link" (click)="openMentionProfile(user)">{{ part.text }}</button> }
                         @else if (part.channel; as linkedChannel) { <button type="button" class="message-link" (click)="channelRequested.emit(linkedChannel)">{{ part.text }}</button> }
+                        @else if (part.url) { <a class="message-link" [href]="part.url" target="_blank" rel="noopener noreferrer">{{ part.text }}</a> }
                         @else { <span>{{ part.text }}</span> }
                     }</p>
                     @if (message.editedAt) { <span class="message-edited">bearbeitet</span> }
@@ -239,15 +240,16 @@
                         <span class="channel-message-time">{{ messageTime(message) }}</span>
                     </div>
                     @if (editingMessageId() === message.id) {
-                    <form class="direct-edit-form" (submit)="saveChannelMessage(message)">
+                    <form class="direct-edit-form" (submit)="$event.preventDefault(); saveChannelMessage(message)">
                         <textarea aria-label="Nachricht bearbeiten" [value]="editingText()"
-                            (input)="editingText.set($any($event.target).value)" (keydown.escape)="cancelEditingDirectMessage()"></textarea>
-                        <div><button type="button" (click)="cancelEditingDirectMessage()">Abbrechen</button><button type="submit" [disabled]="!editingText().trim()">Speichern</button></div>
+                            (input)="editingText.set($any($event.target).value)" (keydown)="saveEditedMessageOnEnter($event, message, true)" (keydown.escape)="cancelEditingDirectMessage()"></textarea>
+                        <div><button type="button" (click)="cancelEditingDirectMessage()">Abbrechen</button><button type="button" (click)="saveChannelMessage(message)" [disabled]="!editingText().trim()">Speichern</button></div>
                     </form>
                     } @else {
                     <p class="channel-message-bubble">@for (part of messageParts(message); track $index) {
                         @if (part.user; as user) { <button type="button" class="message-link" (click)="openMentionProfile(user)">{{ part.text }}</button> }
                         @else if (part.channel; as linkedChannel) { <button type="button" class="message-link" (click)="channelRequested.emit(linkedChannel)">{{ part.text }}</button> }
+                        @else if (part.url) { <a class="message-link" [href]="part.url" target="_blank" rel="noopener noreferrer">{{ part.text }}</a> }
                         @else { <span>{{ part.text }}</span> }
                     }</p>
                     @if (message.editedAt) { <span class="message-edited">bearbeitet</span> }

@@ -181,11 +181,16 @@
 .composer-actions {
     position: absolute;
     right: 18px;
-    bottom: 18px;
+    bottom: 0;
     left: 18px;
     display: flex;
     align-items: center;
     gap: 18px;
+    min-height: 58px;
+    padding: 8px 0 10px;
+    box-sizing: border-box;
+    background: #fff;
+    z-index: 1;
 }
 
 .composer-button {
@@ -318,6 +323,7 @@
     .self-introduction .introduction-profile { gap: 12px; }
     .self-introduction p { font-size: 16px; }
     .message-composer { height: 110px; margin: 0 8px 8px; border-radius: 20px; }
+    .composer-actions { right: 10px; left: 10px; min-height: 48px; padding: 4px 0 6px; }
     .message-composer textarea {
         padding-right: 22px;
         font-size: 16px;

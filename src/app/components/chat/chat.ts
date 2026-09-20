@@ -17,7 +17,7 @@ import { AuthService } from '../../services/auth.service';
 import { MessageService } from '../../services/message.service';
 import { ProfileDialog } from '../profile-dialog/profile-dialog';
 
-type MentionKind = 'user' | 'channel';
+type MentionKind = 'user' | 'channel' | 'url';
 
 interface MentionSuggestion {
   kind: MentionKind;
@@ -28,6 +28,7 @@ interface MentionSuggestion {
 
 interface MessagePart extends MentionSuggestion {
   text: string;
+  url?: string;
 }
 
 @Component({
@@ -53,6 +54,7 @@ export class Chat {
   threadRequested = output<Message>();
   messages = signal<Message[]>([]);
   directMessages = signal<Message[]>([]);
+  directMessagesLoaded = signal(false);
   reactionPickerFor = signal<string | null>(null);
   reactionPickerPosition = signal({ top: 0, left: 0 });
   editingMessageId = signal<string | null>(null);
@@ -78,13 +80,29 @@ export class Chat {
   private readonly messageService = inject(MessageService);
   private editor = viewChild<ElementRef<HTMLTextAreaElement>>('editor');
   private history = viewChild<ElementRef<HTMLElement>>('history');
+  private lastDraftContext = '';
 
   requestAddPeople(event: MouseEvent): void {
     const button = event.currentTarget as HTMLElement;
-    this.addPeopleRequested.emit(button.getBoundingClientRect());
+    const anchor = button.getBoundingClientRect();
+    // On mobile the member avatars are hidden, so the plus represents the
+    // complete member menu. On wider layouts it remains the add-member action.
+    if (window.matchMedia('(max-width: 767px)').matches) {
+      this.membersRequested.emit(anchor);
+      return;
+    }
+    this.addPeopleRequested.emit(anchor);
   }
 
   constructor() {
+    effect(() => {
+      const context = this.channel()?.id ?? this.directUser()?.uid ?? (this.isSelfChat() ? 'self' : '');
+      if (context === this.lastDraftContext) return;
+      this.lastDraftContext = context;
+      this.draft.set('');
+      this.emojiPickerOpen.set(false);
+      this.closeMentionSuggestions();
+    });
     afterRenderEffect(() => {
       if (this.isSelfChat()) this.editor()?.nativeElement.focus();
     });
@@ -92,6 +110,7 @@ export class Chat {
       this.notes();
       this.messages();
       this.directMessages();
+      this.editingMessageId();
       const history = this.history()?.nativeElement;
       if (history) history.scrollTop = history.scrollHeight;
     });
@@ -123,10 +142,12 @@ export class Chat {
     const ownUid = this.authService.currentUserId;
     const otherUid = this.directUser()?.uid;
     this.directMessages.set([]);
+    this.directMessagesLoaded.set(false);
     this.editingMessageId.set(null);
     if (!ownUid || !otherUid || ownUid === otherUid) return;
     const stop = this.messageService.watchDirectMessages(ownUid, otherUid, messages => {
       this.directMessages.set(messages);
+      this.directMessagesLoaded.set(true);
       if (messages.length) void this.messageService.markDirectConversationRead(ownUid, otherUid);
     });
     onCleanup(() => stop());
@@ -210,7 +231,7 @@ export class Chat {
   authorName(message: Message): string {
     return this.isOwnMessage(message)
       ? `${this.userName()} (Du)`
-      : this.userById(message.senderId)?.name ?? 'Gelöschter Account';
+      : this.userById(message.senderId)?.name ?? 'Gelöschtes Profil';
   }
 
   selectMention(suggestion: MentionSuggestion): void {
@@ -310,12 +331,17 @@ export class Chat {
   private createMessageParts(text: string): MessagePart[] {
     const parts: MessagePart[] = [];
     let cursor = 0;
-    let match = this.findNextMention(text, cursor);
-    while (match) {
-      if (match.index > cursor) parts.push({ kind: 'user', label: '', text: text.slice(cursor, match.index) });
-      parts.push({ ...match, text: `${match.kind === 'user' ? '@' : '#'}${match.label}` });
-      cursor = match.index + match.text.length;
-      match = this.findNextMention(text, cursor);
+    const urls = [...text.matchAll(/https?:\/\/[^\s<]+/gi)].map(match => ({ index: match.index ?? 0, text: match[0].replace(/[),.!?;:]+$/, '') }));
+    while (cursor < text.length) {
+      const mention = this.findNextMention(text, cursor);
+      const url = urls.find(item => item.index >= cursor);
+      const next = mention && (!url || mention.index <= url.index)
+        ? { index: mention.index, text: `${mention.kind === 'user' ? '@' : '#'}${mention.label}`, part: { ...mention, text: `${mention.kind === 'user' ? '@' : '#'}${mention.label}` } }
+        : url ? { index: url.index, text: url.text, part: { kind: 'url' as const, label: url.text, text: url.text, url: url.text } } : undefined;
+      if (!next) break;
+      if (next.index > cursor) parts.push({ kind: 'user', label: '', text: text.slice(cursor, next.index) });
+      parts.push(next.part);
+      cursor = next.index + next.text.length;
     }
     if (cursor < text.length) parts.push({ kind: 'user', label: '', text: text.slice(cursor) });
     return parts;
@@ -383,7 +409,7 @@ export class Chat {
   }
 
   reactionTitle(uids: string[]): string {
-    return uids.map(uid => this.userById(uid)?.name ?? uid).join(', ');
+    return uids.map(uid => this.reactionName(uid)).join(', ');
   }
 
   reactionTooltipText(uids: string[]): string {
@@ -391,7 +417,7 @@ export class Chat {
   }
 
   reactionTooltipNames(uids: string[]): string {
-    if (uids.length === 1) return this.userById(uids[0])?.name ?? uids[0];
+    if (uids.length === 1) return this.reactionName(uids[0]);
     const names = uids.map(uid => this.shortReactionName(uid));
     if (names.length === 2) return names.join(' und ');
     if (names.length === 3) return `${names[0]}, ${names[1]} und ${names[2]}`;
@@ -399,8 +425,13 @@ export class Chat {
   }
 
   private shortReactionName(uid: string): string {
-    if (uid === this.authService.currentUserId) return 'Du';
+    if (uid === this.authService.currentUserId) return 'Ich';
     return this.userById(uid)?.name.split(' ')[0] ?? uid;
+  }
+
+  private reactionName(uid: string): string {
+    if (uid === this.authService.currentUserId) return 'Ich';
+    return this.userById(uid)?.name ?? uid;
   }
 
   toggleReaction(message: Message, emoji: string): void {
@@ -431,7 +462,14 @@ export class Chat {
 
   private setReactionPickerPosition(button: HTMLElement): void {
     const rect = button.getBoundingClientRect();
-    const left = Math.max(12, Math.min(rect.right - 232, window.innerWidth - 244));
+    const opensFromRight = button.closest('.channel-message')?.classList.contains('own') ?? false;
+    const preferredLeft = opensFromRight ? rect.right - 232 : rect.left;
+    // Keep the picker inside the actual chat area (not just inside the browser
+    // viewport, which can be wider when DevTools or a side panel is open).
+    const chatBounds = button.closest<HTMLElement>('.chat-body, .chat-content')?.getBoundingClientRect();
+    const minLeft = (chatBounds?.left ?? 0) + 12;
+    const maxLeft = Math.max(minLeft, (chatBounds?.right ?? window.innerWidth) - 232 - 12);
+    const left = Math.max(minLeft, Math.min(preferredLeft, maxLeft));
     this.reactionPickerPosition.set({ top: rect.bottom + 8, left });
   }
 
@@ -442,15 +480,13 @@ export class Chat {
   isLastOwnDirectMessage(message: Message): boolean {
     const ownUid = this.authService.currentUserId;
     if (!ownUid || message.senderId !== ownUid) return false;
-    const ownMessages = this.directMessages().filter(item => item.senderId === ownUid);
-    return ownMessages.at(-1)?.id === message.id;
+    return this.directMessages().at(-1)?.id === message.id;
   }
 
   isLastOwnChannelMessage(message: Message): boolean {
     const ownUid = this.authService.currentUserId;
     if (!ownUid || message.senderId !== ownUid) return false;
-    const ownMessages = this.messages().filter(item => item.senderId === ownUid);
-    return ownMessages.at(-1)?.id === message.id;
+    return this.messages().at(-1)?.id === message.id;
   }
 
   startEditingDirectMessage(message: Message): void {
@@ -477,23 +513,44 @@ export class Chat {
     this.editingText.set('');
   }
 
-  saveDirectMessage(message: Message): void {
+  saveEditedMessageOnEnter(event: KeyboardEvent, message: Message, channelMessage: boolean): void {
+    if (event.key !== 'Enter' || event.shiftKey || event.isComposing) return;
+    event.preventDefault();
+    if (channelMessage) void this.saveChannelMessage(message);
+    else void this.saveDirectMessage(message);
+  }
+
+  async saveDirectMessage(message: Message): Promise<void> {
     const ownUid = this.authService.currentUserId;
     const otherUid = this.directUser()?.uid;
     const text = this.editingText().trim();
     if (!ownUid || !otherUid || !text || !this.isLastOwnDirectMessage(message)) return;
-    this.messageService
-      .editDirectMessage(ownUid, otherUid, message.id, text)
-      .catch(error => console.error('Direktnachricht konnte nicht bearbeitet werden:', error));
+    try {
+      await this.messageService.editDirectMessage(ownUid, otherUid, message.id, text);
+      this.directMessages.update(messages => this.replaceMessageText(messages, message.id, text));
+    } catch (error) {
+      console.error('Direktnachricht konnte nicht bearbeitet werden:', error);
+      return;
+    }
     this.cancelEditingDirectMessage();
   }
 
-  saveChannelMessage(message: Message): void {
+  async saveChannelMessage(message: Message): Promise<void> {
     const channelId = this.channel()?.id;
     const text = this.editingText().trim();
     if (!channelId || !text || !this.isLastOwnChannelMessage(message)) return;
-    this.messageService.editMessage(channelId, message.id, text).catch(() => undefined);
+    try {
+      await this.messageService.editMessage(channelId, message.id, text);
+      this.messages.update(messages => this.replaceMessageText(messages, message.id, text));
+    } catch (error) {
+      console.error('Channel-Nachricht konnte nicht bearbeitet werden:', error);
+      return;
+    }
     this.cancelEditingDirectMessage();
+  }
+
+  private replaceMessageText(messages: Message[], messageId: string, text: string): Message[] {
+    return messages.map(message => message.id === messageId ? { ...message, text } : message);
   }
 
   private userById(uid: string): AppUser | undefined {

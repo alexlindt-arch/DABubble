@@ -91,7 +91,7 @@ export class Thread {
   authorName(message: Message): string {
     return this.isOwnMessage(message)
       ? `${this.userName()} (Du)`
-      : this.userById(message.senderId)?.name ?? 'Gelöschter Account';
+      : this.userById(message.senderId)?.name ?? 'Gelöschtes Profil';
   }
 
   authorAvatar(message: Message): string {

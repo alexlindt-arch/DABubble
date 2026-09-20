@@ -6,10 +6,12 @@ import {
   collection,
   CollectionReference,
   doc,
+  deleteDoc,
   DocumentReference,
   Firestore,
   getFirestore,
   getDocs,
+  getDoc,
   onSnapshot,
   QueryDocumentSnapshot,
   Timestamp,
@@ -58,12 +60,29 @@ export class ChannelService {
   }
 
   leaveChannel(channelId: string, uid: string): Promise<void> {
-    return updateDoc(this.channelRef(channelId), { members: arrayRemove(uid) });
+    return this.removeMemberAndDeleteIfEmpty(channelId, uid);
   }
 
   async removeUserFromChannels(uid: string): Promise<void> {
     const channels = await getDocs(query(this.channelsRef(), where('members', 'array-contains', uid)));
+    // Account deletion must not remove channels or their messages. Keep the
+    // conversation history and only remove the deleted account from members.
     await Promise.all(channels.docs.map(channel => updateDoc(channel.ref, { members: arrayRemove(uid) })));
+  }
+
+  private async removeMemberAndDeleteIfEmpty(channelId: string, uid: string): Promise<void> {
+    const reference = this.channelRef(channelId);
+    const snapshot = await getDoc(reference);
+    if (!snapshot.exists()) return;
+    const members = (snapshot.data() as ChannelProfile).members ?? [];
+    const remaining = members.filter(member => member !== uid);
+    if (remaining.length === 0) {
+      const messages = await getDocs(collection(this.firestore, 'channels', channelId, 'messages'));
+      await Promise.all(messages.docs.map(message => deleteDoc(message.ref)));
+      await deleteDoc(reference);
+      return;
+    }
+    await updateDoc(reference, { members: arrayRemove(uid) });
   }
 
   private channelsRef(): CollectionReference {

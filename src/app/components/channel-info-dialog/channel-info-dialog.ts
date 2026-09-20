@@ -23,6 +23,16 @@ export class ChannelInfoDialog {
   editDescription(): void { this.descriptionDraft.set(this.channel().description); this.editingDescription.set(true); }
   saveName(): void { this.save(this.nameDraft().trim(), this.channel().description); }
   saveDescription(): void { this.save(this.channel().name, this.descriptionDraft().trim()); }
+  handleNameKeydown(event: KeyboardEvent): void {
+    if (event.key !== 'Enter') return;
+    event.preventDefault();
+    this.saveName();
+  }
+  handleDescriptionKeydown(event: KeyboardEvent): void {
+    if (event.key !== 'Enter' || event.shiftKey) return;
+    event.preventDefault();
+    this.saveDescription();
+  }
   openCreatorProfile(): void { this.creatorProfileOpen.set(true); }
   closeCreatorProfile(): void { this.creatorProfileOpen.set(false); }
   private save(name: string, description: string): void {

@@ -657,6 +657,15 @@
     .member-count { font-size: 15px; }
 }
 
+// Match the compact profile size used by the main navigation below 1024px.
+@media (max-width: 1023px) {
+    .channel-message-avatar,
+    .message-avatar-button {
+        width: 50px;
+        height: 50px;
+    }
+}
+
 @media (max-width: 1023px) {
     .channel-title { font-size: 22px; }
 }
@@ -664,6 +673,17 @@
 // Phones follow Figma: only the add-member button stays next to the channel name.
 @media (max-width: 767px) {
     .channel-members { display: none; }
+
+    .channel-message-avatar,
+    .message-avatar-button {
+        width: 44px;
+        height: 44px;
+    }
+
+    .channel-message {
+        gap: 10px;
+        padding: 10px 8px;
+    }
 }
 
 // The mobile/tablet breakpoints remain compact; these values restore the original desktop

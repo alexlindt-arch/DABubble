@@ -35,6 +35,11 @@
                                 (click)="openConversation('channel', channel.id)">
                                 <span class="nav-icon tag-icon" aria-hidden="true"></span>
                                 <span class="row-label">{{ channel.name }}</span>
+                                @if (unreadChannelCount(channel) > 0) {
+                                <span class="unread-count" aria-label="Ungelesene Nachrichten">
+                                    {{ unreadChannelCount(channel) > 99 ? '99+' : unreadChannelCount(channel) }}
+                                </span>
+                                }
                             </button>
                         </li>
                         }

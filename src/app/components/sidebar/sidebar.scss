@@ -154,11 +154,14 @@
     .tag-icon { --icon: url('../../../../public/assets/img/icons/tag.svg'); }
 
     .navigation-group:first-child {
-        margin-bottom: 40px;
+        margin-bottom: 18px;
 
         ul {
-            min-height: 100px;
             padding-right: 4px;
+
+            // Keep the extra breathing room only when the list actually has
+            // multiple channels. A single channel should not create a large gap.
+            &:has(li:nth-child(2)) { min-height: 100px; }
         }
     }
 
@@ -264,6 +267,22 @@
     .channel-row {
         gap: 10px;
         font-weight: 500;
+    }
+
+    .unread-count {
+        flex: 0 0 auto;
+        min-width: 22px;
+        height: 22px;
+        margin-left: auto;
+        padding: 0 6px;
+        box-sizing: border-box;
+        border-radius: 11px;
+        background: #444df2;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 22px;
+        text-align: center;
     }
 
     .user-row {

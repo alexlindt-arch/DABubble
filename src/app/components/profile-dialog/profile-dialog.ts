@@ -51,7 +51,11 @@ export class ProfileDialog {
   get nameErrorMessage(): string {
     const name = this.name().trim();
     if (!name) return 'Bitte gib deinen Namen ein.';
-    return name.length < 3 ? 'Bitte gib deinen vollständigen Namen ein.' : '';
+    if (name.length < 3) return 'Bitte gib deinen vollständigen Namen ein.';
+    if (name.length > 50) return 'Der Name darf höchstens 50 Zeichen lang sein.';
+    return /^[\p{L}]+(?:[ '\u2019-][\p{L}]+)*$/u.test(name)
+      ? ''
+      : 'Bitte verwende nur Buchstaben, Leerzeichen, Bindestriche oder Apostrophe.';
   }
 
   get showNameError(): boolean { return (this.touched() || this.submitted()) && this.nameErrorMessage !== ''; }
@@ -68,7 +72,10 @@ export class ProfileDialog {
   submit(event: Event): void {
     event.preventDefault();
     this.submitted.set(true);
-    if (this.formValid) this.saved.emit({ name: this.name().trim(), avatar: this.editedAvatar() });
+    if (this.formValid) {
+      const name = this.name().trim().replace(/\s+/g, ' ');
+      this.saved.emit({ name, avatar: this.editedAvatar() });
+    }
   }
 
   startDirectMessage(): void {

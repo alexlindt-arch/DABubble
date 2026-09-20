@@ -14,7 +14,7 @@
       <label for="channel-name">Channel-Name</label>
       <div class="input-wrapper" [class.invalid]="submitted() && (!name().trim() || duplicateName)">
         <span aria-hidden="true">#</span>
-        <input #nameInput id="channel-name" type="text" autocomplete="off"
+        <input #nameInput id="channel-name" name="channel-name" type="text" autocomplete="off"
           placeholder="z.B. Kooperationsprojekte" [value]="name()" (input)="name.set(nameInput.value)">
       </div>
       @if (submitted() && !name().trim()) {

@@ -10,6 +10,7 @@ import {
   FieldPath,
   Firestore,
   getFirestore,
+  getDocs,
   increment,
   onSnapshot,
   orderBy,
@@ -95,12 +96,27 @@ export class MessageService {
     await batch.commit();
   }
 
+  async deleteDirectConversationsForUser(uid: string): Promise<void> {
+    const conversations = await getDocs(query(this.directChatsRef(), where('members', 'array-contains', uid)));
+    for (const conversation of conversations.docs) {
+      const messages = await getDocs(this.directMessagesRef(conversation.id));
+      const batch = writeBatch(this.firestore);
+      messages.docs.forEach(message => batch.delete(message.ref));
+      batch.delete(conversation.ref);
+      await batch.commit();
+    }
+  }
+
   watchDirectMessages(firstUid: string, secondUid: string, onChange: (messages: Message[]) => void): Unsubscribe {
     const conversationId = this.directConversationId(firstUid, secondUid);
     return onSnapshot(
       query(this.directMessagesRef(conversationId), orderBy('timestamp')),
       snapshot => onChange(snapshot.docs.map(item => this.toMessage(item))),
-      error => console.error('Direktnachrichten konnten nicht geladen werden:', error),
+      error => {
+        // A conversation without a parent document is a valid empty chat.
+        console.error('Direktnachrichten konnten nicht geladen werden:', error);
+        onChange([]);
+      },
     );
   }
 

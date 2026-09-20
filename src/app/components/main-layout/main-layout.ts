@@ -15,6 +15,7 @@ import { Chat } from '../chat/chat';
 import { Thread } from '../thread/thread';
 import { AuthService } from '../../services/auth.service';
 import { ChannelService } from '../../services/channel.service';
+import { MessageService } from '../../services/message.service';
 import { UserService } from '../../services/user.service';
 import { avatarUrl } from '../../shared/avatar-url';
 import { isMobileViewport } from '../../shared/is-mobile-viewport';
@@ -39,6 +40,7 @@ type SearchResult =
 export class MainLayout {
   private readonly authService = inject(AuthService);
   private readonly channelService = inject(ChannelService);
+  private readonly messageService = inject(MessageService);
   private readonly userService = inject(UserService);
   private readonly router = inject(Router);
 
@@ -198,6 +200,7 @@ export class MainLayout {
     this.accountDeleteBusy = true;
     try {
       await this.channelService.removeUserFromChannels(uid);
+      await this.messageService.deleteDirectConversationsForUser(uid);
       await this.userService.deleteUserProfile(uid);
       await this.authService.deleteCurrentAccount();
       await this.router.navigateByUrl('/login');
@@ -211,6 +214,8 @@ export class MainLayout {
   }
 
   openCreateChannelDialog(): void {
+    // Never leave a previous member dialog mounted underneath the create form.
+    this.closeAddPeopleDialog();
     this.createChannelDialogOpen = true;
   }
 
@@ -221,15 +226,25 @@ export class MainLayout {
   createChannel(channel: NewChannel): void {
     const uid = this.authService.currentUserId;
     if (!uid) return this.closeCreateChannelDialog();
+    const normalizedName = channel.name.trim().toLocaleLowerCase('de');
+    const alreadyExists = this.allChannels().some(existing =>
+      existing.name.trim().toLocaleLowerCase('de') === normalizedName,
+    );
+    if (alreadyExists) return;
+    // Close immediately after local validation. Firebase may update the
+    // channel list before the async create call resolves, which would make
+    // the just-created name look like a duplicate in the still-open form.
+    this.closeCreateChannelDialog();
     this.persistChannel(channel.name, channel.description, uid);
   }
 
-  private persistChannel(name: string, description: string, uid: string): void {
-    this.channelService
-      .createChannel(name, description, uid)
-      .then(created => this.openAddPeopleDialog(created))
-      .catch(error => console.error('Channel konnte nicht erstellt werden:', error))
-      .finally(() => this.closeCreateChannelDialog());
+  private async persistChannel(name: string, description: string, uid: string): Promise<void> {
+    try {
+      const created = await this.channelService.createChannel(name, description, uid);
+      this.openAddPeopleDialog(created);
+    } catch (error) {
+      console.error('Channel konnte nicht erstellt werden:', error);
+    }
   }
 
   private openAddPeopleDialog(created: Channel): void {
@@ -319,13 +334,27 @@ export class MainLayout {
     this.memberDialogChannel.set(null);
   }
 
-  addMembers(uids: string[]): void {
-    const channelId = this.memberDialogChannel()?.id;
-    if (!channelId || !uids.length) return this.closeAddPeopleDialog();
-    this.channelService
-      .addMembers(channelId, uids)
-      .catch(error => console.error('Mitglieder konnten nicht hinzugefügt werden:', error))
-      .finally(() => this.closeAddPeopleDialog());
+  async addMembers(uids: string[]): Promise<void> {
+    const channel = this.memberDialogChannel();
+    if (!channel || !uids.length) {
+      this.closeAddPeopleDialog();
+      return;
+    }
+
+    try {
+      await this.channelService.addMembers(channel.id, uids);
+      // Update the local selection immediately. The realtime channel snapshot
+      // may arrive a moment later, especially directly after channel creation.
+      const members = Array.from(new Set([...channel.members, ...uids]));
+      this.memberDialogChannel.set({ ...channel, members });
+      if (this.selectedChannel()?.id === channel.id) {
+        this.selectedChannel.update(selected => selected ? { ...selected, members } : selected);
+      }
+    } catch (error) {
+      console.error('Mitglieder konnten nicht hinzugefügt werden:', error);
+    } finally {
+      this.closeAddPeopleDialog();
+    }
   }
 
   readonly allUsers = computed(() => this.sidebar()?.users() ?? []);
@@ -434,8 +463,14 @@ export class MainLayout {
   }
 
   startDirectConversation(user: AppUser): void {
+    this.sidebar()?.selectConversation('direct', user.uid);
     this.selectConversation({ type: 'direct', id: user.uid, user });
     this.threadOpen = false;
+  }
+
+  startDirectConversationFromChannelInfo(user: AppUser): void {
+    this.closeChannelInfo();
+    this.startDirectConversation(user);
   }
 
   openMentionedChannel(channel: Channel): void {

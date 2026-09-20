@@ -25,8 +25,11 @@ export class CreateChannelDialog {
   }
 
   get duplicateName(): boolean {
-    const name = this.name().trim().toLocaleLowerCase();
-    return this.existingChannels().some(channel => channel.toLocaleLowerCase() === name);
+    const name = this.name().trim().toLocaleLowerCase('de');
+    if (!name) return false;
+    return this.existingChannels().some(channel =>
+      typeof channel === 'string' && channel.trim().toLocaleLowerCase('de') === name,
+    );
   }
 
   get formValid(): boolean {
@@ -35,6 +38,9 @@ export class CreateChannelDialog {
 
   submit(event: Event): void {
     event.preventDefault();
+    const form = event.target as HTMLFormElement;
+    const nameInput = form.elements.namedItem('channel-name') as HTMLInputElement | null;
+    if (nameInput) this.name.set(nameInput.value);
     this.submitted.set(true);
     if (!this.formValid) return;
     this.created.emit({ name: this.name().trim(), description: this.description().trim() });
