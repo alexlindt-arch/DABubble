@@ -186,7 +186,9 @@
         z-index: 20;
         width: min(485px, calc(100vw - 32px));
         max-width: none;
-        margin: 0;
+        // Das Layout setzt .content > app-thread { margin: 16px 0 } und ist spezifischer als :host.
+        // Ohne diese Ausnahme saesse der Thread 16px tiefer als der Chat, statt buendig darueber.
+        margin: 0 !important;
     }
 
     .thread-content {
