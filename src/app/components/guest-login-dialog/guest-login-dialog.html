@@ -1,0 +1,26 @@
+<div class="dialog-backdrop" (click)="closeOnBackdrop($event)">
+  <section class="guest-dialog" role="dialog" aria-modal="true" aria-labelledby="guest-dialog-title">
+    <header>
+      <h2 id="guest-dialog-title">Anmeldung als Gast</h2>
+      <button type="button" class="close-button" aria-label="Dialog schließen" (click)="closed.emit()">
+        <span class="icon close-icon" aria-hidden="true"></span>
+      </button>
+    </header>
+
+    <p>
+      Als Gast siehst du alle Channels und Nachrichten. Du darfst Channels erstellen,
+      schreiben, antworten und reagieren – genau wie ein angemeldetes Teammitglied.
+    </p>
+
+    <p class="guest-dialog__notice">
+      Wichtig: Dieses Projekt ist eine Testumgebung. Alles, was du als Gast machst, wird nur
+      {{ sessionMinutes }} Minuten gespeichert und danach automatisch gelöscht – deine Nachrichten,
+      deine Reaktionen, deine Channels und dein Gast-Profil.
+    </p>
+
+    <div class="guest-dialog__actions">
+      <button type="button" class="btn btn--ghost" (click)="closed.emit()">Abbrechen</button>
+      <button type="button" class="btn btn--primary" (click)="confirmed.emit()">Verstanden, weiter</button>
+    </div>
+  </section>
+</div>

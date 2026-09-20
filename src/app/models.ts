@@ -7,6 +7,8 @@ export interface UserProfile {
   email: string;
   avatar: string;
   status: UserStatus;
+  /** Nur Gast-Konten: Zeitpunkt, an dem alle Daten der Gast-Sitzung gelöscht werden. */
+  guestUntil?: Timestamp;
 }
 
 export interface AppUser extends UserProfile {

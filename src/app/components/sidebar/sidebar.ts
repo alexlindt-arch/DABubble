@@ -34,7 +34,7 @@ export class Sidebar implements OnDestroy {
     channel?: Channel;
   }>();
 
-  readonly channels = computed(() => this.memberChannels());
+  readonly channels = computed(() => this.visibleChannels());
   readonly users = computed(() => this.sortedAccountUsers());
   readonly directConversationUserIds = computed(() => this.directConversationPartners());
 
@@ -103,9 +103,12 @@ export class Sidebar implements OnDestroy {
     this.initialChannelSelected.emit();
   }
 
-  private memberChannels(): Channel[] {
-    const uid = this.authService.currentUser()?.uid;
-    return uid ? this.firestoreChannels().filter(channel => channel.members.includes(uid)) : [];
+  /** Ein Gast darf zum Testen jeden Channel sehen, alle anderen nur ihre eigenen. */
+  private visibleChannels(): Channel[] {
+    const user = this.authService.currentUser();
+    if (!user) return [];
+    if (user.guestUntil) return this.firestoreChannels();
+    return this.firestoreChannels().filter(channel => channel.members.includes(user.uid));
   }
 
   private lastMessageTimeWith(otherUid: string, currentUid?: string): number {

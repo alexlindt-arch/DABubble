@@ -5,10 +5,12 @@ import {
   arrayUnion,
   collection,
   CollectionReference,
+  deleteDoc,
   doc,
   DocumentReference,
   FieldPath,
   Firestore,
+  getDocs,
   getFirestore,
   increment,
   onSnapshot,
@@ -151,6 +153,43 @@ export class MessageService {
     batch.update(this.directConversationRef(conversationId), { lastActivityAt: Timestamp.now(), lastActivityBy: uid });
   }
 
+  /** Entfernt alle Spuren eines Kontos aus einem Channel: eigene Nachrichten und eigene Reaktionen. */
+  async purgeAuthor(channelId: string, uid: string): Promise<void> {
+    const messages = await getDocs(this.messagesRef(channelId));
+    await Promise.all(messages.docs.map(item => this.purgeMessage(channelId, item, uid)));
+  }
+
+  async deleteAllMessages(channelId: string): Promise<void> {
+    const messages = await getDocs(this.messagesRef(channelId));
+    await Promise.all(messages.docs.map(item => deleteDoc(item.ref)));
+  }
+
+  async deleteDirectChatsOf(uid: string): Promise<void> {
+    const chats = await getDocs(query(this.directChatsRef(), where('members', 'array-contains', uid)));
+    await Promise.all(chats.docs.map(chat => this.deleteDirectChat(chat.ref)));
+  }
+
+  private purgeMessage(channelId: string, snapshot: QueryDocumentSnapshot, uid: string): Promise<void> {
+    const message = this.toMessage(snapshot);
+    if (message.senderId === uid) return this.deleteWithThreadCount(channelId, message);
+    const reactions = withoutReactionsOf(message.reactions, uid);
+    return reactions ? updateDoc(snapshot.ref, { reactions }) : Promise.resolve();
+  }
+
+  /** Die gelöschte Antwort zählt im Elternteil nicht mehr mit; ist er selbst weg, ist nichts zu tun. */
+  private async deleteWithThreadCount(channelId: string, message: Message): Promise<void> {
+    await deleteDoc(this.messageRef(channelId, message.id));
+    if (!message.parentId) return;
+    const parent = this.messageRef(channelId, message.parentId);
+    await updateDoc(parent, { threadCount: increment(-1) }).catch(() => undefined);
+  }
+
+  private async deleteDirectChat(chat: DocumentReference): Promise<void> {
+    const messages = await getDocs(collection(chat, 'messages'));
+    await Promise.all(messages.docs.map(message => deleteDoc(message.ref)));
+    await deleteDoc(chat);
+  }
+
   private messageRef(channelId: string, messageId: string): DocumentReference {
     return doc(this.firestore, 'channels', channelId, 'messages', messageId);
   }
@@ -178,4 +217,12 @@ export class MessageService {
   private directMessageRef(conversationId: string, messageId: string): DocumentReference {
     return doc(this.firestore, 'directChats', conversationId, 'messages', messageId);
   }
+}
+
+/** Liefert die Reaktionen ohne das Konto - oder null, wenn es gar nicht reagiert hat. */
+function withoutReactionsOf(reactions: Record<string, string[]>, uid: string): Record<string, string[]> | null {
+  const entries = Object.entries(reactions ?? {});
+  if (!entries.some(([, uids]) => uids.includes(uid))) return null;
+  const cleaned = entries.map(([emoji, uids]) => [emoji, uids.filter(item => item !== uid)] as const);
+  return Object.fromEntries(cleaned.filter(([, uids]) => uids.length > 0));
 }

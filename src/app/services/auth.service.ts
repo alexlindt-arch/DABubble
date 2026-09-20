@@ -16,9 +16,10 @@ import {
   UserCredential,
   verifyPasswordResetCode,
 } from 'firebase/auth';
-import { Unsubscribe } from 'firebase/firestore';
+import { Timestamp, Unsubscribe } from 'firebase/firestore';
 import { firebaseApp } from '../firebase';
 import { AppUser, UserProfile } from '../models';
+import { GUEST_SESSION_MS } from '../shared/guest-session';
 import { UserService } from './user.service';
 
 const DEFAULT_AVATAR = 'Property 1=Frederik Beck.png';
@@ -29,6 +30,8 @@ export class AuthService {
   private readonly userService = inject(UserService);
   private readonly profile = signal<AppUser | null>(null);
   private profileWatcher: Unsubscribe | null = null;
+  /** Während einer laufenden Anmeldung darf kein alter Stand aus Firestore dazwischenfunken. */
+  private activating = false;
   private markReady: () => void = () => {};
   private readonly ready = new Promise<void>((resolve) => (this.markReady = resolve));
 
@@ -46,6 +49,10 @@ export class AuthService {
     return this.auth.currentUser !== null;
   }
 
+  get isGuest(): boolean {
+    return this.auth.currentUser?.isAnonymous ?? false;
+  }
+
   whenReady(): Promise<void> {
     return this.ready;
   }
@@ -61,8 +68,25 @@ export class AuthService {
   }
 
   async loginAsGuest(): Promise<AppUser | null> {
-    const credential = await signInAnonymously(this.auth);
-    return this.activateProfile(credential.user, 'Gast');
+    this.activating = true;
+    try {
+      const credential = await signInAnonymously(this.auth);
+      return await this.activateGuest(credential.user.uid);
+    } finally {
+      this.activating = false;
+    }
+  }
+
+  /** Jede Gast-Anmeldung startet mit einem frischen 15-Minuten-Fenster. */
+  private async activateGuest(uid: string): Promise<AppUser | null> {
+    try {
+      const guest = await this.userService.saveUser(uid, buildGuestProfile());
+      this.setProfile(guest);
+      return guest;
+    } catch (error) {
+      console.error('Gast-Profil konnte nicht gespeichert werden:', error);
+      return null;
+    }
   }
 
   /**
@@ -130,6 +154,7 @@ export class AuthService {
   }
 
   private async syncProfile(user: User | null): Promise<void> {
+    if (this.activating) return this.markReady();
     if (!user) {
       this.setProfile(null);
     } else if (this.profile()?.uid !== user.uid) {
@@ -166,6 +191,16 @@ function buildProfile(user: User, fallbackName: string): UserProfile {
     email: user.email ?? '',
     avatar: DEFAULT_AVATAR,
     status: 'online',
+  };
+}
+
+function buildGuestProfile(): UserProfile {
+  return {
+    name: 'Gast',
+    email: '',
+    avatar: DEFAULT_AVATAR,
+    status: 'online',
+    guestUntil: Timestamp.fromMillis(Date.now() + GUEST_SESSION_MS),
   };
 }
 
