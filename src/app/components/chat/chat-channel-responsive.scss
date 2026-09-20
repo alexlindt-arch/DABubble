@@ -38,13 +38,44 @@
 // The mobile/tablet breakpoints remain compact; these values restore the original desktop
 // Figma proportions for the channel view.
 @media (min-width: 1024px) {
-    .chat-content:has(.channel-chat-header) { padding: 0; overflow: hidden; }
+    .chat-content:has(.channel-chat-header),
+    .chat-content:has(.direct-chat-header),
+    .chat-content:has(.self-profile-button) {
+        padding: 0;
+        overflow: hidden;
+    }
 
     .channel-title {
         gap: 6px;
         padding: 8px 12px;
         border-radius: 30px;
         color: #000;
+        font-size: 24px;
+    }
+
+    .direct-chat-header {
+        gap: 6px;
+        padding: 8px 12px;
+    }
+
+    .self-chat .chat-header {
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        gap: 6px;
+        padding: 8px 12px;
+    }
+
+    .direct-profile-button,
+    .self-profile-button {
+        gap: 6px;
+        padding: 8px 12px;
+        border-radius: 30px;
+        color: #000;
+        font-size: 24px;
+    }
+
+    .direct-profile-name,
+    .self-profile-name {
         font-size: 24px;
     }
 
