@@ -1,4 +1,4 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import {
   Auth,
   confirmPasswordReset,
@@ -17,8 +17,9 @@ import {
   verifyPasswordResetCode,
 } from 'firebase/auth';
 import { Timestamp, Unsubscribe } from 'firebase/firestore';
-import { firebaseApp } from '../firebase';
-import { AppUser, UserProfile } from '../models';
+import { firebaseApp } from './firebase';
+import { AppUser, UserProfile } from '../shared/models';
+import { avatarUrl } from '../shared/avatar-url';
 import { GUEST_SESSION_MS } from '../shared/guest-session';
 import { UserService } from './user.service';
 
@@ -37,6 +38,10 @@ export class AuthService {
   private readonly ready = new Promise<void>((resolve) => (this.markReady = resolve));
 
   readonly currentUser = this.profile.asReadonly();
+  readonly userName = computed(() => this.currentUser()?.name ?? 'Gast');
+  readonly userEmail = computed(() => this.currentUser()?.email ?? '');
+  readonly userAvatarUrl = computed(() => avatarUrl(this.currentUser()?.avatar));
+  readonly isOnline = computed(() => this.currentUser()?.status === 'online');
 
   /** Handles constructor. */
   constructor() {

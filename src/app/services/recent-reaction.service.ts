@@ -23,20 +23,29 @@ export class RecentReactionService {
     }
   }
 
-  /** Handles load. */
+  /** Reads the stored quick reactions, falling back to the defaults. */
   private load(): string[] {
     try {
-      const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]');
+      const stored: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]');
       if (!Array.isArray(stored)) return [...DEFAULT_REACTIONS];
-      const valid = stored.filter((item): item is string => typeof item === 'string' && item.length > 0);
-      const unique = [...new Set(valid)].slice(0, 2);
-      for (const fallback of DEFAULT_REACTIONS) {
-        if (unique.length === 2) break;
-        if (!unique.includes(fallback)) unique.push(fallback);
-      }
-      return unique;
+      return padWithDefaults(stored.filter(isEmoji));
     } catch {
       return [...DEFAULT_REACTIONS];
     }
   }
+}
+
+/** Checks whether a stored entry is a usable emoji. */
+function isEmoji(item: unknown): item is string {
+  return typeof item === 'string' && item.length > 0;
+}
+
+/** Fills the two quick-reaction slots with defaults where needed. */
+function padWithDefaults(stored: string[]): string[] {
+  const unique = [...new Set(stored)].slice(0, 2);
+  for (const fallback of DEFAULT_REACTIONS) {
+    if (unique.length === 2) break;
+    if (!unique.includes(fallback)) unique.push(fallback);
+  }
+  return unique;
 }

@@ -68,7 +68,7 @@
                                 [attr.aria-pressed]="selectedConversation === 'direct:' + user.uid"
                                 (click)="openConversation('direct', user.uid)">
                                 <span class="avatar-wrapper">
-                                    <img [src]="avatar(user)" alt="">
+                                    <img [src]="user.avatar | avatarUrl" alt="">
                                 </span>
                                 <span class="row-label">{{ user.name }}{{ isSelf(user) ? ' (Du)' : '' }}</span>
                                 <span class="status-dot" [class.offline]="user.status !== 'online'"

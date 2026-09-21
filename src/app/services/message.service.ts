@@ -24,8 +24,8 @@ import {
   WriteBatch,
   writeBatch,
 } from 'firebase/firestore';
-import { firebaseApp } from '../firebase';
-import { DirectConversation, DirectConversationProfile, Message, MessageProfile } from '../models';
+import { firebaseApp } from './firebase';
+import { DirectConversation, DirectConversationProfile, Message, MessageProfile } from '../shared/models';
 
 @Injectable({ providedIn: 'root' })
 /** Provides message data and operations. */

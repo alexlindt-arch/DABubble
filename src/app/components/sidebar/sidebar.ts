@@ -1,15 +1,15 @@
 import { Component, computed, effect, inject, OnDestroy, output, signal } from '@angular/core';
 import { Timestamp, Unsubscribe } from 'firebase/firestore';
-import { AppUser, Channel, DirectConversation, Message } from '../../models';
-import { avatarUrl } from '../../shared/avatar-url';
+import { AppUser, Channel, DirectConversation, Message } from '../../shared/models';
 import { AuthService } from '../../services/auth.service';
 import { ChannelService } from '../../services/channel.service';
 import { MessageService } from '../../services/message.service';
 import { UserService } from '../../services/user.service';
 import { NotificationSoundService } from '../../services/notification-sound.service';
+import { AvatarUrlPipe } from '../../pipes/avatar-url.pipe';
 
 @Component({
-  imports: [],
+  imports: [AvatarUrlPipe],
   selector: 'app-sidebar',
   styleUrl: './sidebar.scss',
   templateUrl: './sidebar.html',
@@ -97,10 +97,6 @@ export class Sidebar implements OnDestroy {
     this.lastDirectMessageIds.clear();
   }
 
-  /** Returns the avatar URL for a user. */
-  avatar(user: AppUser): string {
-    return avatarUrl(user.avatar);
-  }
 
   /** Checks whether a user is the currently authenticated user. */
   isSelf(user: AppUser): boolean {

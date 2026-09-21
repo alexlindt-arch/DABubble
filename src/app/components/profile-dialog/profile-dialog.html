@@ -3,9 +3,9 @@
   <section class="profile-edit" role="dialog" aria-modal="true" aria-labelledby="profile-edit-title" (click)="closeEditOverlays($event); $event.stopPropagation()">
     <header class="profile-edit__header"><h2 id="profile-edit-title">Dein Profil bearbeiten</h2><button type="button" class="icon-button" aria-label="Schließen" (click)="$event.stopPropagation(); closed.emit()"><span class="dialog-icon close-icon"></span></button></header>
     <div class="profile-edit__avatar">
-      <img [src]="editedAvatarUrl()" [alt]="'Profilbild ' + avatarName(editedAvatar())">
+      <img [src]="editedAvatar() | avatarUrl" [alt]="'Profilbild ' + avatarName(editedAvatar())">
       <button type="button" class="avatar-edit" aria-label="Avatar ändern" (click)="togglePicker()"><span class="dialog-icon pencil-icon"></span></button>
-      @if (pickerOpen()) { <div class="avatar-picker" role="group" aria-label="Avatar auswählen">@for (option of avatars; track option) {<button type="button" class="avatar-option" [class.selected]="option === editedAvatar()" (click)="pickAvatar(option)"><img [src]="avatarOptionUrl(option)" [alt]="avatarName(option)"></button>}</div> }
+      @if (pickerOpen()) { <div class="avatar-picker" role="group" aria-label="Avatar auswählen">@for (option of avatars; track option) {<button type="button" class="avatar-option" [class.selected]="option === editedAvatar()" (click)="pickAvatar(option)"><img [src]="option | avatarUrl" [alt]="avatarName(option)"></button>}</div> }
     </div>
     <form class="profile-edit__form" (submit)="submit($event)" novalidate>
       <div class="field"><label class="field__label" for="profile-name"><span class="dialog-icon person-icon"></span>Name</label><input #nameInput id="profile-name" type="text" class="field__input" autocomplete="name" maxlength="50" [value]="name()" (input)="name.set(nameInput.value)" (blur)="touched.set(true)" [attr.aria-invalid]="showNameError" aria-describedby="profile-name-error">@if (showNameError) {<span id="profile-name-error" class="field__error" role="alert">{{ nameErrorMessage }}</span>}</div>
@@ -20,7 +20,7 @@
 <div class="profile-backdrop" (click)="closed.emit()">
   <section class="profile-dialog" role="dialog" aria-modal="true" aria-labelledby="profile-title" (click)="$event.stopPropagation()">
     <header><h2 id="profile-title">Profil</h2><button type="button" class="dialog-close" aria-label="Profil schließen" (click)="closed.emit()">×</button></header>
-    <img class="dialog-avatar" [src]="avatar()" alt="Profilbild von {{ profile().name }}"><h3>{{ profile().name }}</h3>
+    <img class="dialog-avatar" [src]="profile().avatar | avatarUrl" alt="Profilbild von {{ profile().name }}"><h3>{{ profile().name }}</h3>
     <p class="dialog-status" [class.offline]="!isOnline()"><span></span>{{ isOnline() ? 'Aktiv' : 'Offline' }}</p>
     <div class="dialog-email"><span class="mail-symbol"></span><div><h4>E-Mail-Adresse</h4><a [href]="'mailto:' + profile().email">{{ profile().email }}</a></div></div>
     @if (canMessage()) {<button type="button" class="dialog-message-button" (click)="startDirectMessage()"><span class="message-symbol"></span>Nachricht</button>}

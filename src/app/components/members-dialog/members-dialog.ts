@@ -1,11 +1,11 @@
 import { Component, HostListener, input, output, signal } from '@angular/core';
-import { AppUser } from '../../models';
-import { avatarUrl } from '../../shared/avatar-url';
+import { AppUser } from '../../shared/models';
 import { ProfileDialog } from '../profile-dialog/profile-dialog';
+import { AvatarUrlPipe } from '../../pipes/avatar-url.pipe';
 
 @Component({
   selector: 'app-members-dialog',
-  imports: [ProfileDialog],
+  imports: [ProfileDialog, AvatarUrlPipe],
   templateUrl: './members-dialog.html',
   styleUrl: './members-dialog.scss',
 })
@@ -32,10 +32,6 @@ export class MembersDialog {
     return rect ? `${Math.round(window.innerWidth - rect.right)}px` : '40px';
   }
 
-  /** Returns the avatar URL for a member. */
-  avatar(member: AppUser): string {
-    return avatarUrl(member.avatar);
-  }
 
   /** Returns the member name with the current-user suffix when applicable. */
   displayName(member: AppUser): string {

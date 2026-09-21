@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { AppUser, Channel } from '../models';
+import { AppUser, Channel } from '../shared/models';
 import { ChannelService } from './channel.service';
 import { MessageService } from './message.service';
 import { UserService } from './user.service';

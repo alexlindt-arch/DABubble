@@ -1,5 +1,5 @@
 import { Component, effect, input, output, signal } from '@angular/core';
-import { AppUser, Channel } from '../../models';
+import { AppUser, Channel } from '../../shared/models';
 import { ProfileDialog } from '../profile-dialog/profile-dialog';
 
 @Component({ selector: 'app-channel-info-dialog', imports: [ProfileDialog], templateUrl: './channel-info-dialog.html', styleUrl: './channel-info-dialog.scss' })

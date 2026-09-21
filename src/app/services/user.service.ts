@@ -14,8 +14,8 @@ import {
   Unsubscribe,
   updateDoc,
 } from 'firebase/firestore';
-import { firebaseApp } from '../firebase';
-import { AppUser, UserProfile, UserStatus } from '../models';
+import { firebaseApp } from './firebase';
+import { AppUser, UserProfile, UserStatus } from '../shared/models';
 
 @Injectable({ providedIn: 'root' })
 /** Provides user data and operations. */

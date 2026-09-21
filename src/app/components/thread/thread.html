@@ -22,16 +22,16 @@
                 <div class="thread-meta">
                     <button type="button" class="thread-author thread-author-button"
                         (click)="openMessageProfile(message)">{{ authorName(message) }}</button>
-                    <span class="thread-time">{{ messageTime(message) }}</span>
+                    <span class="thread-time">{{ message.timestamp | messageTime }}</span>
                 </div>
 
-                @if (editingMessageId() === message.id) {
-                <form class="thread-edit-form" (submit)="saveEditing(message)">
-                    <textarea aria-label="Antwort bearbeiten" [value]="editingText()"
-                        (input)="editingText.set($any($event.target).value)" (keydown.escape)="cancelEditing()"></textarea>
+                @if (editing.messageId() === message.id) {
+                <form class="thread-edit-form" (submit)="saveEditing(message)" novalidate>
+                    <textarea aria-label="Antwort bearbeiten" [value]="editing.text()"
+                        (input)="editing.text.set($any($event.target).value)" (keydown.escape)="editing.cancel()"></textarea>
                     <div>
-                        <button type="button" (click)="cancelEditing()">Abbrechen</button>
-                        <button type="submit" [disabled]="!editingText().trim()">Speichern</button>
+                        <button type="button" (click)="editing.cancel()">Abbrechen</button>
+                        <button type="submit" [disabled]="!editing.text().trim()">Speichern</button>
                     </div>
                 </form>
                 } @else {
@@ -40,22 +40,24 @@
                         (click)="openMentionProfile(user)">{{ part.text }}</button> }
                     @else if (part.channel; as linkedChannel) { <button type="button" class="thread-message-link"
                         (click)="channelRequested.emit(linkedChannel)">{{ part.text }}</button> }
+                    @else if (part.url) { <a class="thread-message-link" [href]="part.url" target="_blank"
+                        rel="noopener noreferrer">{{ part.text }}</a> }
                     @else { <span>{{ part.text }}</span> }
                 }</p>
                 @if (message.editedAt) { <span class="thread-message-edited">bearbeitet</span> }
                 }
 
-                @if (reactionsOf(message).length) {
+                @if (reactions.of(message).length) {
                 <div class="thread-reactions">
-                    @for (reaction of reactionsOf(message); track reaction.emoji) {
-                    <button type="button" class="thread-reaction" [class.active]="hasReacted(reaction.uids)"
-                        [attr.aria-pressed]="hasReacted(reaction.uids)"
+                    @for (reaction of reactions.of(message); track reaction.emoji) {
+                    <button type="button" class="thread-reaction" [class.active]="reactions.has(reaction.uids)"
+                        [attr.aria-pressed]="reactions.has(reaction.uids)"
                         (click)="toggleReaction(message, reaction.emoji)">
                         <span aria-hidden="true">{{ reaction.emoji }}</span>
                         <span class="thread-reaction-count">{{ reaction.uids.length }}</span>
                         <span class="thread-reaction-tooltip" role="tooltip"><span>{{ reaction.emoji }}</span>
                             <strong>{{ reactionTooltipNames(reaction.uids) }}</strong>
-                            <span>{{ reactionTooltipText(reaction.uids) }}</span></span>
+                            <span>{{ reactions.verb(reaction.uids) }}</span></span>
                     </button>
                     }
                 </div>
@@ -66,10 +68,10 @@
                 @if (isEditable(message)) {
                 <div class="thread-edit-menu-anchor">
                     <button type="button" class="thread-hover-button" aria-label="Antwortoptionen"
-                        [attr.aria-expanded]="editMenuFor() === message.id" (click)="toggleEditMenu(message.id)">
+                        [attr.aria-expanded]="editing.menuFor() === message.id" (click)="toggleEditMenu(message.id)">
                         <img class="thread-hover-icon" src="assets/img/icons/more_vert.svg" alt="">
                     </button>
-                    @if (editMenuFor() === message.id) {
+                    @if (editing.menuFor() === message.id) {
                     <div class="thread-edit-menu">
                         <button type="button" (click)="startEditing(message)">Nachricht bearbeiten</button>
                     </div>
@@ -81,13 +83,13 @@
                 <button type="button" class="thread-hover-button" [attr.aria-label]="'Mit ' + recentReactions()[1] + ' reagieren'"
                     (click)="toggleReaction(message, recentReactions()[1])"><span aria-hidden="true">{{ recentReactions()[1] }}</span></button>
                 <button type="button" class="thread-hover-button" aria-label="Reaktion hinzufügen"
-                    [attr.aria-expanded]="reactionPickerFor() === message.id"
+                    [attr.aria-expanded]="reactions.openFor() === message.id"
                     (click)="toggleReactionPicker(message.id)">
                     <span class="thread-icon reaction-icon" aria-hidden="true"></span>
                 </button>
             </div>
 
-            @if (reactionPickerFor() === message.id) {
+            @if (reactions.openFor() === message.id) {
             <div class="thread-reaction-picker" role="group" aria-label="Reaktion auswählen">
                 @for (emoji of emojis; track emoji) {
                 <button type="button" (click)="toggleReaction(message, emoji)">{{ emoji }}</button>
@@ -98,45 +100,45 @@
 
         @if (i === 0 && parent()) {
         <div class="thread-divider">
-            <span>{{ replyLabel }}</span>
+            <span>{{ replies().length | replyCount }}</span>
             <span class="thread-divider-line"></span>
         </div>
         }
         }
     </div>
 
-    <form class="thread-composer" (submit)="sendReply($event)">
+    <form class="thread-composer" (submit)="sendReply($event)" novalidate>
         <textarea #editor rows="2" aria-label="Auf den Thread antworten" placeholder="Antworten..."
-            [value]="draft()" (input)="onDraftInput(editor)" (keydown)="onEditorKeydown($event)"></textarea>
+            [value]="composer.draft()" (input)="composer.onInput(editor)" (keydown)="onEditorKeydown($event)"></textarea>
 
         <div class="thread-composer-actions">
             <button type="button" class="thread-composer-button" aria-label="Emoji auswählen"
-                [attr.aria-expanded]="emojiPickerOpen()" aria-controls="thread-emojis"
-                (click)="emojiPickerOpen.set(!emojiPickerOpen())">
+                [attr.aria-expanded]="composer.emojiPickerOpen()" aria-controls="thread-emojis"
+                (click)="composer.emojiPickerOpen.set(!composer.emojiPickerOpen())">
                 <span class="thread-icon emoji-icon" aria-hidden="true"></span>
             </button>
-            <button type="button" class="thread-composer-button" aria-label="Person erwähnen" (click)="insertText('@')">
+            <button type="button" class="thread-composer-button" aria-label="Person erwähnen" (click)="composer.insert('@')">
                 <span class="thread-icon mention-icon" aria-hidden="true"></span>
             </button>
             <button type="submit" class="thread-composer-button thread-send" aria-label="Antwort senden"
-                [disabled]="!draft().trim()">
+                [disabled]="!composer.draft().trim()">
                 <span class="thread-icon send-icon" aria-hidden="true"></span>
             </button>
         </div>
 
-        @if (emojiPickerOpen()) {
+        @if (composer.emojiPickerOpen()) {
         <div id="thread-emojis" class="thread-emoji-picker" role="group" aria-label="Emojis">
             @for (emoji of emojis; track emoji) {
-            <button type="button" (click)="insertText(emoji)">{{ emoji }}</button>
+            <button type="button" (click)="composer.insert(emoji)">{{ emoji }}</button>
             }
         </div>
         }
 
-        @if (mentionOpen() && mentionSuggestions().length) {
+        @if (composer.mentionOpen() && composer.suggestions().length) {
         <ul class="thread-mention-suggestions" role="listbox" aria-label="Vorschläge">
-            @for (suggestion of mentionSuggestions(); track suggestion.kind + suggestion.label; let index = $index) {
-            <li><button type="button" [class.active]="index === mentionIndex()" (mousedown)="$event.preventDefault()"
-                (click)="selectMention(suggestion)"><span>{{ suggestion.kind === 'user' ? '@' : '#' }}</span>{{ suggestion.label }}</button></li>
+            @for (suggestion of composer.suggestions(); track suggestion.kind + suggestion.label; let index = $index) {
+            <li><button type="button" [class.active]="index === composer.mentionIndex()" (mousedown)="$event.preventDefault()"
+                (click)="composer.select(suggestion)"><span>{{ suggestion.kind === 'user' ? '@' : '#' }}</span>{{ suggestion.label }}</button></li>
             }
         </ul>
         }

@@ -9,7 +9,7 @@ import { NotificationService } from '../../services/notification.service';
 @Component({
   imports: [ReactiveFormsModule, RouterLink],
   selector: 'app-register',
-  styleUrl: './register.scss',
+  styleUrls: ['./register.scss', './register-responsive.scss'],
   templateUrl: './register.html',
 })
 /** Handles account registration and navigation to avatar selection. */

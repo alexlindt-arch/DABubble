@@ -9,14 +9,14 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { AppUser } from '../../models';
-import { avatarUrl } from '../../shared/avatar-url';
+import { AppUser } from '../../shared/models';
+import { AvatarUrlPipe } from '../../pipes/avatar-url.pipe';
 
 type AddMode = 'all' | 'specific';
 
 @Component({
   selector: 'app-add-people-dialog',
-  imports: [],
+  imports: [AvatarUrlPipe],
   templateUrl: './add-people-dialog.html',
   styleUrl: './add-people-dialog.scss',
 })
@@ -55,10 +55,6 @@ export class AddPeopleDialog {
   /** Calculates the dialog's right offset and keeps it within the viewport. */
   get offsetRight(): string { return `${Math.max(16, Math.round(window.innerWidth - (this.anchor()?.right ?? window.innerWidth - 24)))}px`; }
 
-  /** Returns the displayable avatar URL for a user. */
-  avatar(user: AppUser): string {
-    return avatarUrl(user.avatar);
-  }
 
   /** Adds a user to the selection and clears the search input. */
   addUser(user: AppUser): void {

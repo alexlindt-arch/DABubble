@@ -13,7 +13,7 @@
       <div class="people-picker compact-picker">
         <div class="input-wrapper">
           @for (user of selected(); track user.uid) {
-          <span class="chip"><img [src]="avatar(user)" alt="">{{ user.name }}<button type="button"
+          <span class="chip"><img [src]="user.avatar | avatarUrl" alt="">{{ user.name }}<button type="button"
               [attr.aria-label]="user.name + ' entfernen'" (click)="removeUser(user)"><span class="icon close-icon" aria-hidden="true"></span></button></span>
           }
           <input #searchInput type="text" autocomplete="off" aria-label="Nach Personen suchen" [value]="search()"
@@ -22,7 +22,7 @@
         @if (suggestions().length) {
         <ul class="suggestions">
           @for (user of suggestions(); track user.uid) {
-          <li><button type="button" (click)="addUser(user)"><span class="avatar-wrapper"><img [src]="avatar(user)" alt=""><span
+          <li><button type="button" (click)="addUser(user)"><span class="avatar-wrapper"><img [src]="user.avatar | avatarUrl" alt=""><span
                 class="status-dot" [class.offline]="user.status !== 'online'"></span></span><span class="suggestion-name">{{ user.name }}</span></button></li>
           }
         </ul>
@@ -46,7 +46,7 @@
         <div class="input-wrapper">
           @for (user of selected(); track user.uid) {
           <span class="chip">
-            <img [src]="avatar(user)" alt="">
+            <img [src]="user.avatar | avatarUrl" alt="">
             {{ user.name }}
             <button type="button" [attr.aria-label]="user.name + ' entfernen'" (click)="removeUser(user)">
               <span class="icon close-icon" aria-hidden="true"></span>
@@ -63,7 +63,7 @@
           <li>
             <button type="button" (click)="addUser(user)">
               <span class="avatar-wrapper">
-                <img [src]="avatar(user)" alt="">
+                <img [src]="user.avatar | avatarUrl" alt="">
                 <span class="status-dot" [class.offline]="user.status !== 'online'" role="img"
                   [attr.aria-label]="user.status === 'online' ? 'Online' : 'Offline'"></span>
               </span>

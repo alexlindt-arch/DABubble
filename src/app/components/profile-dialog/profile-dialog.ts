@@ -1,7 +1,7 @@
 import { afterNextRender, Component, ElementRef, HostListener, input, linkedSignal, output, signal, viewChild } from '@angular/core';
-import { AppUser } from '../../models';
-import { avatarUrl } from '../../shared/avatar-url';
+import { AppUser } from '../../shared/models';
 import { AVATAR_FILES, avatarLabel } from '../../shared/avatars';
+import { AvatarUrlPipe } from '../../pipes/avatar-url.pipe';
 
 /** Contains the editable profile values emitted by the dialog. */
 export interface ProfileEdit {
@@ -11,7 +11,7 @@ export interface ProfileEdit {
 
 @Component({
   selector: 'app-profile-dialog',
-  imports: [],
+  imports: [AvatarUrlPipe],
   templateUrl: './profile-dialog.html',
   styleUrl: './profile-dialog.scss',
 })
@@ -40,15 +40,6 @@ export class ProfileDialog {
 
   /** Focuses the name field after the dialog has rendered. */
   constructor() { afterNextRender(() => this.nameInput()?.nativeElement.focus()); }
-
-  /** Returns the current profile avatar URL. */
-  avatar(): string { return avatarUrl(this.profile().avatar); }
-
-  /** Returns the edited avatar URL. */
-  editedAvatarUrl(): string { return avatarUrl(this.editedAvatar()); }
-
-  /** Returns the avatar URL for a picker option. */
-  avatarOptionUrl(avatar: string): string { return avatarUrl(avatar); }
 
   /** Returns the accessible label for an avatar option. */
   avatarName(avatar: string): string { return avatarLabel(avatar); }

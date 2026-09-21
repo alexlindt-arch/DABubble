@@ -17,8 +17,6 @@ import { Thread } from '../thread/thread';
 import { AuthService } from '../../services/auth.service';
 import { ChannelService } from '../../services/channel.service';
 import { MessageService } from '../../services/message.service';
-import { UserService } from '../../services/user.service';
-import { avatarUrl } from '../../shared/avatar-url';
 import { isMobileViewport } from '../../shared/is-mobile-viewport';
 import { AddPeopleDialog } from '../add-people-dialog/add-people-dialog';
 import { MembersDialog } from '../members-dialog/members-dialog';
@@ -26,13 +24,12 @@ import { CreateChannelDialog, NewChannel } from '../create-channel-dialog/create
 import { NewMessage } from '../new-message/new-message';
 import { ProfileDialog, ProfileEdit } from '../profile-dialog/profile-dialog';
 import { ChannelInfoDialog } from '../channel-info-dialog/channel-info-dialog';
-import { AppUser, Channel, Message } from '../../models';
-
-type SearchResult =
-  | { kind: 'channel'; id: string; label: string; channel: Channel }
-  | { kind: 'user'; id: string; label: string; user: AppUser }
-  | { kind: 'channel-message'; id: string; label: string; context: string; channel: Channel; message: Message; parent?: Message }
-  | { kind: 'direct-message'; id: string; label: string; context: string; user: AppUser; message: Message };
+import { AppUser, Channel, ChannelEdit, ConversationSelection, Message } from '../../shared/models';
+import { MessageSearchService, SearchResult, SearchSources } from '../../services/message-search.service';
+import { AccountService } from '../../services/account.service';
+import { WorkspaceDialogs } from '../../shared/workspace-dialogs';
+import { SearchBox } from '../../shared/search-box';
+import { toggleHeightFor } from '../../shared/toggle-height';
 
 @Component({
   selector: 'app-main-layout',
@@ -45,37 +42,22 @@ export class MainLayout {
   private readonly authService = inject(AuthService);
   private readonly channelService = inject(ChannelService);
   private readonly messageService = inject(MessageService);
-  private readonly userService = inject(UserService);
+  private readonly accountService = inject(AccountService);
   private readonly router = inject(Router);
   private readonly notifications = inject(NotificationService);
+  readonly search = inject(MessageSearchService);
 
   readonly currentUser = this.authService.currentUser;
-  readonly searchQuery = signal('');
-  readonly searchOpen = signal(false);
-  readonly searchIndex = signal(0);
-  readonly messageSearchResults = signal<SearchResult[]>([]);
-  readonly searchLoading = signal(false);
-  readonly searchResults = computed(() => [...this.matchSearchResults(), ...this.messageSearchResults()].slice(0, 30));
+  readonly searchBox = new SearchBox();
+  readonly searchResults = computed(() => this.collectSearchResults());
 
-  profileMenuOpen = false;
-  profilePopupOpen = false;
-  profileEditOpen = false;
+  readonly dialogs = new WorkspaceDialogs();
   profileSaveError = '';
   accountDeleteError = '';
   accountDeleteBusy = false;
-  createChannelDialogOpen = false;
-  addPeopleDialogOpen = false;
-  membersDialogOpen = false;
-  channelInfoOpen = false;
   channelInfoSaveError = '';
   channelInfoSaving = false;
   channelInfoSaveVersion = 0;
-  channelInfoAnchor = signal<DOMRect | null>(null);
-  membersAnchor = signal<DOMRect | null>(null);
-  addPeopleAnchor = signal<DOMRect | null>(null);
-  memberDialogLabel = 'Erstellen';
-  memberDialogForExistingChannel = false;
-  memberDialogChannel = signal<Channel | null>(null);
   sidebarOpen = true;
   selfChatOpen = false;
   newMessageOpen = false;
@@ -90,14 +72,10 @@ export class MainLayout {
   private openLabel = viewChild.required<ElementRef<HTMLElement>>('openLabel');
   private destroyRef = inject(DestroyRef);
   private sidebar = viewChild(Sidebar);
-  private searchTimer?: ReturnType<typeof setTimeout>;
-  private searchRequest = 0;
 
   /** Initializes the layout state and responsive sidebar behavior. */
   constructor() {
-    this.destroyRef.onDestroy(() => {
-      if (this.searchTimer) clearTimeout(this.searchTimer);
-    });
+    this.destroyRef.onDestroy(() => this.search.cancelPending());
     afterNextRender(() => {
       const observer = new ResizeObserver(() => this.updateToggleHeight());
       observer.observe(this.closeLabel().nativeElement);
@@ -109,75 +87,35 @@ export class MainLayout {
 
   /** Updates the sidebar toggle height to fit its measured label. */
   private updateToggleHeight(): void {
-    const chrome = this.toggleChromeHeight(this.closeLabel().nativeElement);
-    this.closeLabelHeight.set(this.closeLabel().nativeElement.offsetHeight + chrome);
-    this.openLabelHeight.set(this.openLabel().nativeElement.offsetHeight + chrome);
+    this.closeLabelHeight.set(toggleHeightFor(this.closeLabel().nativeElement));
+    this.openLabelHeight.set(toggleHeightFor(this.openLabel().nativeElement));
   }
 
-  /** Vertical padding, icon and gap of the toggle; they scale with the window, so they are read live. */
-  /** Returns the height needed for the toggle label. */
-  private toggleChromeHeight(label: HTMLElement): number {
-    const button = label.closest('button');
-    if (!button) return 0;
-    const style = getComputedStyle(button);
-    const icon = button.querySelector<HTMLElement>('.toggle-icon')?.offsetHeight ?? 0;
-    return parseFloat(style.paddingTop) + parseFloat(style.paddingBottom) + parseFloat(style.rowGap) + icon;
-  }
-
-  get userName(): string {
-    return this.currentUser()?.name ?? 'Gast';
-  }
-
-  get userAvatarUrl(): string {
-    return avatarUrl(this.currentUser()?.avatar);
-  }
-
-  get isOnline(): boolean {
-    return this.currentUser()?.status === 'online';
-  }
-
-  get userEmail(): string {
-    return this.currentUser()?.email ?? '';
-  }
+  readonly userName = this.authService.userName;
+  readonly userEmail = this.authService.userEmail;
+  readonly userAvatarUrl = this.authService.userAvatarUrl;
+  readonly isOnline = this.authService.isOnline;
 
   /** Signs the current user out and returns to the login screen. */
   logout(): void {
-    this.closeProfileMenu();
+    this.dialogs.closeProfileMenu();
     this.authService.logout().finally(() => {
       this.notifications.success('Du wurdest erfolgreich abgemeldet.');
       this.router.navigateByUrl('/login');
     });
   }
 
-  /** Toggles the profile menu visibility. */
-  toggleProfileMenu() {
-    this.profileMenuOpen = !this.profileMenuOpen;
-  }
-
-  /** Closes the profile menu. */
-  closeProfileMenu() {
-    this.profileMenuOpen = false;
-  }
-
-  /** Opens the profile details dialog. */
-  openProfilePopup(): void {
-    this.closeProfileMenu();
-    this.profilePopupOpen = true;
-  }
-
   /** Updates the global search query and schedules message search. */
   onSearchInput(value: string): void {
-    this.searchQuery.set(value);
-    this.searchIndex.set(0);
-    this.searchOpen.set(true);
-    this.scheduleMessageSearch(value);
+    this.searchBox.type(value);
+    this.search.schedule(value, this.searchSources());
   }
 
   /** Handles keyboard navigation for search results. */
   onSearchKeydown(event: KeyboardEvent): void {
     const results = this.searchResults();
-    if (!results.length || !this.handleSearchNavigation(event, results.length)) return;
-    if (event.key === 'Enter') this.selectSearchResult(results[this.searchIndex()]);
+    if (!results.length || !this.searchBox.handleKeydown(event, results.length)) return;
+    if (event.key === 'Enter') this.selectSearchResult(results[this.searchBox.index()]);
   }
 
   /** Shows the selected conversation on mobile layouts. */
@@ -185,53 +123,44 @@ export class MainLayout {
     if (isMobileViewport()) this.sidebarOpen = false;
   }
 
-  /** Opens the conversation represented by a search result. */
+  /** Opens the conversation represented by a search result and clears the box. */
   selectSearchResult(result: SearchResult): void {
     if (result.kind === 'channel') this.openMentionedChannel(result.channel);
-    else if (result.kind === 'user') this.openSearchedUser(result.user);
     else if (result.kind === 'channel-message') this.openChannelMessageResult(result);
     else this.openSearchedUser(result.user);
     this.showChatOnMobile();
-    this.clearSearch();
+    this.search.reset();
+    this.searchBox.clear();
   }
 
-  /** Closes the global search results. */
-  closeSearch(): void {
-    this.searchOpen.set(false);
-    this.searchIndex.set(0);
+  /** Merges name matches and message matches into one result list. */
+  private collectSearchResults(): SearchResult[] {
+    const names = this.search.nameResults(this.searchBox.query(), this.allChannels(), this.allUsers());
+    return [...names, ...this.search.messageResults()].slice(0, 30);
   }
 
-  /** Clears the current search state. */
-  private clearSearch(): void {
-    this.searchQuery.set('');
-    this.messageSearchResults.set([]);
-    this.searchLoading.set(false);
-    this.searchRequest++;
-    this.closeSearch();
-  }
-
-  /** Closes the profile details dialog. */
-  closeProfilePopup(): void {
-    this.profilePopupOpen = false;
+  /** Returns the workspace data the message search reads. */
+  private searchSources(): SearchSources {
+    return {
+      ownUid: this.currentUserId,
+      channels: this.allChannels(),
+      authors: this.allMessageAuthors(),
+      directUserIds: this.directConversationUserIds(),
+    };
   }
 
   /** Opens the profile editing dialog. */
   openProfileEdit(): void {
     this.profileSaveError = '';
-    this.profileEditOpen = true;
-  }
-
-  /** Closes the profile editing dialog. */
-  closeProfileEdit(): void {
-    this.profileEditOpen = false;
+    this.dialogs.openProfileEdit();
   }
 
   /** Persists profile changes. */
   saveProfile(edit: ProfileEdit): void {
     this.profileSaveError = '';
     this.authService
-      .saveUserProfile(edit.name, this.userEmail, edit.avatar)
-      .then(() => this.closeProfileEdit())
+      .saveUserProfile(edit.name, this.userEmail(), edit.avatar)
+      .then(() => this.dialogs.closeProfileEdit())
       .catch(() => (this.profileSaveError = 'Profil konnte nicht gespeichert werden.'));
   }
 
@@ -239,85 +168,49 @@ export class MainLayout {
   async deleteAccount(): Promise<void> {
     const uid = this.authService.currentUserId;
     if (!uid) return;
-    this.accountDeleteError = '';
     this.accountDeleteBusy = true;
-    try {
-      await this.channelService.removeUserFromChannels(uid);
-      await this.messageService.deleteDirectConversationsForUser(uid);
-      await this.userService.deleteUserProfile(uid);
-      await this.authService.deleteCurrentAccount();
-      this.notifications.success('Dein Konto wurde erfolgreich gelöscht.');
-      await this.router.navigateByUrl('/login');
-    } catch (error) { this.accountDeleteError = this.accountDeletionError(error); }
-    finally { this.accountDeleteBusy = false; }
-  }
-
-  /** Maps account deletion errors to a user-facing message. */
-  private accountDeletionError(error: unknown): string {
-    const code = (error as { code?: string }).code;
-    return code === 'auth/requires-recent-login' ? 'Bitte melde dich erneut an und versuche es dann noch einmal.' : 'Das Konto konnte nicht gelöscht werden.';
+    this.accountDeleteError = (await this.accountService.deleteAccount(uid)) ?? '';
+    this.accountDeleteBusy = false;
+    if (this.accountDeleteError) return;
+    this.notifications.success('Dein Konto wurde erfolgreich gelöscht.');
+    await this.router.navigateByUrl('/login');
   }
 
   /** Opens the channel creation dialog. */
   openCreateChannelDialog(): void {
-    this.closeAddPeopleDialog();
-    this.createChannelDialogOpen = true;
-  }
-
-  /** Closes the channel creation dialog. */
-  closeCreateChannelDialog(): void {
-    this.createChannelDialogOpen = false;
+    this.dialogs.openCreateChannel();
   }
 
   /** Validates and starts creating a channel. */
   createChannel(channel: NewChannel): void {
     const uid = this.authService.currentUserId;
-    if (!uid) return this.closeCreateChannelDialog();
-    const normalizedName = channel.name.trim().toLocaleLowerCase('de');
-    const alreadyExists = this.allChannels().some(existing =>
-      existing.name.trim().toLocaleLowerCase('de') === normalizedName,
-    );
-    if (alreadyExists) return;
-    this.closeCreateChannelDialog();
-    this.persistChannel(channel.name, channel.description, uid);
+    if (!uid) return this.dialogs.closeCreateChannel();
+    if (this.channelService.existsByName(channel.name, this.allChannels())) return;
+    this.dialogs.closeCreateChannel();
+    void this.persistChannel(channel.name, channel.description, uid);
   }
 
+  /** Creates the channel and opens member selection for it. */
   private async persistChannel(name: string, description: string, uid: string): Promise<void> {
     try {
       const created = await this.channelService.createChannel(name, description, uid);
-      this.openAddPeopleDialog(created);
+      this.dialogs.openAddPeopleForNewChannel(created);
+      this.sidebar()?.selectConversation('channel', created.id);
+      this.selectedChannel.set(created);
     } catch (error) {
       console.error('Channel konnte nicht erstellt werden:', error);
     }
   }
 
-  /** Opens the member dialog for a newly created channel. */
-  private openAddPeopleDialog(created: Channel): void {
-    this.memberDialogLabel = 'Erstellen';
-    this.memberDialogForExistingChannel = false;
-    this.addPeopleAnchor.set(null);
-    this.memberDialogChannel.set(created);
-    this.addPeopleDialogOpen = true;
-    this.sidebar()?.selectConversation('channel', created.id);
-    this.selectedChannel.set(created);
-  }
-
   /** Opens the current channel members dialog. */
   openMembersDialog(anchor: DOMRect): void {
-    if (!this.selectedChannel()) return;
-    this.membersAnchor.set(anchor);
-    this.membersDialogOpen = true;
-  }
-
-  /** Closes the members dialog. */
-  closeMembersDialog(): void {
-    this.membersDialogOpen = false;
+    if (this.selectedChannel()) this.dialogs.openMembers(anchor);
   }
 
   /** Switches from the members list to member selection. */
   openMemberDialogFromList(): void {
-    this.closeMembersDialog();
-    this.openMemberDialog(this.membersAnchor());
+    this.dialogs.closeMembers();
+    this.openMemberDialog(this.dialogs.membersAnchor());
   }
 
   get currentUserId(): string | null {
@@ -327,44 +220,37 @@ export class MainLayout {
   /** Opens member selection for the selected channel. */
   openMemberDialog(anchor: DOMRect | null = null): void {
     const channel = this.selectedChannel();
-    if (!channel) return;
-    this.memberDialogLabel = 'Hinzufügen';
-    this.memberDialogForExistingChannel = true;
-    this.addPeopleAnchor.set(anchor);
-    this.memberDialogChannel.set(channel);
-    this.addPeopleDialogOpen = true;
+    if (channel) this.dialogs.openAddPeopleForChannel(channel, anchor);
   }
 
   /** Opens the channel information dialog. */
   openChannelInfo(anchor: DOMRect): void {
-    this.channelInfoAnchor.set(anchor);
     this.channelInfoSaveError = '';
     this.channelInfoSaving = false;
-    this.channelInfoOpen = true;
-  }
-
-  /** Closes the channel information dialog. */
-  closeChannelInfo(): void {
-    this.channelInfoOpen = false;
-    this.channelInfoAnchor.set(null);
+    this.dialogs.openChannelInfo(anchor);
   }
 
   /** Persists channel name and description changes. */
-  async saveChannelInfo(change: { name: string; description: string }): Promise<void> {
+  async saveChannelInfo(change: ChannelEdit): Promise<void> {
     const channel = this.selectedChannel();
     if (!channel) return;
     this.channelInfoSaveError = '';
     this.channelInfoSaving = true;
+    await this.writeChannelInfo(channel, change);
+    this.channelInfoSaving = false;
+  }
+
+  /** Writes the channel edit and records its outcome. */
+  private async writeChannelInfo(channel: Channel, change: ChannelEdit): Promise<void> {
     try {
       await this.channelService.updateChannel(channel.id, change.name, change.description);
-      this.selectedChannel.set({ ...channel, ...change });
-      this.channelInfoSaveVersion++;
     } catch (error) {
       console.error('Channel-Informationen konnten nicht gespeichert werden:', error);
       this.channelInfoSaveError = 'Die Änderungen konnten nicht gespeichert werden. Bitte versuche es erneut.';
-    } finally {
-      this.channelInfoSaving = false;
+      return;
     }
+    this.selectedChannel.set({ ...channel, ...change });
+    this.channelInfoSaveVersion++;
   }
 
   /** Leaves the currently selected channel. */
@@ -372,13 +258,13 @@ export class MainLayout {
     const channel = this.selectedChannel();
     const uid = this.authService.currentUserId;
     if (!channel || !uid) return;
-    if (channel.name.trim().toLocaleLowerCase('de') === 'willkommenschannel') return;
+    if (this.channelService.isPermanent(channel)) return;
     this.channelService.leaveChannel(channel.id, uid).then(() => this.openAfterLeaving(channel.id));
   }
 
   /** Selects the next available conversation after leaving a channel. */
   private openAfterLeaving(leftChannelId: string): void {
-    this.closeChannelInfo();
+    this.dialogs.closeChannelInfo();
     const nextChannel = this.allChannels().find(channel => channel.id !== leftChannelId);
     if (nextChannel) return this.sidebar()?.selectConversation('channel', nextChannel.id);
     const uid = this.authService.currentUserId;
@@ -392,197 +278,56 @@ export class MainLayout {
     return this.allUsers().find(user => user.uid === creatorId) ?? null;
   }
 
-  /** Closes the add-people dialog and clears its state. */
-  closeAddPeopleDialog(): void {
-    this.addPeopleDialogOpen = false;
-    this.addPeopleAnchor.set(null);
-    this.memberDialogChannel.set(null);
-  }
-
   /** Adds selected users to the current channel. */
   async addMembers(uids: string[]): Promise<void> {
-    const channel = this.memberDialogChannel();
-    if (!this.canAddMembers(channel, uids)) return this.closeAddPeopleDialog();
+    const channel = this.dialogs.memberChannel();
+    if (!channel || !uids.length) return this.dialogs.closeAddPeople();
     try {
       await this.channelService.addMembers(channel.id, uids);
-      const members = Array.from(new Set([...channel.members, ...uids]));
-      this.updateMemberState(channel, members);
+      this.updateMemberState(channel, Array.from(new Set([...channel.members, ...uids])));
     } catch (error) {
-      this.logMemberUpdateError(error);
+      console.error('Mitglieder konnten nicht hinzugefügt werden:', error);
     } finally {
-      this.closeAddPeopleDialog();
+      this.dialogs.closeAddPeople();
     }
-  }
-
-  /** Checks whether member additions can be processed. */
-  private canAddMembers(channel: Channel | null, uids: string[]): channel is Channel {
-    return !!channel && uids.length > 0;
   }
 
   /** Updates member state in the dialog and selected channel. */
   private updateMemberState(channel: Channel, members: string[]): void {
-    this.memberDialogChannel.set({ ...channel, members });
+    this.dialogs.memberChannel.set({ ...channel, members });
     if (this.selectedChannel()?.id !== channel.id) return;
     this.selectedChannel.update(selected => selected ? { ...selected, members } : selected);
-  }
-
-  /** Logs a member update failure. */
-  private logMemberUpdateError(error: unknown): void {
-    console.error('Mitglieder konnten nicht hinzugefügt werden:', error);
   }
 
   readonly allUsers = computed(() => this.sidebar()?.users() ?? []);
   readonly allMessageAuthors = computed(() => this.sidebar()?.messageAuthors() ?? []);
   readonly allChannels = computed(() => this.sidebar()?.channels() ?? []);
   readonly directConversationUserIds = computed(() => this.sidebar()?.directConversationUserIds() ?? []);
-  readonly channelMembers = computed(() => this.membersOfSelectedChannel());
-  readonly canManageSelectedChannel = computed(() => this.isSelectedChannelMember());
+  readonly channelNames = computed(() => this.allChannels().map(channel => channel.name));
 
-  /** Returns user and channel results matching the query. */
-  private matchSearchResults(): SearchResult[] {
-    const raw = this.searchQuery().trim();
-    const kind = raw.startsWith('#') ? 'channel' : raw.startsWith('@') ? 'user' : 'all';
-    const query = raw.replace(/^[@#]/, '').toLocaleLowerCase('de');
-    if (!query) return [];
-    const channels = kind !== 'user' ? this.allChannels().filter(item => this.matchesSearch(item.name, query)) : [];
-    const users = kind !== 'channel' ? this.allUsers().filter(item => this.matchesSearch(item.name, query)) : [];
-    return [...channels.map(channel => ({ kind: 'channel' as const, id: `channel-${channel.id}`, label: channel.name, channel })),
-      ...users.map(user => ({ kind: 'user' as const, id: `user-${user.uid}`, label: user.name, user }))];
-  }
+  /** Users that belong to the selected channel. */
+  readonly channelMembers = computed(() => {
+    const members = this.selectedChannel()?.members ?? [];
+    return this.allUsers().filter(user => members.includes(user.uid));
+  });
 
-  /** Schedules a debounced message search. */
-  private scheduleMessageSearch(value: string): void {
-    if (this.searchTimer) clearTimeout(this.searchTimer);
-    const raw = value.trim();
-    const request = ++this.searchRequest;
-    this.messageSearchResults.set([]);
-    this.searchLoading.set(false);
-    if (!raw || raw.startsWith('#') || raw.startsWith('@')) return;
-    this.searchLoading.set(true);
-    this.searchTimer = setTimeout(() => void this.searchMessages(raw, request), 250);
-  }
+  /** Users that can still be invited into the channel of the member dialog. */
+  readonly invitableUsers = computed(() => {
+    const members = this.dialogs.memberChannel()?.members ?? [];
+    return this.allUsers().filter(user => !members.includes(user.uid));
+  });
 
-  private async searchMessages(term: string, request: number): Promise<void> {
-    const uid = this.authService.currentUserId;
-    if (!uid) return this.finishMessageSearch(request, []);
-    const query = term.toLocaleLowerCase('de');
-    const usersById = new Map(this.allMessageAuthors().map(user => [user.uid, user]));
-    const [channelLoads, directLoads] = await this.loadSearchMessages(uid, usersById);
-    const results = [
-      ...this.channelMessageResults(channelLoads, query, usersById, uid),
-      ...this.directMessageResults(directLoads, query, uid),
-    ].sort((a, b) => b.message.timestamp.toMillis() - a.message.timestamp.toMillis());
-    this.finishMessageSearch(request, results);
-  }
-
-  private async loadSearchMessages(uid: string, usersById: Map<string, AppUser>) {
-    const channels = this.allChannels();
-    const directUsers = this.directConversationUsers(usersById);
-    return Promise.all([
-      Promise.allSettled(channels.map(async channel => ({ channel, messages: await this.messageService.loadChannelMessages(channel.id) }))),
-      Promise.allSettled(directUsers.map(async user => ({ user, messages: await this.messageService.loadDirectMessages(uid, user.uid) }))),
-    ]);
-  }
-
-  /** Resolves users participating in direct conversations. */
-  private directConversationUsers(usersById: Map<string, AppUser>): AppUser[] {
-    return this.directConversationUserIds()
-      .map(userId => usersById.get(userId))
-      .filter((user): user is AppUser => !!user);
-  }
-
-  /** Builds search results for channel messages. */
-  private channelMessageResults(
-    loads: PromiseSettledResult<{ channel: Channel; messages: Message[] }>[],
-    query: string,
-    usersById: Map<string, AppUser>,
-    ownUid: string,
-  ): Extract<SearchResult, { kind: 'channel-message' }>[] {
-    return loads.flatMap(load => this.channelLoadResults(load, query, usersById, ownUid));
-  }
-
-  /** Builds results from one channel message load. */
-  private channelLoadResults(
-    load: PromiseSettledResult<{ channel: Channel; messages: Message[] }>,
-    query: string,
-    usersById: Map<string, AppUser>,
-    ownUid: string,
-  ): Extract<SearchResult, { kind: 'channel-message' }>[] {
-    if (load.status === 'rejected') return [];
-    const { channel, messages } = load.value;
-    const byId = new Map(messages.map(message => [message.id, message]));
-    return messages.filter(message => this.matchesSearch(message.text, query)).map(message => ({
-      kind: 'channel-message' as const,
-      id: `channel-message-${channel.id}-${message.id}`,
-      label: `#${channel.name} · ${message.senderId === ownUid ? 'Du' : usersById.get(message.senderId)?.name ?? 'Gelöschtes Profil'}`,
-      context: this.searchContext(message.text, query),
-      channel,
-      message,
-      parent: message.parentId ? byId.get(message.parentId) : undefined,
-    }));
-  }
-
-  /** Builds search results for direct messages. */
-  private directMessageResults(
-    loads: PromiseSettledResult<{ user: AppUser; messages: Message[] }>[],
-    query: string,
-    ownUid: string,
-  ): Extract<SearchResult, { kind: 'direct-message' }>[] {
-    return loads.flatMap(load => this.directLoadResults(load, query, ownUid));
-  }
-
-  /** Builds results from one direct-message load. */
-  private directLoadResults(
-    load: PromiseSettledResult<{ user: AppUser; messages: Message[] }>,
-    query: string,
-    ownUid: string,
-  ): Extract<SearchResult, { kind: 'direct-message' }>[] {
-    if (load.status === 'rejected') return [];
-    const { user, messages } = load.value;
-    return messages.filter(message => this.matchesSearch(message.text, query)).map(message => ({
-      kind: 'direct-message' as const,
-      id: `direct-message-${user.uid}-${message.id}`,
-      label: `@${user.name} · ${message.senderId === ownUid ? 'Du' : user.name}`,
-      context: this.searchContext(message.text, query),
-      user,
-      message,
-    }));
-  }
-
-  /** Publishes message-search results for the active request. */
-  private finishMessageSearch(request: number, results: SearchResult[]): void {
-    if (request !== this.searchRequest) return;
-    this.messageSearchResults.set(results);
-    this.searchLoading.set(false);
-  }
-
-  /** Creates a shortened context snippet around a match. */
-  private searchContext(text: string, query: string): string {
-    const position = text.toLocaleLowerCase('de').indexOf(query);
-    const start = Math.max(0, position - 38);
-    const end = Math.min(text.length, position + query.length + 58);
-    return `${start > 0 ? '…' : ''}${text.slice(start, end)}${end < text.length ? '…' : ''}`;
-  }
+  /** Whether the current user may administer the selected channel. */
+  readonly canManageSelectedChannel = computed(() => {
+    const selected = this.selectedChannel();
+    const channel = this.allChannels().find(item => item.id === selected?.id) ?? selected;
+    return !!this.currentUserId && !!channel?.members.includes(this.currentUserId);
+  });
 
   /** Opens a channel message search result and its thread. */
   private openChannelMessageResult(result: Extract<SearchResult, { kind: 'channel-message' }>): void {
     this.openMentionedChannel(result.channel);
     if (result.parent) this.openThread(result.parent);
-  }
-
-  /** Checks whether a value contains the search query. */
-  private matchesSearch(value: string, query: string): boolean {
-    return value.toLocaleLowerCase('de').includes(query);
-  }
-
-  /** Handles keyboard navigation and selection of search results. */
-  private handleSearchNavigation(event: KeyboardEvent, count: number): boolean {
-    if (event.key === 'ArrowDown') this.searchIndex.update(index => (index + 1) % count);
-    else if (event.key === 'ArrowUp') this.searchIndex.update(index => (index - 1 + count) % count);
-    else if (event.key === 'Escape') return this.closeSearch(), false;
-    else if (event.key !== 'Enter') return false;
-    event.preventDefault();
-    return true;
   }
 
   /** Opens a direct conversation with a searched user. */
@@ -592,40 +337,10 @@ export class MainLayout {
     this.startDirectConversation(user);
   }
 
-  /** Checks whether the current user belongs to the selected channel. */
-  private isSelectedChannelMember(): boolean {
-    const selected = this.selectedChannel();
-    const channel = this.allChannels().find(item => item.id === selected?.id) ?? selected;
-    return !!this.currentUserId && !!channel?.members.includes(this.currentUserId);
-  }
-
-  /** Returns users belonging to the selected channel. */
-  private membersOfSelectedChannel(): AppUser[] {
-    const members = this.selectedChannel()?.members ?? [];
-    return this.allUsers().filter(user => members.includes(user.uid));
-  }
-
-  readonly invitableUsers = computed(() => this.usersWithoutMembers());
-
-  /** Returns users who can be invited to the channel. */
-  private usersWithoutMembers(): AppUser[] {
-    const members = this.memberDialogChannel()?.members ?? [];
-    return (this.sidebar()?.users() ?? []).filter(user => !members.includes(user.uid));
-  }
-
-  get channelNames(): string[] {
-    return this.sidebar()?.channels().map(channel => channel.name) ?? [];
-  }
-
   @HostListener('document:keydown.escape')
   /** Closes open dialogs when Escape is pressed. */
   closeDialogsWithEscape(): void {
-    this.closeProfileMenu();
-    this.closeProfilePopup();
-    this.closeProfileEdit();
-    this.closeCreateChannelDialog();
-    this.closeAddPeopleDialog();
-    this.closeMembersDialog();
+    this.dialogs.closeOnEscape();
   }
 
   /** Toggles the workspace sidebar. */
@@ -634,12 +349,7 @@ export class MainLayout {
   }
 
   /** Selects a channel or direct conversation. */
-  selectConversation(conversation: {
-    type: 'channel' | 'direct';
-    id: string;
-    user?: AppUser;
-    channel?: Channel;
-  }): void {
+  selectConversation(conversation: ConversationSelection): void {
     this.newMessageOpen = false;
     this.threadOpen = false;
     this.selfChatOpen = conversation.type === 'direct' && conversation.id === this.currentUser()?.uid;
@@ -671,17 +381,12 @@ export class MainLayout {
     this.newMessageOpen = true;
   }
 
-  /** Starts a direct conversation with a user. */
+  /** Starts a direct conversation with a user and closes the channel info. */
   startDirectConversation(user: AppUser): void {
+    this.dialogs.closeChannelInfo();
     this.sidebar()?.selectConversation('direct', user.uid);
     this.selectConversation({ type: 'direct', id: user.uid, user });
     this.threadOpen = false;
-  }
-
-  /** Starts a direct conversation from channel information. */
-  startDirectConversationFromChannelInfo(user: AppUser): void {
-    this.closeChannelInfo();
-    this.startDirectConversation(user);
   }
 
   /** Opens a channel referenced by a search result. */

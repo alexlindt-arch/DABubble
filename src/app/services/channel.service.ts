@@ -20,8 +20,11 @@ import {
   query,
   where,
 } from 'firebase/firestore';
-import { firebaseApp } from '../firebase';
-import { Channel, ChannelProfile } from '../models';
+import { firebaseApp } from './firebase';
+import { Channel, ChannelProfile } from '../shared/models';
+
+/** Name of the channel that every member keeps; it cannot be left. */
+const PERMANENT_CHANNEL = 'willkommenschannel';
 
 @Injectable({ providedIn: 'root' })
 /** Provides channel data and operations. */
@@ -76,9 +79,19 @@ export class ChannelService {
     return channels.docs.map(channel => this.toChannel(channel));
   }
 
+  /** Reports whether a channel of that name already exists. */
+  existsByName(name: string, channels: Channel[]): boolean {
+    return channels.some(channel => normalizeName(channel.name) === normalizeName(name));
+  }
+
+  /** Reports whether a channel is protected and must not be left. */
+  isPermanent(channel: Channel): boolean {
+    return normalizeName(channel.name) === PERMANENT_CHANNEL;
+  }
+
   /** Creates the protected welcome channel when it does not exist yet. */
   async ensureWelcomeChannel(creatorUid: string, channels: Channel[]): Promise<void> {
-    const exists = channels.some(channel => channel.name.trim().toLocaleLowerCase('de') === 'willkommenschannel');
+    const exists = this.existsByName(PERMANENT_CHANNEL, channels);
     if (exists || !channels.length) return;
     await this.createChannel('Willkommenschannel', 'Willkommen und wichtige Verhaltensregeln für alle Mitglieder.', creatorUid);
   }
@@ -121,4 +134,9 @@ export class ChannelService {
   private channelRef(channelId: string): DocumentReference {
     return doc(this.firestore, 'channels', channelId);
   }
+}
+
+/** Normalizes a channel name so comparisons ignore case and padding. */
+function normalizeName(name: string): string {
+  return name.trim().toLocaleLowerCase('de');
 }

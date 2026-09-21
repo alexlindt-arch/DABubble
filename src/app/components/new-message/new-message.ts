@@ -1,12 +1,13 @@
 import { afterNextRender, Component, computed, ElementRef, HostListener, inject, input, output, signal, viewChild } from '@angular/core';
-import { AppUser, Channel } from '../../models';
+import { AppUser, Channel } from '../../shared/models';
 import { AuthService } from '../../services/auth.service';
 import { MessageService } from '../../services/message.service';
 import { avatarUrl } from '../../shared/avatar-url';
 import { EMOJIS } from '../../shared/emojis';
+import { AvatarUrlPipe } from '../../pipes/avatar-url.pipe';
 
 @Component({
-  imports: [],
+  imports: [AvatarUrlPipe],
   selector: 'app-new-message',
   styleUrl: './new-message.scss',
   templateUrl: './new-message.html',

@@ -14,7 +14,7 @@
         <button type="button" class="member-profile-button" (click)="openProfile(member)"
           [attr.aria-label]="'Profil von ' + displayName(member) + ' öffnen'">
           <span class="avatar-wrapper">
-            <img [src]="avatar(member)" alt="">
+            <img [src]="member.avatar | avatarUrl" alt="">
             <span class="status-dot" [class.offline]="!isOnline(member)" role="img"
               [attr.aria-label]="isOnline(member) ? 'Online' : 'Offline'"></span>
           </span>

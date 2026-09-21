@@ -6,8 +6,8 @@ import { ResetPassword } from './components/reset-password/reset-password';
 import { SendMail } from './components/send-mail/send-mail';
 import { MainLayout } from './components/main-layout/main-layout';
 import { authGuard } from './services/auth.guard';
-import { Imprint } from './shared/imprint/imprint';
-import { PrivacyPolicy } from './shared/privacy-policy/privacy-policy';
+import { Imprint } from './components/imprint/imprint';
+import { PrivacyPolicy } from './components/privacy-policy/privacy-policy';
 
 export const routes: Routes = [
   {

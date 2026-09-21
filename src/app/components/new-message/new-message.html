@@ -8,7 +8,7 @@
             @if (userSuggestions().length) {
             <ul class="recipient-suggestions" role="listbox" aria-label="Mitglied auswählen">
                 @for (user of userSuggestions(); track user.uid) {
-                <li><button type="button" (click)="selectRecipient(user)"><img [src]="avatar(user)" alt=""><span>{{ user.name }}</span></button></li>
+                <li><button type="button" (click)="selectRecipient(user)"><img [src]="user.avatar | avatarUrl" alt=""><span>{{ user.name }}</span></button></li>
                 }
             </ul>
             }
@@ -23,7 +23,7 @@
     </header>
 
     <div class="new-message-body">
-        <form class="message-composer" (submit)="sendMessage($event)">
+        <form class="message-composer" (submit)="sendMessage($event)" novalidate>
             <textarea #editor aria-label="Neue Nachricht" placeholder="Starte eine neue Nachricht"
                 [value]="draft()" (input)="draft.set(editor.value)"></textarea>
             <div class="composer-actions">

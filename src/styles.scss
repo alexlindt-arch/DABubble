@@ -4,6 +4,22 @@
     font-family: 'Nunito';
 }
 
+/* Buttons und Eingabefelder starten ohne Browser-Rahmen; jede Komponente
+   bringt ihren eigenen Rahmen mit, wenn das Design einen vorsieht. */
+button,
+input,
+textarea {
+  border: none;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+}
+
 input:focus {
   outline: none;
 }

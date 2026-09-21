@@ -1,6 +1,6 @@
 import { effect, inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { AppUser } from '../models';
+import { AppUser } from '../shared/models';
 import { AuthService } from './auth.service';
 import { GuestCleanupService } from './guest-cleanup.service';
 

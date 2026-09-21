@@ -59,3 +59,17 @@ export interface DirectConversationProfile {
 export interface DirectConversation extends DirectConversationProfile {
   id: string;
 }
+
+/** A conversation selected from the sidebar or from a search result. */
+export interface ConversationSelection {
+  type: 'channel' | 'direct';
+  id: string;
+  user?: AppUser;
+  channel?: Channel;
+}
+
+/** Name and description submitted from the channel information dialog. */
+export interface ChannelEdit {
+  name: string;
+  description: string;
+}
