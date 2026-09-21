@@ -185,7 +185,7 @@ directChats/{conversationId}                members[], createdAt, lastMessage, l
 directChats/{conversationId}/messages/{id}  text, senderId, timestamp, reactions{}, parentId?
 ```
 
-Die ID einer Direktnachrichten-Konversation ergibt sich deterministisch aus beiden alphabetisch sortierten Teilnehmer-UIDs — so landen beide Seiten immer im selben Dokument. Die vollständige Backend-Dokumentation steht in [FIREBASE.md](FIREBASE.md), die Zugriffsrechte in [firestore.rules](firestore.rules).
+Die ID einer Direktnachrichten-Konversation ergibt sich deterministisch aus beiden alphabetisch sortierten Teilnehmer-UIDs — so landen beide Seiten immer im selben Dokument. Die Zugriffsrechte stehen in [firestore.rules](firestore.rules).
 
 ### Architekturentscheidungen
 
@@ -195,7 +195,7 @@ Die ID einer Direktnachrichten-Konversation ergibt sich deterministisch aus beid
 
 ## Mitwirken
 
-Das Projekt ist eine Kursarbeit, Pull Requests und Issues sind aber willkommen. Bitte halte dich an die Konventionen aus [CLAUDE.md](CLAUDE.md): striktes TypeScript, Funktionen mit genau einer Aufgabe und höchstens 14 Zeilen, camelCase und maximal 400 Zeilen pro Datei.
+Das Projekt ist eine Kursarbeit, Pull Requests und Issues sind aber willkommen. Bitte halte dich an die etablierten Konventionen im Repository (striktes TypeScript, Funktionen mit genau einer Aufgabe und höchstens 14 Zeilen, camelCase und maximal 400 Zeilen pro Datei).
 
 ## Team
 
