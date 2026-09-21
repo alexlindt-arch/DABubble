@@ -91,14 +91,14 @@ input { padding: 0 20px; }
   color: #686868;
 
   &:focus-within { border-color: #535af1; }
-  &.invalid { border-color: #ed1e79; }
+  &.invalid { border-color: #e11c73; }
 
   input { flex: 1; width: 0; height: 100%; padding-left: 16px; border: none; }
 }
 
 .error-message {
   margin: 6px 20px 0;
-  color: #ed1e79;
+  color: #e11c73;
   font-size: 16px;
 }
 
