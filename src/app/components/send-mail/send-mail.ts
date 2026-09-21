@@ -7,7 +7,7 @@ import { AuthService } from '../../services/auth.service';
 @Component({
   imports: [ReactiveFormsModule, RouterLink],
   selector: 'app-send-mail',
-  styleUrl: './send-mail.scss',
+  styleUrls: ['./send-mail.scss', './send-mail-responsive.scss'],
   templateUrl: './send-mail.html',
 })
 /** Handles password-reset email requests. */

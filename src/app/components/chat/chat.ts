@@ -34,7 +34,8 @@ import { ProfileDialog } from '../profile-dialog/profile-dialog';
 @Component({
   imports: [ProfileDialog, AvatarUrlPipe, MessageDatePipe, MessageTimePipe, ReplyCountPipe],
   selector: 'app-chat',
-  styleUrls: ['./chat.scss', './chat-channel.scss', './chat-channel-reactions.scss', './chat-channel-responsive.scss'],
+  styleUrls: ['./chat.scss', './chat-responsive.scss', './chat-channel.scss', './chat-channel-messages.scss',
+    './chat-channel-reactions.scss', './chat-channel-responsive.scss'],
   templateUrl: './chat.html',
 })
 /** Manages channel and direct-message chat interactions. */

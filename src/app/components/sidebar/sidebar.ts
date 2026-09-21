@@ -11,7 +11,7 @@ import { AvatarUrlPipe } from '../../pipes/avatar-url.pipe';
 @Component({
   imports: [AvatarUrlPipe],
   selector: 'app-sidebar',
-  styleUrl: './sidebar.scss',
+  styleUrls: ['./sidebar.scss', './sidebar-responsive.scss'],
   templateUrl: './sidebar.html',
 })
 /** Manages workspace navigation, conversations, and unread notifications. */

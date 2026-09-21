@@ -35,7 +35,8 @@ import { toggleHeightFor } from '../../shared/toggle-height';
   selector: 'app-main-layout',
   imports: [Sidebar, Chat, Thread, CreateChannelDialog, AddPeopleDialog, MembersDialog, NewMessage, ProfileDialog, ChannelInfoDialog],
   templateUrl: './main-layout.html',
-  styleUrls: ['./main-layout.scss', './main-layout-mobile.scss', './main-layout-overlays.scss'],
+  styleUrls: ['./main-layout.scss', './main-layout-profile-menu.scss', './main-layout-mobile.scss',
+    './main-layout-overlays.scss'],
 })
 /** Coordinates workspace navigation, dialogs, search, and conversation state. */
 export class MainLayout {

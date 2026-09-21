@@ -30,7 +30,8 @@ import { ProfileDialog } from '../profile-dialog/profile-dialog';
 @Component({
   imports: [ProfileDialog, MessageTimePipe, ReplyCountPipe],
   selector: 'app-thread',
-  styleUrls: ['./thread.scss', './thread-actions.scss', './thread-pickers.scss', './thread-mobile.scss'],
+  styleUrls: ['./thread.scss', './thread-composer.scss', './thread-actions.scss', './thread-pickers.scss',
+    './thread-mobile.scss'],
   templateUrl: './thread.html',
 })
 /** Manages thread replies, reactions, editing, and mentions. */
