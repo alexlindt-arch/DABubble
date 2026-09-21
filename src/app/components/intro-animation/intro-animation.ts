@@ -11,7 +11,7 @@ interface LogoBox {
 
 const logoAspect = 243 / 70;
 const bodyIntroClass = 'intro-active';
-let introPlayedInSession = false;
+const introStorageKey = 'dabubble-intro-played';
 const visiblePhases: IntroPhase[] = ['ready', 'running', 'done'];
 const safeGap = 16;
 const minIconSize = 40;
@@ -112,14 +112,22 @@ function isLoginRoute(path: string): boolean {
   return route === '' || route === '/login';
 }
 
-/** Returns whether the intro animation has already played during this session. */
+/** Returns whether the intro animation has already played during this browser session. */
 function introAlreadyPlayed(): boolean {
-  return introPlayedInSession;
+  try {
+    return window.sessionStorage.getItem(introStorageKey) === '1';
+  } catch {
+    return false;
+  }
 }
 
-/** Marks the intro animation as played for the current session. */
+/** Marks the intro animation as played for the current browser session. */
 function markIntroPlayed(): void {
-  introPlayedInSession = true;
+  try {
+    window.sessionStorage.setItem(introStorageKey, '1');
+  } catch {
+    // Speicher nicht verfügbar (z. B. blockierte Cookies) – Animation läuft erneut.
+  }
 }
 
 /** Measures the static login logo used as the animation's starting position. */
