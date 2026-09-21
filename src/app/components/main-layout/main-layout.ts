@@ -10,6 +10,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
+import { NotificationService } from '../../services/notification.service';
 import { Sidebar } from '../sidebar/sidebar';
 import { Chat } from '../chat/chat';
 import { Thread } from '../thread/thread';
@@ -46,6 +47,7 @@ export class MainLayout {
   private readonly messageService = inject(MessageService);
   private readonly userService = inject(UserService);
   private readonly router = inject(Router);
+  private readonly notifications = inject(NotificationService);
 
   readonly currentUser = this.authService.currentUser;
   readonly searchQuery = signal('');
@@ -141,7 +143,10 @@ export class MainLayout {
   /** Signs the current user out and returns to the login screen. */
   logout(): void {
     this.closeProfileMenu();
-    this.authService.logout().finally(() => this.router.navigateByUrl('/login'));
+    this.authService.logout().finally(() => {
+      this.notifications.success('Du wurdest erfolgreich abgemeldet.');
+      this.router.navigateByUrl('/login');
+    });
   }
 
   /** Toggles the profile menu visibility. */

@@ -3,6 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { FirebaseError } from 'firebase/app';
 import { AuthService } from '../../services/auth.service';
+import { NotificationService } from '../../services/notification.service';
 
 
 @Component({
@@ -16,6 +17,7 @@ export class Register {
   private readonly formBuilder = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly notifications = inject(NotificationService);
 
   readonly registerForm = this.formBuilder.group({
     name: ['', [Validators.required, Validators.minLength(3)]],
@@ -30,8 +32,8 @@ export class Register {
   /** Returns the validation message for the name field. */
   get nameErrorMessage(): string {
     const name = this.registerForm.controls.name;
-    if (name.hasError('required')) return 'Bitte gib deinen Namen ein.';
-    if (name.hasError('minlength')) return 'Bitte gib deinen vollständigen Namen ein.';
+    if (name.hasError('required')) return 'Bitte gib deinen Benutzernamen ein.';
+    if (name.hasError('minlength')) return 'Bitte gib einen längeren Benutzernamen ein.';
     return '';
   }
 
@@ -86,6 +88,7 @@ export class Register {
 
   /** Opens avatar selection for the newly registered user. */
   private goToAvatarSelection(name: string, email: string): void {
+    this.notifications.success('Dein Konto wurde erfolgreich erstellt.');
     this.router.navigate(['/choose-avatar'], { state: { name, email } });
   }
 

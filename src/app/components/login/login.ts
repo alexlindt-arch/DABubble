@@ -4,6 +4,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FirebaseError } from 'firebase/app';
 import { AppUser } from '../../models';
 import { AuthService } from '../../services/auth.service';
+import { NotificationService } from '../../services/notification.service';
 import { GuestLoginDialog } from '../guest-login-dialog/guest-login-dialog';
 
 @Component({
@@ -17,6 +18,7 @@ export class Login {
   private readonly formBuilder = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly notifications = inject(NotificationService);
   private readonly route = inject(ActivatedRoute);
 
   readonly passwordReset = this.route.snapshot.queryParamMap.get('reset') === 'success';
@@ -100,6 +102,7 @@ export class Login {
       this.loginError = 'Das Gast-Profil konnte nicht angelegt werden. Bitte versuche es erneut.';
       return;
     }
+    this.notifications.success('Du wurdest erfolgreich als Gast angemeldet.');
     this.router.navigateByUrl('/main');
   }
 
@@ -129,6 +132,7 @@ export class Login {
   /** Routes authenticated users to avatar setup or the main workspace. */
   private goToMain(user: AppUser | null): void {
     if (user && !user.avatar) return void this.router.navigate(['/choose-avatar'], { state: user });
+    this.notifications.success('Du wurdest erfolgreich angemeldet.');
     this.router.navigateByUrl('/main');
   }
 

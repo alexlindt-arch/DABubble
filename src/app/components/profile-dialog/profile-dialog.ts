@@ -59,8 +59,8 @@ export class ProfileDialog {
   /** Returns the current profile-name validation message. */
   get nameErrorMessage(): string {
     const name = this.name().trim();
-    if (!name) return 'Bitte gib deinen Namen ein.';
-    if (name.length < 3) return 'Bitte gib deinen vollständigen Namen ein.';
+    if (!name) return 'Bitte gib deinen Benutzernamen ein.';
+    if (name.length < 3) return 'Bitte gib einen längeren Benutzernamen ein.';
     if (name.length > 50) return 'Der Name darf höchstens 50 Zeichen lang sein.';
     return /^[\p{L}]+(?:[ '\u2019-][\p{L}]+)*$/u.test(name)
       ? ''

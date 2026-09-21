@@ -1,4 +1,5 @@
 import {
+  afterNextRender,
   afterRenderEffect,
   Component,
   computed,
@@ -81,6 +82,7 @@ export class Thread {
 
   /** Initializes reply watching and keeps the thread scrolled to the latest message. */
   constructor() {
+    afterNextRender(() => this.editor()?.nativeElement.focus());
     afterRenderEffect(() => {
       this.replies();
       const history = this.history()?.nativeElement;
