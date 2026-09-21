@@ -58,6 +58,8 @@ $color-input-bg: rgba(236, 238, 254, 1);
   }
 
   .form-field__error {
+    position: static;
+    padding-top: 0;
     padding-left: 32px;
     font-size: 14px;
     line-height: 19px;

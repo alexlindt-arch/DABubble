@@ -83,10 +83,12 @@ $color-disabled-bg: rgba(215, 216, 250, 1);
 }
 
 .form-field {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 6px;
   text-align: left;
+  margin-bottom: 13px;
 }
 
 .input-group {
@@ -123,8 +125,14 @@ $color-disabled-bg: rgba(215, 216, 250, 1);
 }
 
 .form-field__error {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
   padding-left: 24px;
+  padding-top: 2px;
   font-size: 13px;
+  line-height: 16px;
   color: rgba(224, 34, 34, 1);
 }
 
