@@ -374,3 +374,16 @@
         }
     }
 }
+.welcome-channel-message {
+  max-width: 720px;
+  margin: auto;
+  padding: 32px;
+  border-radius: 24px;
+  color: #2d2d3f;
+  background: #eef0ff;
+  line-height: 1.6;
+}
+
+.welcome-channel-message h2 { margin-top: 0; }
+
+.welcome-channel-recommendation { margin-bottom: 0; }

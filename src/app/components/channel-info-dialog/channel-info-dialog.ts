@@ -23,6 +23,9 @@ export class ChannelInfoDialog {
   descriptionDraft = signal('');
   private lastSaveVersion = 0;
 
+  /** Indicates whether this is the protected welcome channel. */
+  get isWelcomeChannel(): boolean { return this.channel().name.trim().toLocaleLowerCase('de') === 'willkommenschannel'; }
+
   /** Closes active editors after the parent confirms a successful save. */
   constructor() {
     effect(() => {

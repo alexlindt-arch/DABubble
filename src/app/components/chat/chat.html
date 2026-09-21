@@ -200,7 +200,7 @@
     <header class="chat-header channel-chat-header">
         <button type="button" class="channel-title" (click)="openChannelInfo($event)"><span class="channel-name"># {{ activeChannel.name }}</span><span class="channel-arrow" aria-hidden="true"></span></button>
 
-        <div class="channel-header-actions">
+        @if (!isWelcomeChannel()) {<div class="channel-header-actions">
             <button type="button" class="channel-members" (click)="openMembers($event)"
                 [attr.aria-label]="'Mitglieder von ' + activeChannel.name + ' anzeigen'">
                 <span class="member-avatars">
@@ -217,12 +217,20 @@
                     <img class="add-member-icon-hover" src="assets/img/icons/add-user-hover.svg" alt="">
                 </span>
             </button>}
-        </div>
+        </div>}
     </header>
 
     <div class="chat-body channel-chat-body">
         <div #history class="chat-history" role="log" [attr.aria-label]="'Verlauf von ' + activeChannel.name"
             aria-live="polite">
+            @if (isWelcomeChannel()) {
+            <article class="welcome-channel-message">
+                <h2>Willkommen bei DABubble!</h2>
+                <p>Schön, dass du da bist. Bitte behandle alle Mitglieder respektvoll, bleibe freundlich und teile keine vertraulichen oder beleidigenden Inhalte.</p>
+                <p>Halte dich an die Themen der jeweiligen Channels und achte auf die Privatsphäre aller Beteiligten.</p>
+                <p class="welcome-channel-recommendation">Du bist automatisch Mitglied in <strong>#Allgemein</strong> und <strong>#News</strong>. Beide Channels kannst du jederzeit verlassen.</p>
+            </article>
+            } @else {
             @for (message of messages(); track message.id; let i = $index) {
             @if (showDateDivider(i)) {
             <div class="chat-date-divider"><span>{{ dateLabel(message) }}</span></div>
@@ -319,8 +327,10 @@
                 }
             </article>
             }
+            }
         </div>
 
+        @if (!isWelcomeChannel()) {
         <form class="message-composer" (submit)="sendChannelMessage($event)">
             <textarea #editor [attr.aria-label]="'Nachricht an #' + activeChannel.name"
                 [placeholder]="'Nachricht an #' + activeChannel.name"
@@ -355,6 +365,7 @@
             </ul>
             }
         </form>
+        }
     </div>
     }
 </section>

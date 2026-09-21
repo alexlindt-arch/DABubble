@@ -73,6 +73,7 @@ export class Chat {
   mentionStart = signal(0);
   mentionIndex = signal(0);
   readonly mentionSuggestions = computed(() => this.filteredMentionSuggestions());
+  readonly isWelcomeChannel = computed(() => this.channel()?.name.trim().toLocaleLowerCase('de') === 'willkommenschannel');
   emojis = [
     '😂', '❤️', '🤣', '👍', '😭',
     '💀', '🔥', '🥰', '😊', '🙏',

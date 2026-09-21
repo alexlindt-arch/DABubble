@@ -246,6 +246,7 @@ export class MainLayout {
       await this.messageService.deleteDirectConversationsForUser(uid);
       await this.userService.deleteUserProfile(uid);
       await this.authService.deleteCurrentAccount();
+      this.notifications.success('Dein Konto wurde erfolgreich gelöscht.');
       await this.router.navigateByUrl('/login');
     } catch (error) { this.accountDeleteError = this.accountDeletionError(error); }
     finally { this.accountDeleteBusy = false; }
@@ -371,6 +372,7 @@ export class MainLayout {
     const channel = this.selectedChannel();
     const uid = this.authService.currentUserId;
     if (!channel || !uid) return;
+    if (channel.name.trim().toLocaleLowerCase('de') === 'willkommenschannel') return;
     this.channelService.leaveChannel(channel.id, uid).then(() => this.openAfterLeaving(channel.id));
   }
 

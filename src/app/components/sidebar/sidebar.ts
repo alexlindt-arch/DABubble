@@ -25,6 +25,7 @@ export class Sidebar implements OnDestroy {
   private readonly channelMessageStops = new Map<string, Unsubscribe>();
   private readonly channelMessageIds = new Map<string, Set<string>>();
   private readonly lastDirectMessageIds = new Map<string, string>();
+  private welcomeCreationStarted = false;
   private readonly notificationSound: NotificationSoundService;
   private readonly stopWatchingUsers: Unsubscribe;
   private readonly stopWatchingChannels: Unsubscribe;
@@ -47,11 +48,19 @@ export class Sidebar implements OnDestroy {
   readonly messageAuthors = computed(() => this.firestoreUsers());
   readonly directConversationUserIds = computed(() => this.directConversationPartners());
 
-  constructor(userService: UserService, channelService: ChannelService, private readonly messageService: MessageService,
+  constructor(userService: UserService, private readonly channelService: ChannelService, private readonly messageService: MessageService,
     notificationSound: NotificationSoundService) {
     this.notificationSound = notificationSound;
     this.stopWatchingUsers = userService.watchUsers(users => this.firestoreUsers.set(users));
     this.stopWatchingChannels = channelService.watchChannels(channels => this.updateChannels(channels));
+    effect(() => {
+      const user = this.authService.currentUser();
+      const channels = this.firestoreChannels();
+      if (user) {
+        void this.ensureWelcomeChannel(user.uid, channels);
+        void this.ensureDefaultChannelMembership(user.uid, channels);
+      }
+    });
     effect(() => this.selectInitialConversation());
     effect(onCleanup => this.watchDirectConversations(onCleanup));
   }
@@ -179,8 +188,41 @@ export class Sidebar implements OnDestroy {
   private visibleChannels(): Channel[] {
     const user = this.authService.currentUser();
     if (!user) return [];
-    if (user.guestUntil) return this.firestoreChannels();
-    return this.firestoreChannels().filter(channel => channel.members.includes(user.uid));
+    const channels = user.guestUntil
+      ? this.firestoreChannels()
+      : this.firestoreChannels().filter(channel => this.isPublicChannel(channel) || channel.members.includes(user.uid));
+    return this.sortWelcomeChannelFirst(channels);
+  }
+
+  /** Places the protected welcome channel before all other channels. */
+  private sortWelcomeChannelFirst(channels: Channel[]): Channel[] {
+    return [...channels].sort((a, b) => Number(!this.isWelcomeChannel(a)) - Number(!this.isWelcomeChannel(b)));
+  }
+
+  /** Checks whether a channel is the protected welcome channel. */
+  private isWelcomeChannel(channel: Channel): boolean {
+    return channel.name.trim().toLocaleLowerCase('de') === 'willkommenschannel';
+  }
+
+  /** Identifies channels that every signed-in user may join. */
+  private isPublicChannel(channel: Channel): boolean {
+    const name = channel.name.trim().toLocaleLowerCase('de');
+    return name === 'allgemein' || name === 'news' || name === 'willkommenschannel';
+  }
+
+  /** Adds a signed-in user to the default shared channels. */
+  private async ensureDefaultChannelMembership(uid: string, channels: Channel[]): Promise<void> {
+    const defaults = channels.filter(channel => ['allgemein', 'news', 'willkommenschannel']
+      .includes(channel.name.trim().toLocaleLowerCase('de')));
+    await Promise.all(defaults.filter(channel => !channel.members.includes(uid))
+      .map(channel => this.channelService.addMembers(channel.id, [uid])));
+  }
+
+  /** Ensures the protected welcome channel exists for existing workspaces. */
+  private async ensureWelcomeChannel(uid: string, channels: Channel[]): Promise<void> {
+    if (this.welcomeCreationStarted || !channels.length) return;
+    this.welcomeCreationStarted = true;
+    await this.channelService.ensureWelcomeChannel(uid, channels);
   }
 
   /** Returns the latest direct-message timestamp with a user. */
@@ -228,6 +270,7 @@ export class Sidebar implements OnDestroy {
   /** Selects a channel or direct conversation and emits the selection. */
   selectConversation(type: 'channel' | 'direct', id: string): void {
     this.selectedConversation = `${type}:${id}`;
+    if (type === 'channel') void this.joinPublicChannel(id);
     if (type === 'channel') this.markChannelRead(id);
     const user = type === 'direct' ? this.users().find(item => item.uid === id) : undefined;
     const channel = type === 'channel' ? this.channels().find(item => item.id === id) : undefined;
@@ -271,5 +314,13 @@ export class Sidebar implements OnDestroy {
   openConversation(type: 'channel' | 'direct', id: string): void {
     this.selectConversation(type, id);
     this.conversationOpened.emit();
+  }
+
+  /** Adds the current user to a public channel when it is opened. */
+  private async joinPublicChannel(channelId: string): Promise<void> {
+    const user = this.authService.currentUser();
+    const channel = this.channels().find(item => item.id === channelId);
+    if (!user || !channel || !this.isPublicChannel(channel) || channel.members.includes(user.uid)) return;
+    await this.channelService.addMembers(channelId, [user.uid]);
   }
 }

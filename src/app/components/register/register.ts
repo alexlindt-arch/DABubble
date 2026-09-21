@@ -20,7 +20,7 @@ export class Register {
   private readonly notifications = inject(NotificationService);
 
   readonly registerForm = this.formBuilder.group({
-    name: ['', [Validators.required, Validators.minLength(3)]],
+    name: ['', [Validators.required, Validators.minLength(3), Validators.pattern(/^[\p{L}]+(?:[ '\u2019-][\p{L}]+)*$/u)]],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]],
     acceptPrivacy: [false, [Validators.requiredTrue]],
@@ -32,8 +32,9 @@ export class Register {
   /** Returns the validation message for the name field. */
   get nameErrorMessage(): string {
     const name = this.registerForm.controls.name;
-    if (name.hasError('required')) return 'Bitte gib deinen Benutzernamen ein.';
-    if (name.hasError('minlength')) return 'Bitte gib einen längeren Benutzernamen ein.';
+    if (name.hasError('required')) return 'Bitte gib deinen Namen ein.';
+    if (name.hasError('minlength')) return 'Bitte gib einen längeren Namen ein.';
+    if (name.hasError('pattern')) return 'Der Name darf nur Buchstaben, Leerzeichen und Bindestriche enthalten.';
     return '';
   }
 

@@ -76,6 +76,13 @@ export class ChannelService {
     return channels.docs.map(channel => this.toChannel(channel));
   }
 
+  /** Creates the protected welcome channel when it does not exist yet. */
+  async ensureWelcomeChannel(creatorUid: string, channels: Channel[]): Promise<void> {
+    const exists = channels.some(channel => channel.name.trim().toLocaleLowerCase('de') === 'willkommenschannel');
+    if (exists || !channels.length) return;
+    await this.createChannel('Willkommenschannel', 'Willkommen und wichtige Verhaltensregeln für alle Mitglieder.', creatorUid);
+  }
+
   /** Handles deleteChannel. */
   deleteChannel(channelId: string): Promise<void> {
     return deleteDoc(this.channelRef(channelId));
