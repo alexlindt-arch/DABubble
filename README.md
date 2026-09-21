@@ -28,7 +28,7 @@ Das Projekt folgt durchgängig einer verbindlichen Coding-Richtlinie: TypeScript
 
 ## Live-Demo
 
-> 🚧 Deployment läuft — die öffentliche URL wird hier verlinkt.
+https://dabubble-3258.developerakademie.net/angular-projects/dabubble/login
 
 **Ausprobieren ohne Registrierung?** Die Anmeldeseite bietet eine **Gast-Sitzung**: ein temporäres Konto mit vollem Zugriff auf alle Funktionen. Die Sitzung und sämtliche dabei erzeugten Daten werden nach 15 Minuten automatisch gelöscht.
 
