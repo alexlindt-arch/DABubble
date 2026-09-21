@@ -2,7 +2,7 @@
 .sidebar-toggle {
   position: fixed;
   bottom: 14.07vh;
-  left: 0;
+  left: max(0px, calc((100vw - 1445px) / 2));
   z-index: 30;
 
   display: flex;

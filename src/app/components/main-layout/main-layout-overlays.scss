@@ -5,7 +5,7 @@
     display: flex;
     align-items: flex-start;
     justify-content: flex-end;
-    padding: calc(clamp(64px, 6.25vw, 120px) + 8px) calc(clamp(0px, 1.2vw, 16px) + 16px) 16px;
+    padding: calc(clamp(64px, 6.25vw, 120px) + 8px) max(calc(clamp(0px, 1.2vw, 16px) + 16px), calc((100vw - 1445px) / 2 + 16px)) 16px;
     box-sizing: border-box;
     background: rgba(0, 0, 0, 0.6);
 }
