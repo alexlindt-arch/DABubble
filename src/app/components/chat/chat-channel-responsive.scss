@@ -3,7 +3,7 @@
     .channel-members { gap: 10px; }
     .member-avatars img { width: 30px; height: 30px; }
     .add-member-button { width: 30px; height: 30px; }
-    .member-count { font-size: 15px; }
+    .member-count { font-size: 16px; }
 }
 
 // Match the compact profile size used by the main navigation below 1024px.
@@ -112,7 +112,7 @@
     .channel-message-column { gap: 8px; flex: initial; }
     .channel-message-meta { gap: 20px; }
     .channel-message-author { font-size: 18px; line-height: 25px; font-weight: 700; }
-    .channel-message-time { color: #686868; font-size: 14px; line-height: 19px; }
+    .channel-message-time { color: #686868; font-size: 16px; line-height: 19px; }
     .channel-message-bubble { max-width: none; padding: 15px; border-radius: 0 20px 20px 20px; font-size: 18px; line-height: 25px; }
     .channel-message-replies { margin: 0; color: #535af1; font-size: 18px; }
 

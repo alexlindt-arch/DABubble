@@ -70,3 +70,12 @@ body.intro-active .login-card {
   font-weight: 800;
 }
 
+
+@media (min-width: 601px) {
+  [class$="-page__header"],
+  [class$="-page__footer"] {
+    width: 100%;
+    max-width: 1445px;
+    margin-inline: auto;
+  }
+}

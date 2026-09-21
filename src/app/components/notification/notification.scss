@@ -9,7 +9,7 @@
   color: #fff;
   background: #444ce7;
   box-shadow: 0 8px 24px rgb(0 0 0 / 18%);
-  font-size: 15px;
+  font-size: 16px;
   transform: translate(-50%, calc(-50% + 24px));
   animation: notification-enter 350ms ease-out forwards, notification-leave 350ms ease-in 2.35s forwards;
 }
@@ -25,7 +25,7 @@
     padding: 12px 16px;
     border-radius: 10px;
     text-align: center;
-    font-size: 14px;
+    font-size: 16px;
   }
 }
 

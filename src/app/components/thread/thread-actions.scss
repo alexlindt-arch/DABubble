@@ -64,7 +64,7 @@
 }
 
 .thread-message-edited {
-    font-size: 12px;
+    font-size: 16px;
     line-height: 16px;
     color: #686868;
 }
@@ -224,7 +224,7 @@
     padding: 10px 15px;
     background: #444df2;
     border-radius: 25px 25px 0 25px;
-    font-size: 14px;
+    font-size: 16px;
     line-height: 19px;
     white-space: nowrap;
     color: white;
@@ -243,7 +243,7 @@
 @container thread (max-width: 430px) {
     .thread-edit-form button {
         padding: 6px 8px;
-        font-size: 14px;
+        font-size: 16px;
     }
 }
 
@@ -254,6 +254,6 @@
 
     .thread-edit-form button {
         padding: 6px 6px;
-        font-size: 13px;
+        font-size: 16px;
     }
 }

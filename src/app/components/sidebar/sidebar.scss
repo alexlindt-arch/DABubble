@@ -273,7 +273,7 @@
         border-radius: 11px;
         background: #444df2;
         color: #fff;
-        font-size: 12px;
+        font-size: 16px;
         font-weight: 700;
         line-height: 22px;
         text-align: center;
@@ -348,7 +348,7 @@
 }
 
 @media (max-width: 359px) {
-    .sidebar-navigation .conversation { padding: 8px 12px; font-size: 15px; }
+    .sidebar-navigation .conversation { padding: 8px 12px; font-size: 16px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

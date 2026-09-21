@@ -144,7 +144,7 @@ $color-disabled-bg: rgba(215, 216, 250, 1);
   gap: 12px;
   padding-left: 24px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 16px;
   color: rgba(0, 0, 0, 1);
 }
 
@@ -237,7 +237,7 @@ $color-disabled-bg: rgba(215, 216, 250, 1);
   padding: 10px 15px;
   border: 1px solid transparent;
   border-radius: 30px;
-  font-size: 14px;
+  font-size: 16px;
   color: $color-primary;
   text-decoration: none;
   cursor: pointer;
@@ -400,6 +400,6 @@ $color-disabled-bg: rgba(215, 216, 250, 1);
 
   .checkbox-group__text,
   .checkbox-group__link {
-    font-size: 15px;
+    font-size: 16px;
   }
 }
