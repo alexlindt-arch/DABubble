@@ -104,7 +104,13 @@ npm install
 
 ### Firebase konfigurieren
 
-Die Zugangsdaten liegen **nicht** im Repository. Lege `src/environments/environment.ts` (steht in `.gitignore`) mit deinen eigenen Projektschlüsseln an:
+Die Zugangsdaten liegen **nicht** im Repository. Kopiere die mitgelieferte Vorlage und trage die Schlüssel deines eigenen Firebase-Projekts ein:
+
+```bash
+cp src/environments/environment.example.ts src/environments/environment.ts
+```
+
+`environment.ts` steht in `.gitignore` und hat folgenden Aufbau:
 
 ```ts
 export const environment = {
@@ -185,7 +191,7 @@ directChats/{conversationId}                members[], createdAt, lastMessage, l
 directChats/{conversationId}/messages/{id}  text, senderId, timestamp, reactions{}, parentId?
 ```
 
-Die ID einer Direktnachrichten-Konversation ergibt sich deterministisch aus beiden alphabetisch sortierten Teilnehmer-UIDs — so landen beide Seiten immer im selben Dokument. Die vollständige Backend-Dokumentation steht in [FIREBASE.md](FIREBASE.md), die Zugriffsrechte in [firestore.rules](firestore.rules).
+Die ID einer Direktnachrichten-Konversation ergibt sich deterministisch aus beiden alphabetisch sortierten Teilnehmer-UIDs — so landen beide Seiten immer im selben Dokument. Die Zugriffsrechte sind in [firestore.rules](firestore.rules) und [storage.rules](storage.rules) definiert, die Indizes in [firestore.indexes.json](firestore.indexes.json).
 
 ### Architekturentscheidungen
 
@@ -195,7 +201,15 @@ Die ID einer Direktnachrichten-Konversation ergibt sich deterministisch aus beid
 
 ## Mitwirken
 
-Das Projekt ist eine Kursarbeit, Pull Requests und Issues sind aber willkommen. Bitte halte dich an die Konventionen aus [CLAUDE.md](CLAUDE.md): striktes TypeScript, Funktionen mit genau einer Aufgabe und höchstens 14 Zeilen, camelCase und maximal 400 Zeilen pro Datei.
+Das Projekt ist eine Kursarbeit, Pull Requests und Issues sind aber willkommen. Für den Code gelten folgende Konventionen:
+
+- TypeScript im **Strict Mode**
+- Eine Funktion erfüllt **genau eine Aufgabe** und ist höchstens **14 Zeilen** lang
+- **camelCase** für Funktionen und Variablen, beschreibende und kurze Namen
+- Maximal **400 Zeilen** pro Datei
+- Formatierung über Prettier ([.prettierrc](.prettierrc))
+
+Vor einem Pull Request gilt: keine Fehler in der Konsole, alle Links und Buttons funktionieren, das Layout bleibt bis 320 px ohne horizontalen Scrollbalken.
 
 ## Team
 

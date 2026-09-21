@@ -43,9 +43,20 @@ __screenshots__/
 .DS_Store
 Thumbs.db
 
-# Local notes / AI assistant docs (not pushed)
-!README.md
+# Interne Notizen und Werkzeug-Konfiguration (nicht im Repo)
 /docs
+/.claude
+CLAUDE.md
+CHECKLISTE.md
+FIREBASE.md
+STATUS.md
+passwort-zuruecksetzen.md
+
+# Lokale Umgebungsvariablen
+.env
+.env.*
+!.env.example
+*.log
 
 # Firebase
 /.firebase
@@ -53,7 +64,5 @@ firebase-debug.log
 firestore-debug.log
 ui-debug.log
 /src/environments/environment.ts
-STATUS.md
-passwort-zuruecksetzen.md
 
 
